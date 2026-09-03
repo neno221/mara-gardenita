@@ -97,7 +97,30 @@ type Capture = {
 
 /** Runs in the page. Kept self-contained: it is serialised across the boundary. */
 function collect() {
-  const HASH = /__[A-Za-z0-9_-]{4,10}$/;
+  // Next hashes CSS-module class names from the file's path and contents, and it
+  // changed where the hash sits between 15 and 16:
+  //
+  //   Next 15   Section_section__rXxcK              (hash last)
+  //   Next 16   Section-module__27SNAG__section     (hash in the middle)
+  //
+  // Both canonicalise to `Section_section`, so a baseline survives the framework
+  // upgrade and a phase-4 stylesheet edit alike. next/font classes carry their own
+  // 8-hex digest (`marcellus_f7fbba0d-module__KTf9Wa__variable`), which moves when
+  // layout.tsx moves, so that is stripped too.
+  const NEXT16 = /^(.+?)-module__[A-Za-z0-9_-]+?__(.+)$/;
+  const NEXT15 = /^(.+)__[A-Za-z0-9_-]{4,10}$/;
+  const FONT_DIGEST = /_[0-9a-f]{8}_/;
+
+  const canon = (c: string): string => {
+    const m16 = c.match(NEXT16);
+    if (m16) c = m16[1] + "_" + m16[2];
+    else {
+      const m15 = c.match(NEXT15);
+      if (m15) c = m15[1];
+    }
+    return c.replace(FONT_DIGEST, "_");
+  };
+
   const SKIP = new Set([
     "SCRIPT",
     "STYLE",
@@ -114,7 +137,7 @@ function collect() {
     String(cls ?? "")
       .split(/\s+/)
       .filter(Boolean)
-      .map((c) => c.replace(HASH, ""))
+      .map(canon)
       .sort()
       .join(" ");
 
