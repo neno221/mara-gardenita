@@ -1,0 +1,976 @@
+{
+  "route": "home",
+  "path": "/",
+  "width": 375,
+  "title": "Loovio — Destination Wedding Planners & Event Designers",
+  "scrollHeight": 9022,
+  "classSequence": [
+    "div",
+    "header.SiteHeader_navbar",
+    "a.SiteHeader_brandMobile",
+    "img.SiteHeader_logoMobile",
+    "div.SiteHeader_navOverlay",
+    "nav.SiteHeader_navMenu",
+    "div.SiteHeader_navGrid",
+    "div.SiteHeader_navGroup SiteHeader_navGroupLeading",
+    "a.SiteHeader_navLink",
+    "br",
+    "a.SiteHeader_navLink",
+    "a.SiteHeader_brand",
+    "img.SiteHeader_logo",
+    "div.SiteHeader_navGroup SiteHeader_navGroupTrailing",
+    "a.SiteHeader_navLink",
+    "a.SiteHeader_navLink",
+    "button.SiteHeader_menuButton",
+    "img.SiteHeader_menuIcon",
+    "div.SiteHeader_borderNav",
+    "div.SiteShell_page",
+    "div.HeroTop_sectionHero",
+    "div.Section_content",
+    "div.HeroTop_heroTop",
+    "div.HeroTop_borderTop",
+    "img.Section_sprig",
+    "div.Section_subtitle",
+    "br",
+    "h1.HeroTop_headingHero",
+    "a.buttons_link",
+    "div.HeroTop_borderDown",
+    "div.Hero_collage",
+    "div.Hero_collageInner",
+    "div.Hero_frameLeft",
+    "img.photo_fill",
+    "div.Hero_frameRight",
+    "img.photo_fill",
+    "div.Hero_frame",
+    "img.photo_fill",
+    "img.Hero_petalsBack",
+    "img.Hero_petalsFront",
+    "div.Section_section",
+    "div.Section_content",
+    "div.ServiceGrid_grid",
+    "div.ServiceGrid_service",
+    "img.ServiceGrid_icon",
+    "a.ServiceGrid_titleLink",
+    "h4.ServiceGrid_title",
+    "p.ServiceGrid_copy",
+    "a.buttons_link",
+    "div.ServiceGrid_service",
+    "img.ServiceGrid_icon",
+    "a.ServiceGrid_titleLink",
+    "h4.ServiceGrid_title",
+    "p.ServiceGrid_copy",
+    "a.buttons_link",
+    "div.ServiceGrid_service",
+    "img.ServiceGrid_icon",
+    "a.ServiceGrid_titleLink",
+    "h4.ServiceGrid_title",
+    "p.ServiceGrid_copy",
+    "a.buttons_link",
+    "div.Section_section",
+    "div.Section_content",
+    "div.StorySplit_grid",
+    "div.StorySplit_text",
+    "img.Section_sprig",
+    "div.Section_subtitle",
+    "br",
+    "h2.Section_heading",
+    "p.Section_paragraph",
+    "a.buttons_button",
+    "div.StorySplit_figure StorySplit_figureFirst",
+    "div.photo_frame",
+    "img.photo_fill",
+    "img.StorySplit_petalsTall",
+    "div.Section_section",
+    "div.Section_content",
+    "div.StorySplit_grid",
+    "div.StorySplit_figure",
+    "div.photo_frame",
+    "img.photo_fill",
+    "img.StorySplit_petalsWide",
+    "div.StorySplit_text",
+    "img.Section_sprig",
+    "div.Section_subtitle",
+    "br",
+    "h2.Section_heading",
+    "p.Section_paragraph",
+    "a.buttons_button",
+    "div.Section_section",
+    "div.Section_content",
+    "div.Section_blockHeading Section_blockHeadingSpaced",
+    "img.Section_sprig",
+    "div.Section_subtitle",
+    "br",
+    "h2.Section_heading",
+    "div.PortfolioGrid_wrapper",
+    "div.PortfolioGrid_grid",
+    "div.PortfolioCard_item",
+    "a.PortfolioCard_frame",
+    "img.PortfolioCard_image",
+    "div.PortfolioCard_caption",
+    "a.PortfolioCard_titleLink",
+    "h5.PortfolioCard_title",
+    "a.buttons_link",
+    "div.PortfolioCard_item",
+    "a.PortfolioCard_frame",
+    "img.PortfolioCard_image",
+    "div.PortfolioCard_caption",
+    "a.PortfolioCard_titleLink",
+    "h5.PortfolioCard_title",
+    "a.buttons_link",
+    "div.PortfolioCard_item",
+    "a.PortfolioCard_frame",
+    "img.PortfolioCard_image",
+    "div.PortfolioCard_caption",
+    "a.PortfolioCard_titleLink",
+    "h5.PortfolioCard_title",
+    "a.buttons_link",
+    "div.PortfolioCard_item",
+    "a.PortfolioCard_frame",
+    "img.PortfolioCard_image",
+    "div.PortfolioCard_caption",
+    "a.PortfolioCard_titleLink",
+    "h5.PortfolioCard_title",
+    "a.buttons_link",
+    "a.buttons_button",
+    "div.Section_section",
+    "div.Section_content",
+    "div.Section_blockHeading Section_blockHeadingSpaced",
+    "img.Section_sprig",
+    "div.Section_subtitle",
+    "br",
+    "h2.Section_heading",
+    "div.Testimonials_slider",
+    "div.Testimonials_mask",
+    "div.Testimonials_slide Testimonials_slideActive",
+    "div.Testimonials_testimonial",
+    "img.Testimonials_portrait",
+    "p.Testimonials_quote",
+    "div.Testimonials_signature",
+    "div.Testimonials_slide",
+    "div.Testimonials_testimonial",
+    "img.Testimonials_portrait",
+    "p.Testimonials_quote",
+    "div.Testimonials_signature",
+    "div.Testimonials_slide",
+    "div.Testimonials_testimonial",
+    "img.Testimonials_portrait",
+    "p.Testimonials_quote",
+    "div.Testimonials_signature",
+    "button.Testimonials_arrowButton Testimonials_arrowLeft",
+    "img.Testimonials_arrow",
+    "button.Testimonials_arrowButton Testimonials_arrowRight",
+    "img.Testimonials_arrow",
+    "footer.SiteFooter_footer",
+    "div.Section_content",
+    "div.SiteFooter_rule",
+    "div.Section_blockHeading",
+    "h3.Section_heading",
+    "div.SiteFooter_instagramGrid",
+    "a.SiteFooter_instagramTile SiteFooter_instagramTileDropped",
+    "img.SiteFooter_instagramImage",
+    "a.SiteFooter_instagramTile",
+    "img.SiteFooter_instagramImage",
+    "a.SiteFooter_instagramTile SiteFooter_instagramTileDropped",
+    "img.SiteFooter_instagramImage",
+    "a.SiteFooter_instagramTile",
+    "img.SiteFooter_instagramImage",
+    "a.SiteFooter_instagramTile SiteFooter_instagramTileDropped",
+    "img.SiteFooter_instagramImage",
+    "a.SiteFooter_instagramTile",
+    "img.SiteFooter_instagramImage",
+    "div.SiteFooter_columns",
+    "div.SiteFooter_column",
+    "h5",
+    "a.SiteFooter_link",
+    "a.SiteFooter_link",
+    "a.SiteFooter_link",
+    "div.SiteFooter_column SiteFooter_columnDivided",
+    "h5",
+    "a.SiteFooter_link",
+    "a.SiteFooter_link",
+    "a.SiteFooter_link",
+    "div.SiteFooter_column",
+    "img.SiteFooter_logo",
+    "a.SiteFooter_link"
+  ],
+  "images": [
+    {
+      "i": 0,
+      "cls": "SiteHeader_logoMobile",
+      "alt": "Loovio",
+      "loading": "eager",
+      "src": "/images/logo.svg",
+      "srcSetWidths": [],
+      "srcSetUrls": [],
+      "sizes": null,
+      "naturalWidth": 124
+    },
+    {
+      "i": 1,
+      "cls": "SiteHeader_logo",
+      "alt": "Loovio",
+      "loading": "eager",
+      "src": "/images/logo.svg",
+      "srcSetWidths": [],
+      "srcSetUrls": [],
+      "sizes": null,
+      "naturalWidth": 124
+    },
+    {
+      "i": 2,
+      "cls": "SiteHeader_menuIcon",
+      "alt": "",
+      "loading": "eager",
+      "src": "/images/icon-menu.svg",
+      "srcSetWidths": [],
+      "srcSetUrls": [],
+      "sizes": null,
+      "naturalWidth": 18
+    },
+    {
+      "i": 3,
+      "cls": "Section_sprig",
+      "alt": "",
+      "loading": "eager",
+      "src": "/images/ornament-sprig.png",
+      "srcSetWidths": [],
+      "srcSetUrls": [],
+      "sizes": null,
+      "naturalWidth": 124
+    },
+    {
+      "i": 4,
+      "cls": "photo_fill",
+      "alt": "",
+      "loading": "eager",
+      "src": "/images/hero-left.jpg",
+      "srcSetWidths": [
+        500,
+        800,
+        803
+      ],
+      "srcSetUrls": [
+        "/images/hero-left-500.jpg",
+        "/images/hero-left-800.jpg",
+        "/images/hero-left.jpg"
+      ],
+      "sizes": "(max-width: 479px) 51vw, (max-width: 767px) 49vw, 375.1875px",
+      "naturalWidth": 191
+    },
+    {
+      "i": 5,
+      "cls": "photo_fill",
+      "alt": "",
+      "loading": "eager",
+      "src": "/images/hero-right.jpg",
+      "srcSetWidths": [
+        500,
+        800,
+        803
+      ],
+      "srcSetUrls": [
+        "/images/hero-right-500.jpg",
+        "/images/hero-right-800.jpg",
+        "/images/hero-right.jpg"
+      ],
+      "sizes": "(max-width: 479px) 51vw, (max-width: 767px) 49vw, 375.1875px",
+      "naturalWidth": 191
+    },
+    {
+      "i": 6,
+      "cls": "photo_fill",
+      "alt": "",
+      "loading": "eager",
+      "src": "/images/hero-center.jpg",
+      "srcSetWidths": [
+        500,
+        800,
+        908
+      ],
+      "srcSetUrls": [
+        "/images/hero-center-500.jpg",
+        "/images/hero-center-800.jpg",
+        "/images/hero-center.jpg"
+      ],
+      "sizes": "(max-width: 479px) 77vw, (max-width: 767px) 73vw, 560px",
+      "naturalWidth": 288
+    },
+    {
+      "i": 7,
+      "cls": "Hero_petalsBack",
+      "alt": "",
+      "loading": "eager",
+      "src": "/images/petals-rose.png",
+      "srcSetWidths": [],
+      "srcSetUrls": [],
+      "sizes": null,
+      "naturalWidth": 399
+    },
+    {
+      "i": 8,
+      "cls": "Hero_petalsFront",
+      "alt": "",
+      "loading": "eager",
+      "src": "/images/petals-stem.png",
+      "srcSetWidths": [],
+      "srcSetUrls": [],
+      "sizes": null,
+      "naturalWidth": 292
+    },
+    {
+      "i": 9,
+      "cls": "ServiceGrid_icon",
+      "alt": "",
+      "loading": "eager",
+      "src": "/images/icon-service-weddings.png",
+      "srcSetWidths": [],
+      "srcSetUrls": [],
+      "sizes": null,
+      "naturalWidth": 138
+    },
+    {
+      "i": 10,
+      "cls": "ServiceGrid_icon",
+      "alt": "",
+      "loading": "eager",
+      "src": "/images/icon-service-event-design.png",
+      "srcSetWidths": [],
+      "srcSetUrls": [],
+      "sizes": null,
+      "naturalWidth": 138
+    },
+    {
+      "i": 11,
+      "cls": "ServiceGrid_icon",
+      "alt": "",
+      "loading": "eager",
+      "src": "/images/icon-service-branding.png",
+      "srcSetWidths": [],
+      "srcSetUrls": [],
+      "sizes": null,
+      "naturalWidth": 138
+    },
+    {
+      "i": 12,
+      "cls": "Section_sprig",
+      "alt": "",
+      "loading": "eager",
+      "src": "/images/ornament-sprig.png",
+      "srcSetWidths": [],
+      "srcSetUrls": [],
+      "sizes": null,
+      "naturalWidth": 124
+    },
+    {
+      "i": 13,
+      "cls": "photo_fill",
+      "alt": "",
+      "loading": "eager",
+      "src": "/images/about-who-we-are.jpg",
+      "srcSetWidths": [
+        500,
+        800,
+        805
+      ],
+      "srcSetUrls": [
+        "/images/about-who-we-are-500.jpg",
+        "/images/about-who-we-are-800.jpg",
+        "/images/about-who-we-are.jpg"
+      ],
+      "sizes": "(max-width: 767px) 80vw, (max-width: 991px) 81vw, 77vw",
+      "naturalWidth": 300
+    },
+    {
+      "i": 14,
+      "cls": "StorySplit_petalsTall",
+      "alt": "",
+      "loading": "eager",
+      "src": "/images/petals-tall.png",
+      "srcSetWidths": [],
+      "srcSetUrls": [],
+      "sizes": null,
+      "naturalWidth": 364
+    },
+    {
+      "i": 15,
+      "cls": "photo_fill",
+      "alt": "",
+      "loading": "eager",
+      "src": "/images/about-what-we-do.jpg",
+      "srcSetWidths": [
+        500,
+        800,
+        805
+      ],
+      "srcSetUrls": [
+        "/images/about-what-we-do-500.jpg",
+        "/images/about-what-we-do-800.jpg",
+        "/images/about-what-we-do.jpg"
+      ],
+      "sizes": "(max-width: 767px) 80vw, (max-width: 991px) 81vw, 77vw",
+      "naturalWidth": 300
+    },
+    {
+      "i": 16,
+      "cls": "StorySplit_petalsWide",
+      "alt": "",
+      "loading": "eager",
+      "src": "/images/petals-wide.png",
+      "srcSetWidths": [],
+      "srcSetUrls": [],
+      "sizes": null,
+      "naturalWidth": 355
+    },
+    {
+      "i": 17,
+      "cls": "Section_sprig",
+      "alt": "",
+      "loading": "eager",
+      "src": "/images/ornament-sprig.png",
+      "srcSetWidths": [],
+      "srcSetUrls": [],
+      "sizes": null,
+      "naturalWidth": 124
+    },
+    {
+      "i": 18,
+      "cls": "Section_sprig",
+      "alt": "",
+      "loading": "eager",
+      "src": "/images/ornament-sprig.png",
+      "srcSetWidths": [],
+      "srcSetUrls": [],
+      "sizes": null,
+      "naturalWidth": 124
+    },
+    {
+      "i": 19,
+      "cls": "PortfolioCard_image",
+      "alt": "Jennifer & Oliver",
+      "loading": "eager",
+      "src": "/images/portfolio-jennifer-oliver.jpg",
+      "srcSetWidths": [
+        500,
+        628
+      ],
+      "srcSetUrls": [
+        "/images/portfolio-jennifer-oliver-500.jpg",
+        "/images/portfolio-jennifer-oliver.jpg"
+      ],
+      "sizes": "(max-width: 479px) 100vw, (max-width: 767px) 46vw, (max-width: 991px) 23vw, 22vw",
+      "naturalWidth": 375
+    },
+    {
+      "i": 20,
+      "cls": "PortfolioCard_image",
+      "alt": "Briana & Richard",
+      "loading": "eager",
+      "src": "/images/portfolio-briana-richard.jpg",
+      "srcSetWidths": [],
+      "srcSetUrls": [],
+      "sizes": null,
+      "naturalWidth": 628
+    },
+    {
+      "i": 21,
+      "cls": "PortfolioCard_image",
+      "alt": "Anne & Cameron",
+      "loading": "eager",
+      "src": "/images/portfolio-anne-cameron.jpg",
+      "srcSetWidths": [
+        500,
+        628
+      ],
+      "srcSetUrls": [
+        "/images/portfolio-anne-cameron-500.jpg",
+        "/images/portfolio-anne-cameron.jpg"
+      ],
+      "sizes": "(max-width: 479px) 100vw, (max-width: 767px) 46vw, (max-width: 991px) 23vw, 22vw",
+      "naturalWidth": 375
+    },
+    {
+      "i": 22,
+      "cls": "PortfolioCard_image",
+      "alt": "Linda & Charles",
+      "loading": "eager",
+      "src": "/images/portfolio-linda-charles.jpg",
+      "srcSetWidths": [
+        500,
+        628
+      ],
+      "srcSetUrls": [
+        "/images/portfolio-linda-charles-500.jpg",
+        "/images/portfolio-linda-charles.jpg"
+      ],
+      "sizes": "(max-width: 479px) 100vw, (max-width: 767px) 46vw, (max-width: 991px) 23vw, 22vw",
+      "naturalWidth": 375
+    },
+    {
+      "i": 23,
+      "cls": "Section_sprig",
+      "alt": "",
+      "loading": "eager",
+      "src": "/images/ornament-sprig.png",
+      "srcSetWidths": [],
+      "srcSetUrls": [],
+      "sizes": null,
+      "naturalWidth": 124
+    },
+    {
+      "i": 24,
+      "cls": "Testimonials_portrait",
+      "alt": "",
+      "loading": "eager",
+      "src": "/images/petals-rose.png",
+      "srcSetWidths": [],
+      "srcSetUrls": [],
+      "sizes": null,
+      "naturalWidth": 399
+    },
+    {
+      "i": 25,
+      "cls": "Testimonials_portrait",
+      "alt": "",
+      "loading": "eager",
+      "src": "/images/petals-wide.png",
+      "srcSetWidths": [],
+      "srcSetUrls": [],
+      "sizes": null,
+      "naturalWidth": 355
+    },
+    {
+      "i": 26,
+      "cls": "Testimonials_portrait",
+      "alt": "",
+      "loading": "eager",
+      "src": "/images/petals-tall.png",
+      "srcSetWidths": [],
+      "srcSetUrls": [],
+      "sizes": null,
+      "naturalWidth": 364
+    },
+    {
+      "i": 27,
+      "cls": "Testimonials_arrow",
+      "alt": "",
+      "loading": "eager",
+      "src": "/images/arrow-left.png",
+      "srcSetWidths": [],
+      "srcSetUrls": [],
+      "sizes": null,
+      "naturalWidth": 46
+    },
+    {
+      "i": 28,
+      "cls": "Testimonials_arrow",
+      "alt": "",
+      "loading": "eager",
+      "src": "/images/arrow-right.png",
+      "srcSetWidths": [],
+      "srcSetUrls": [],
+      "sizes": null,
+      "naturalWidth": 45
+    },
+    {
+      "i": 29,
+      "cls": "SiteFooter_instagramImage",
+      "alt": "",
+      "loading": "eager",
+      "src": "/images/instagram-1.jpg",
+      "srcSetWidths": [],
+      "srcSetUrls": [],
+      "sizes": null,
+      "naturalWidth": 401
+    },
+    {
+      "i": 30,
+      "cls": "SiteFooter_instagramImage",
+      "alt": "",
+      "loading": "eager",
+      "src": "/images/instagram-2.jpg",
+      "srcSetWidths": [],
+      "srcSetUrls": [],
+      "sizes": null,
+      "naturalWidth": 401
+    },
+    {
+      "i": 31,
+      "cls": "SiteFooter_instagramImage",
+      "alt": "",
+      "loading": "eager",
+      "src": "/images/instagram-3.jpg",
+      "srcSetWidths": [],
+      "srcSetUrls": [],
+      "sizes": null,
+      "naturalWidth": 401
+    },
+    {
+      "i": 32,
+      "cls": "SiteFooter_instagramImage",
+      "alt": "",
+      "loading": "eager",
+      "src": "/images/instagram-4.jpg",
+      "srcSetWidths": [],
+      "srcSetUrls": [],
+      "sizes": null,
+      "naturalWidth": 401
+    },
+    {
+      "i": 33,
+      "cls": "SiteFooter_instagramImage",
+      "alt": "",
+      "loading": "eager",
+      "src": "/images/instagram-5.jpg",
+      "srcSetWidths": [],
+      "srcSetUrls": [],
+      "sizes": null,
+      "naturalWidth": 401
+    },
+    {
+      "i": 34,
+      "cls": "SiteFooter_instagramImage",
+      "alt": "",
+      "loading": "eager",
+      "src": "/images/instagram-6.jpg",
+      "srcSetWidths": [],
+      "srcSetUrls": [],
+      "sizes": null,
+      "naturalWidth": 401
+    },
+    {
+      "i": 35,
+      "cls": "SiteFooter_logo",
+      "alt": "Loovio",
+      "loading": "eager",
+      "src": "/images/logo.svg",
+      "srcSetWidths": [],
+      "srcSetUrls": [],
+      "sizes": null,
+      "naturalWidth": 124
+    }
+  ],
+  "boxes": [
+    {
+      "i": 0,
+      "tag": "div",
+      "cls": "HeroTop_sectionHero",
+      "text": "Legendary partiesDestination Wedding Planners & ",
+      "brs": 0,
+      "margin": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "padding": [
+        0,
+        10,
+        54,
+        10
+      ],
+      "w": 375,
+      "h": 1039,
+      "fontSize": 18,
+      "lineHeight": 32
+    },
+    {
+      "i": 1,
+      "tag": "div",
+      "cls": "Section_section",
+      "text": "WeddingsAdipiscing mauris sed metus dictum eget ",
+      "brs": 0,
+      "margin": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "padding": [
+        54,
+        10,
+        54,
+        10
+      ],
+      "w": 375,
+      "h": 1066,
+      "fontSize": 18,
+      "lineHeight": 32
+    },
+    {
+      "i": 2,
+      "tag": "p",
+      "cls": "ServiceGrid_copy",
+      "text": "Adipiscing mauris sed metus dictum eget morbi al",
+      "brs": 0,
+      "margin": [
+        0,
+        0,
+        24,
+        0
+      ],
+      "padding": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "w": 320,
+      "h": 97,
+      "fontSize": 18,
+      "lineHeight": 32
+    },
+    {
+      "i": 3,
+      "tag": "p",
+      "cls": "ServiceGrid_copy",
+      "text": "Lectus sit turpis iaculis eu non sed turpis susc",
+      "brs": 0,
+      "margin": [
+        0,
+        0,
+        24,
+        0
+      ],
+      "padding": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "w": 320,
+      "h": 97,
+      "fontSize": 18,
+      "lineHeight": 32
+    },
+    {
+      "i": 4,
+      "tag": "p",
+      "cls": "ServiceGrid_copy",
+      "text": "Tristique sodales consectetur lectus feugiat mol",
+      "brs": 0,
+      "margin": [
+        0,
+        0,
+        24,
+        0
+      ],
+      "padding": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "w": 320,
+      "h": 97,
+      "fontSize": 18,
+      "lineHeight": 32
+    },
+    {
+      "i": 5,
+      "tag": "div",
+      "cls": "Section_section",
+      "text": "who we areWeave story into every thread of your ",
+      "brs": 0,
+      "margin": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "padding": [
+        54,
+        10,
+        54,
+        10
+      ],
+      "w": 375,
+      "h": 1016,
+      "fontSize": 18,
+      "lineHeight": 32
+    },
+    {
+      "i": 6,
+      "tag": "p",
+      "cls": "Section_paragraph",
+      "text": "Cras urna sed purus magna morbi morbi congue sus",
+      "brs": 0,
+      "margin": [
+        0,
+        0,
+        40,
+        0
+      ],
+      "padding": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "w": 298,
+      "h": 162,
+      "fontSize": 18,
+      "lineHeight": 32
+    },
+    {
+      "i": 7,
+      "tag": "div",
+      "cls": "Section_section",
+      "text": "What We DoWe are concept creators. We tell your ",
+      "brs": 0,
+      "margin": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "padding": [
+        54,
+        10,
+        54,
+        10
+      ],
+      "w": 375,
+      "h": 1016,
+      "fontSize": 18,
+      "lineHeight": 32
+    },
+    {
+      "i": 8,
+      "tag": "p",
+      "cls": "Section_paragraph",
+      "text": "Lorem ipsum dolor sit amet, consectetur adipisci",
+      "brs": 0,
+      "margin": [
+        0,
+        0,
+        40,
+        0
+      ],
+      "padding": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "w": 298,
+      "h": 162,
+      "fontSize": 18,
+      "lineHeight": 32
+    },
+    {
+      "i": 9,
+      "tag": "div",
+      "cls": "Section_section",
+      "text": "PortfolioEvent design to make your heart skip a ",
+      "brs": 0,
+      "margin": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "padding": [
+        54,
+        10,
+        54,
+        10
+      ],
+      "w": 375,
+      "h": 2912,
+      "fontSize": 18,
+      "lineHeight": 32
+    },
+    {
+      "i": 10,
+      "tag": "div",
+      "cls": "Section_section",
+      "text": "TestimonialsWhat our clients say“Turpis nullam d",
+      "brs": 0,
+      "margin": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "padding": [
+        54,
+        10,
+        54,
+        10
+      ],
+      "w": 375,
+      "h": 818,
+      "fontSize": 18,
+      "lineHeight": 32
+    },
+    {
+      "i": 11,
+      "tag": "p",
+      "cls": "Testimonials_quote",
+      "text": "“Turpis nullam dictum semper non. Sit libero ven",
+      "brs": 0,
+      "margin": [
+        0,
+        0,
+        26,
+        0
+      ],
+      "padding": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "w": 284,
+      "h": 259,
+      "fontSize": 18,
+      "lineHeight": 32
+    },
+    {
+      "i": 12,
+      "tag": "p",
+      "cls": "Testimonials_quote",
+      "text": "“Donec tortor pellentesque morbi aliquam quis du",
+      "brs": 0,
+      "margin": [
+        0,
+        0,
+        26,
+        0
+      ],
+      "padding": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "w": 284,
+      "h": 292,
+      "fontSize": 18,
+      "lineHeight": 32
+    },
+    {
+      "i": 13,
+      "tag": "p",
+      "cls": "Testimonials_quote",
+      "text": "“Faucibus in vulputate et amet. Vulputate eget e",
+      "brs": 0,
+      "margin": [
+        0,
+        0,
+        26,
+        0
+      ],
+      "padding": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "w": 284,
+      "h": 259,
+      "fontSize": 18,
+      "lineHeight": 32
+    }
+  ]
+}

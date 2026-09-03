@@ -1,0 +1,30 @@
+# The database for the Payload migration (docs/payload-plan.md, decision C).
+#
+# This is not a throwaway dev database. Decision C rules out hosted Postgres, so
+# the named volume below is the ONLY copy of every edit anyone makes in /admin.
+# Run `scripts/db-dump.ps1` before every `payload migrate`, and never
+# `docker compose down -v` without a dump in hand.
+
+services:
+  postgres:
+    image: postgres:17
+    container_name: mara-gardenita-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: loovio
+      POSTGRES_PASSWORD: loovio
+      POSTGRES_DB: loovio
+    ports:
+      - "5432:5432"
+    volumes:
+      - mara_gardenita_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U loovio -d loovio"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  # Named, not anonymous, so `docker compose down` (without -v) keeps the data.
+  mara_gardenita_pgdata:
+    name: mara_gardenita_pgdata

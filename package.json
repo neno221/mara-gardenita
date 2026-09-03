@@ -5,7 +5,13 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "fingerprint": "tsx scripts/fingerprint.ts",
+    "fingerprint:capture": "tsx scripts/fingerprint.ts --capture",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "db:dump": "powershell -ExecutionPolicy Bypass -File scripts/db-dump.ps1",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "gsap": "^3.13.0",
@@ -17,6 +23,8 @@
     "@types/node": "^22.15.3",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
+    "playwright": "^1.62.1",
+    "tsx": "^4.23.13",
     "typescript": "^5.8.3"
   }
 }
