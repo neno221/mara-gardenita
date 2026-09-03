@@ -1,0 +1,20 @@
+.image {
+  width: 100%;
+  height: 520px;
+  object-fit: cover;
+  opacity: 0;
+}
+
+@media screen and (max-width: 991px) {
+  .image {
+    height: 50vw;
+  }
+}
+
+/* Off the grid the tiles stack full width, so the photography goes back to its
+   own aspect ratio rather than being cropped to a band. */
+@media screen and (max-width: 767px) {
+  .image {
+    height: 100%;
+  }
+}

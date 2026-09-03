@@ -1,0 +1,352 @@
+.navbar {
+  z-index: 100;
+  width: 100%;
+  background-color: var(--background);
+  justify-content: center;
+  align-items: center;
+  padding: 20px 15px;
+  display: flex;
+  position: sticky;
+  top: 0;
+}
+
+.navGrid {
+  grid-column-gap: 23px;
+  grid-row-gap: 0px;
+  grid-template-rows: auto;
+  grid-template-columns: 1fr auto 1fr;
+  grid-auto-columns: 1fr;
+  align-items: center;
+  justify-items: stretch;
+  display: grid;
+}
+
+.navMenu {
+  width: 100%;
+  position: relative;
+}
+
+.navGroup {
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+/* The two link clusters hug the wordmark rather than filling their columns. */
+.navGroupLeading {
+  justify-self: end;
+}
+
+.navGroupTrailing {
+  justify-self: start;
+}
+
+.navLink {
+  color: var(--heading);
+  text-align: center;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 20px 27px;
+  font-family: var(--font-ui-stack);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 140%;
+  text-decoration: none;
+  vertical-align: top;
+  display: inline-block;
+  position: relative;
+}
+
+.navLink:hover {
+  color: var(--accent);
+}
+
+.brand {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 8px;
+  display: flex;
+  text-decoration: none;
+  position: relative;
+}
+
+.logo {
+  width: 124px;
+  height: 44px;
+  max-width: none;
+}
+
+.brandMobile {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 8px;
+  text-decoration: none;
+  position: relative;
+  display: none;
+}
+
+.logoMobile {
+  width: 124px;
+  height: 44px;
+}
+
+/* ---------- dropdowns ---------- */
+
+.dropdown {
+  z-index: 1;
+  text-align: left;
+  margin-left: auto;
+  margin-right: auto;
+  display: inline-block;
+  position: relative;
+}
+
+.dropdownToggle {
+  justify-content: center;
+  align-items: center;
+  padding: 20px 27px;
+  display: flex;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  background: none;
+  border: 0;
+  font: inherit;
+  text-decoration: none;
+  position: relative;
+  width: 100%;
+}
+
+.dropdownToggle:focus-visible {
+  outline: 1px dotted var(--subtitle);
+}
+
+.dropdownText {
+  color: var(--heading);
+  text-align: center;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-family: var(--font-ui-stack);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 140%;
+}
+
+.dropdownIcon {
+  color: var(--heading);
+  width: 1em;
+  height: 1em;
+  margin: 0 0 0 5px;
+  font-size: 10px;
+  line-height: 100%;
+  position: relative;
+}
+
+.dropdownIcon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.dropdownList {
+  min-width: 100%;
+  background-color: var(--white);
+  padding-top: 14px;
+  padding-bottom: 14px;
+  box-shadow: var(--shadow-panel);
+  display: none;
+  position: absolute;
+  opacity: 0;
+}
+
+.dropdownListOpen {
+  display: block;
+}
+
+.dropdownLink {
+  color: var(--heading);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 12px 30px;
+  font-family: var(--font-ui-stack);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 140%;
+  text-decoration: none;
+  white-space: nowrap;
+  vertical-align: top;
+  text-align: left;
+  display: block;
+  position: relative;
+}
+
+.dropdownLink:hover {
+  color: var(--accent);
+}
+
+/* ---------- mobile trigger + hairline ---------- */
+
+.menuButton {
+  cursor: pointer;
+  user-select: none;
+  padding: 18px;
+  font-size: 24px;
+  display: none;
+  position: relative;
+  background: none;
+  border: 0;
+}
+
+.menuIcon {
+  width: 18px;
+  height: 18px;
+  max-width: none;
+}
+
+.navOverlay {
+  display: contents;
+}
+
+.borderNav {
+  width: 90%;
+  height: 1px;
+  background-image: linear-gradient(
+    to right,
+    rgba(160, 164, 142, 0),
+    var(--border) 40%,
+    var(--border) 60%,
+    rgba(160, 164, 142, 0)
+  );
+  position: absolute;
+  bottom: 0%;
+  opacity: 0;
+}
+
+@media screen and (max-width: 991px) {
+  .navbar {
+    padding: 15px 20px;
+    position: relative;
+  }
+
+  .navGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .navGroup,
+  .navGroupLeading,
+  .navGroupTrailing {
+    flex-direction: column;
+    justify-self: center;
+  }
+
+  .brandMobile {
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+  }
+
+  .logoMobile {
+    width: 104px;
+    height: 36px;
+  }
+
+  .navOverlay {
+    display: block;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    height: 100vh;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+    /* Closed, the panel is parked above the top of this box, but its drop
+       shadow reaches back down under the bar. Taking it out of the paint
+       tree removes that smudge; the delay holds it through the slide out so
+       the closing animation still plays. */
+    visibility: hidden;
+    transition: visibility 0s linear 0.4s;
+  }
+
+  .navOverlayOpen {
+    pointer-events: auto;
+    visibility: visible;
+    transition-delay: 0s;
+  }
+
+  .navMenu {
+    background-color: var(--background);
+    padding-bottom: 25px;
+    padding-left: 20px;
+    padding-right: 20px;
+    box-shadow: 0 50px 50px -20px rgba(46, 48, 39, 0.1);
+    width: 100%;
+    position: relative;
+    transform: translateY(-100%);
+  }
+
+  .brand {
+    display: none;
+  }
+
+  .dropdown {
+    width: 100%;
+  }
+
+  .dropdownList {
+    position: relative;
+    box-shadow: none;
+    background-color: transparent;
+    padding-top: 0;
+    padding-bottom: 0;
+    text-align: center;
+  }
+
+  .dropdownLink {
+    text-align: center;
+  }
+
+  .menuButton {
+    width: 48px;
+    height: 48px;
+    color: var(--heading);
+    border-radius: 50%;
+    padding: 15px;
+    font-size: 20px;
+    line-height: 0%;
+    transition: box-shadow 0.4s var(--ease),
+      background-color 0.4s var(--ease);
+    position: absolute;
+    right: 20px;
+    display: block;
+  }
+
+  .menuButtonOpen {
+    background-color: var(--white);
+    color: var(--heading);
+    box-shadow: var(--shadow-panel);
+  }
+
+  .borderNav {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 479px) {
+  .navbar {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .navMenu {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .menuButton {
+    right: 10px;
+  }
+}

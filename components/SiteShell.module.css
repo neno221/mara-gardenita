@@ -1,0 +1,9 @@
+/* Clips the artwork that deliberately hangs past the edge of each section. */
+.page {
+  flex-direction: column;
+  flex: 1;
+  justify-content: flex-start;
+  align-items: stretch;
+  display: flex;
+  overflow: hidden;
+}

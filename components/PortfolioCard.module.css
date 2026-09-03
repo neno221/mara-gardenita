@@ -1,0 +1,110 @@
+.item {
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  display: flex;
+}
+
+.frame {
+  width: 100%;
+  max-width: 100%;
+  background-color: var(--preload);
+  transition-property: box-shadow;
+  transition-duration: 0.7s;
+  display: block;
+  overflow: hidden;
+}
+
+.frame:hover {
+  box-shadow: var(--shadow-photo-hover);
+}
+
+.image {
+  width: 100%;
+  height: 380px;
+  object-fit: cover;
+  opacity: 0;
+}
+
+/* Compounded so the taller portrait crop keeps outranking the breakpoint
+   heights below, the way the two-class selector it was authored as does. */
+.image.imageTall {
+  height: 780px;
+}
+
+/* Caption under a four-up tile: floats on the page background. */
+.caption {
+  width: 100%;
+  text-align: center;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  margin-top: 32px;
+  padding-left: 5%;
+  padding-right: 5%;
+  display: flex;
+}
+
+/* Caption under a two-up tile: a white plate butted against the photo. */
+.captionPlate {
+  width: 100%;
+  background-color: var(--white);
+  text-align: center;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 50px 10%;
+  display: flex;
+}
+
+.titleLink {
+  margin-bottom: 8px;
+  max-width: 100%;
+  display: inline-block;
+  text-decoration: none;
+  transition-property: opacity;
+  transition-duration: 0.4s;
+}
+
+.titleLink:hover {
+  opacity: 0.7;
+}
+
+.title {
+  margin-bottom: 0;
+}
+
+@media screen and (max-width: 991px) {
+  .image {
+    height: 35vw;
+  }
+
+  .image.imageTall {
+    height: 70vw;
+  }
+
+  .captionPlate {
+    padding-top: 40px;
+    padding-bottom: 40px;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .image {
+    height: 60vw;
+  }
+
+  .image.imageTall {
+    height: 100%;
+  }
+}
+
+@media screen and (max-width: 479px) {
+  .image {
+    height: 100%;
+  }
+
+  .caption {
+    margin-top: 28px;
+  }
+}

@@ -1,0 +1,72 @@
+.section {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: var(--section-block) var(--section-inline);
+  display: flex;
+}
+
+/* A section that opens the page body, so the hero above already carries the
+   leading space. Kept as the two-class selector it was authored as, so it
+   outranks `.section` whatever order the two land in. */
+.section.sectionFirst {
+  padding-top: 0;
+}
+
+.content {
+  width: 100%;
+  max-width: 1200px;
+  flex-direction: column;
+  align-items: center;
+  display: flex;
+}
+
+.blockHeading {
+  text-align: center;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 10px;
+  display: flex;
+}
+
+.blockHeadingSpaced {
+  margin-bottom: 25px;
+}
+
+.sprig {
+  max-width: none;
+  object-fit: contain;
+  margin-bottom: 14px;
+  opacity: 0;
+}
+
+.subtitle {
+  color: var(--subtitle);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  font-family: var(--font-ui-stack);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 140%;
+}
+
+.heading {
+  max-width: 730px;
+}
+
+.paragraph {
+  max-width: 720px;
+  margin-bottom: 40px;
+}
+
+/* A lede that sits directly above a rule rather than opening a run of prose. */
+.paragraphTight {
+  margin-bottom: 28px;
+}
+
+@media screen and (max-width: 991px) {
+  .blockHeadingSpaced {
+    margin-bottom: 15px;
+  }
+}

@@ -1,0 +1,97 @@
+.panel {
+  max-width: 720px;
+  position: relative;
+}
+
+/* The panel in the narrow column hangs below the other two. */
+.panelDropped {
+  margin-top: 80px;
+}
+
+/* The closing panel runs the width of the grid, centred by `justify-items`. */
+.panelWide {
+  grid-area: span 1 / span 2 / span 1 / span 2;
+}
+
+.block {
+  flex-direction: column;
+  align-items: flex-start;
+  margin-top: 56px;
+  padding-right: 5%;
+  display: flex;
+}
+
+.heading {
+  align-items: center;
+  margin-bottom: 20px;
+  display: flex;
+}
+
+.icon {
+  width: 69px;
+  height: 55px;
+  margin-right: 15px;
+}
+
+.title {
+  margin-bottom: 0;
+}
+
+/* Sits behind the panel, so the photograph crosses in front of it as it drifts. */
+.petals {
+  z-index: -1;
+  width: 260px;
+  max-width: none;
+  object-fit: contain;
+  opacity: 0;
+  position: absolute;
+  top: -83px;
+  right: -24%;
+}
+
+@media screen and (max-width: 991px) {
+  .panelDropped {
+    margin-top: 60px;
+  }
+
+  .block {
+    margin-top: 48px;
+  }
+
+  .petals {
+    width: 190px;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  /* One column, so the closing panel stops spanning and the glyph moves above
+     the title rather than beside it. */
+  .panelWide {
+    grid-area: span 1 / span 1 / span 1 / span 1;
+  }
+
+  .heading {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .icon {
+    margin-bottom: 15px;
+    margin-right: 0;
+  }
+
+  .petals {
+    right: -10%;
+  }
+}
+
+@media screen and (max-width: 479px) {
+  .panelDropped {
+    margin-top: 50px;
+  }
+
+  .petals {
+    width: 150px;
+    top: -72px;
+  }
+}

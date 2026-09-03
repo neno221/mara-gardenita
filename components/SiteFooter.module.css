@@ -1,0 +1,150 @@
+.footer {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: auto;
+  padding: var(--section-block) var(--section-inline);
+  display: flex;
+}
+
+.rule {
+  width: 100%;
+  height: 1px;
+  background-image: var(--rule);
+  margin-bottom: 120px;
+}
+
+.instagramGrid {
+  width: 100%;
+  grid-column-gap: 12px;
+  grid-row-gap: 12px;
+  grid-template-rows: auto;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+  grid-auto-columns: 1fr;
+  align-items: start;
+  display: grid;
+}
+
+.instagramTile {
+  width: 100%;
+  background-color: var(--preload);
+  transition-property: box-shadow;
+  transition-duration: 0.7s;
+  max-width: 100%;
+  display: inline-block;
+  overflow: hidden;
+}
+
+.instagramTile:hover {
+  box-shadow: var(--shadow-photo-hover);
+}
+
+.instagramTileDropped {
+  margin-top: 34px;
+}
+
+.instagramImage {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  opacity: 0;
+}
+
+.columns {
+  width: 100%;
+  grid-column-gap: 0px;
+  grid-row-gap: 0px;
+  grid-template-rows: auto;
+  grid-template-columns: 1fr 1fr;
+  grid-auto-columns: 1fr;
+  margin-top: 80px;
+  margin-bottom: 80px;
+  display: grid;
+}
+
+.column {
+  width: 100%;
+  text-align: center;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding-left: 10%;
+  padding-right: 10%;
+  display: flex;
+}
+
+.columnDivided {
+  border-left: 1px solid var(--border);
+}
+
+.link {
+  opacity: 0.7;
+  color: var(--heading);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  font-family: var(--font-ui-stack);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 140%;
+  text-decoration: none;
+  transition: opacity 0.3s var(--ease),
+    color 0.3s var(--ease);
+}
+
+.link:hover {
+  opacity: 1;
+}
+
+.logo {
+  width: 100px;
+  height: auto;
+  margin-bottom: 10px;
+}
+
+@media screen and (max-width: 991px) {
+  .rule {
+    margin-bottom: 100px;
+  }
+
+  .instagramTileDropped {
+    margin-top: 30px;
+  }
+
+  .columns {
+    margin-top: 70px;
+    margin-bottom: 70px;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .rule {
+    margin-bottom: 90px;
+  }
+
+  .instagramGrid {
+    grid-column-gap: 10px;
+    grid-row-gap: 10px;
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+
+  .instagramTileDropped {
+    margin-top: 0;
+  }
+}
+
+@media screen and (max-width: 479px) {
+  .rule {
+    margin-bottom: 80px;
+  }
+
+  .columns {
+    grid-row-gap: 50px;
+    grid-template-columns: 1fr;
+  }
+
+  .columnDivided {
+    border-left-style: none;
+  }
+}

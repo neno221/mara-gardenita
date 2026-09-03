@@ -1,0 +1,59 @@
+/* The banner section every page opens with. It carries the shared rhythm on
+   three sides only — the header above already supplies the leading space. */
+.sectionHero {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: var(--section-block);
+  padding-left: var(--section-inline);
+  padding-right: var(--section-inline);
+  display: flex;
+}
+
+/* Interior pages stop at the headline, so the section closes up behind it.
+   Kept as the two-class selector it was authored as, so it outranks
+   `.sectionHero` whatever order the two land in. */
+.sectionHero.sectionHeroTight {
+  padding-bottom: 35px;
+}
+
+.heroTop {
+  width: 100%;
+  text-align: center;
+  flex-direction: column;
+  align-items: center;
+  padding-left: 5%;
+  padding-right: 5%;
+  display: flex;
+}
+
+.borderTop {
+  width: 1px;
+  height: 54px;
+  background-color: var(--border);
+  margin-top: 15px;
+  margin-bottom: 40px;
+}
+
+.borderDown {
+  width: 1px;
+  height: 54px;
+  background-color: var(--border);
+  margin-top: 50px;
+  margin-bottom: 50px;
+}
+
+.borderDownTight {
+  margin-top: 15px;
+  margin-bottom: 20px;
+}
+
+.headingHero {
+  max-width: 890px;
+}
+
+@media screen and (max-width: 991px) {
+  .sectionHero.sectionHeroTight {
+    padding-bottom: 30px;
+  }
+}

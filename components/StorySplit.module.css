@@ -1,0 +1,109 @@
+.grid {
+  width: 100%;
+  grid-column-gap: 20px;
+  grid-row-gap: 20px;
+  grid-template-rows: auto;
+  grid-template-columns: 1fr 1fr;
+  grid-auto-columns: 1fr;
+  display: grid;
+}
+
+.text {
+  z-index: 30;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 60px 12%;
+  display: flex;
+  position: relative;
+}
+
+.figure {
+  width: 100%;
+  justify-content: center;
+  align-items: stretch;
+  padding-left: 10%;
+  padding-right: 10%;
+  display: flex;
+  position: relative;
+}
+
+.petalsTall {
+  z-index: 5;
+  width: 230px;
+  max-width: none;
+  height: auto;
+  object-fit: contain;
+  position: absolute;
+  bottom: -59px;
+  left: -5%;
+  transform: rotate(-23deg);
+  opacity: 0;
+}
+
+.petalsWide {
+  z-index: 5;
+  width: 260px;
+  max-width: none;
+  height: auto;
+  object-fit: contain;
+  position: absolute;
+  bottom: 24px;
+  right: -5%;
+  opacity: 0;
+}
+
+@media screen and (max-width: 991px) {
+  .grid {
+    grid-column-gap: 15px;
+    grid-row-gap: 15px;
+  }
+
+  .text {
+    padding: 50px 8%;
+  }
+
+  .figure {
+    padding-left: 8%;
+    padding-right: 8%;
+  }
+
+  .petalsTall {
+    width: 180px;
+  }
+
+  .petalsWide {
+    width: 200px;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .text {
+    padding-top: 60px;
+    padding-bottom: 0;
+  }
+
+  /* On one column the artwork always leads, whichever side it sits on. */
+  .figureFirst {
+    order: -9999;
+  }
+
+  .petalsTall {
+    width: 150px;
+    bottom: -35px;
+  }
+}
+
+@media screen and (max-width: 479px) {
+  .petalsTall {
+    width: 120px;
+  }
+
+  .petalsWide {
+    width: 160px;
+  }
+}
