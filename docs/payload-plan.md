@@ -309,8 +309,29 @@ no placeholder substitution, which is what lets the diff stay exact:
 
 The existing views read from Payload; section order stays hardcoded.
 
+> **Measured in phase 2, and unresolved.** `lib/media.ts` reproduces the shipped `srcSet`
+> for **51 of the 55** rendered photographs exactly. The four exceptions are the journal
+> hero plates, all 1372w, which *gain* candidates because Payload generates all three
+> image sizes where the old export shipped one or two:
+>
+> | Plate | Shipped | Payload | Delta |
+> |---|---|---|---|
+> | `journal-napkin-fold-hero` | 1080, 1372 | 500, 800, 1080, 1372 | +500, +800 |
+> | `journal-full-service-hero` | 1080, 1372 | 500, 800, 1080, 1372 | +500, +800 |
+> | `journal-family-affair-hero` | 1080, 1372 | 500, 800, 1080, 1372 | +500, +800 |
+> | `journal-guest-list-hero` | 800, 1080, 1372 | 500, 800, 1080, 1372 | +500 |
+>
+> Nothing is lost and no layout moves — the `sizes` hint is unchanged, so the slot width
+> is unchanged, and a narrow viewport simply gets a smaller file than it used to. But it
+> **fails the fingerprint on 8 captures** (4 post routes × 2 widths), and decision E does
+> not distinguish an improvement from a regression. Phase 3 has to choose, explicitly:
+> accept it and re-baseline those eight with the reason recorded, or teach `toArtwork` to
+> restrict its candidates to a stated set. Re-baselining is the honest option — a
+> strictly-larger candidate list is what a CMS is *for* — but it is the first time the
+> gate is moved rather than met, so it should be a decision and not a shrug.
+
 **Done when** the fingerprint diff is clean at both widths, modulo the two known DOM changes
-in [§3](#3-fidelity-where-the-dom-cannot-stay-identical).
+in [§3](#3-fidelity-where-the-dom-cannot-stay-identical) and the four journal plates above.
 
 ---
 

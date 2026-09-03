@@ -1,4 +1,5 @@
 import type { ProjectSlug } from "./projects";
+import { SIZES } from "./sizes";
 
 /**
  * Responsive sources for the photography. Each entry keeps the widths the
@@ -35,18 +36,16 @@ export function responsive(
 /** A photograph that shipped without alternates, so it stays single-source. */
 const single = (stem: string): Artwork => ({ src: `/images/${stem}.jpg` });
 
-/** A plate that runs the full width of its column at every breakpoint. */
-export const FULL_WIDTH_SIZES = "(max-width: 479px) 96vw, (max-width: 767px) 95vw, 96vw";
-
-const HERO_SIDE_SIZES = "(max-width: 479px) 51vw, (max-width: 767px) 49vw, 375.1875px";
-const STORY_SIZES = "(max-width: 767px) 80vw, (max-width: 991px) 81vw, 77vw";
-
+/**
+ * The story-split pair, still served from disk.
+ *
+ * The three hero plates that used to sit here are gone: phase 2 moved them into the
+ * Media collection, and `Hero` now takes them as props. Everything below is still
+ * hardcoded until the phase-3 seed.
+ */
 export const ARTWORK = {
-  heroLeft: responsive("hero-left", [500, 800], 803, HERO_SIDE_SIZES),
-  heroRight: responsive("hero-right", [500, 800], 803, HERO_SIDE_SIZES),
-  heroCenter: responsive("hero-center", [500, 800], 908, "(max-width: 479px) 77vw, (max-width: 767px) 73vw, 560px"),
-  whoWeAre: responsive("about-who-we-are", [500, 800], 805, STORY_SIZES),
-  whatWeDo: responsive("about-what-we-do", [500, 800], 805, STORY_SIZES),
+  whoWeAre: responsive("about-who-we-are", [500, 800], 805, SIZES.story),
+  whatWeDo: responsive("about-what-we-do", [500, 800], 805, SIZES.story),
 } satisfies Record<string, Artwork>;
 
 /** The petal cut-outs that drift behind the artwork. */
@@ -66,8 +65,8 @@ export const ABOUT_ARTWORK = {
   laceGown: single("about-lace-gown"),
   poppyField: single("about-poppy-field"),
   florists: single("about-florists"),
-  goldenField: responsive("about-golden-field", [500], 761, FULL_WIDTH_SIZES),
-  veilKiss: responsive("about-veil-kiss", [500], 761, FULL_WIDTH_SIZES),
+  goldenField: responsive("about-golden-field", [500], 761, SIZES.fullWidth),
+  veilKiss: responsive("about-veil-kiss", [500], 761, SIZES.fullWidth),
   hatBox: single("about-hat-box"),
   brideTulle: single("about-bride-tulle"),
   lemonCake: single("about-lemon-cake"),
@@ -103,11 +102,7 @@ function withSizes(sizes: string): Record<ProjectSlug, Artwork> {
 }
 
 /** Four across on desktop — the home page grid. */
-export const PORTFOLIO_ARTWORK = withSizes(
-  "(max-width: 479px) 100vw, (max-width: 767px) 46vw, (max-width: 991px) 23vw, 22vw",
-);
+export const PORTFOLIO_ARTWORK = withSizes(SIZES.portfolioGrid);
 
 /** Two across on desktop — the portfolio page grid. */
-export const PORTFOLIO_PAGE_ARTWORK = withSizes(
-  "(max-width: 479px) 96vw, (max-width: 767px) 95vw, (max-width: 991px) 47vw, 46vw",
-);
+export const PORTFOLIO_PAGE_ARTWORK = withSizes(SIZES.portfolioList);

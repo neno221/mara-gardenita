@@ -3,14 +3,31 @@
 import { useRef } from "react";
 import gsap from "gsap";
 import { lerp } from "@/lib/easing";
-import { ARTWORK, PETALS } from "@/lib/artwork";
+import { PETALS, type Artwork } from "@/lib/artwork";
 import { useScrollProgress } from "@/lib/useScrollProgress";
 import { useRevealOnView } from "@/lib/useRevealOnView";
 import { HeroSection, HeroTop } from "./HeroTop";
 import styles from "./Hero.module.css";
 import photo from "./photo.module.css";
 
-export function Hero() {
+type HeroProps = {
+  /** The three collage plates, already resolved to src/srcSet/sizes. */
+  left: Artwork;
+  right: Artwork;
+  center: Artwork;
+};
+
+/**
+ * The home page's opening band: the masthead, and the collage of three
+ * photographs that drifts apart as the page scrolls past it.
+ *
+ * The plates arrive as props rather than being imported. Phase 2 of
+ * docs/payload-plan.md puts them in the Media collection, and an `Artwork` is all
+ * this component ever needed — it never cared where the URLs came from. The rest
+ * of the prop interface in §1.1 (eyebrow, heading, cta) lands in phase 4 with the
+ * `hero` block; the petals stay hardcoded, as ornament rather than content.
+ */
+export function Hero({ left, right, center }: HeroProps) {
   const collageRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<HTMLDivElement>(null);
   const frameLeftRef = useRef<HTMLDivElement>(null);
@@ -81,7 +98,7 @@ export function Hero() {
             <img
               ref={leftImageRef}
               className={photo.fill}
-              {...ARTWORK.heroLeft}
+              {...left}
               loading="lazy"
               alt=""
             />
@@ -90,7 +107,7 @@ export function Hero() {
             <img
               ref={rightImageRef}
               className={photo.fill}
-              {...ARTWORK.heroRight}
+              {...right}
               loading="lazy"
               alt=""
             />
@@ -99,7 +116,7 @@ export function Hero() {
             <img
               ref={centerImageRef}
               className={photo.fill}
-              {...ARTWORK.heroCenter}
+              {...center}
               loading="lazy"
               alt=""
             />

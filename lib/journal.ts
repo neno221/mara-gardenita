@@ -1,4 +1,5 @@
-import { FULL_WIDTH_SIZES, responsive, type Artwork } from "./artwork";
+import { responsive, type Artwork } from "./artwork";
+import { SIZES } from "./sizes";
 
 export type JournalPost = {
   slug: string;
@@ -16,7 +17,7 @@ export type JournalPost = {
 
 /** Every card and plate is served at the same three breakpoints. */
 const plate = (stem: string, alternates: number[], intrinsic: number): Artwork =>
-  responsive(stem, alternates, intrinsic, FULL_WIDTH_SIZES);
+  responsive(stem, alternates, intrinsic, SIZES.fullWidth);
 
 /** The four entries, in the order the journal lists them. */
 export const JOURNAL_POSTS: JournalPost[] = [

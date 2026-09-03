@@ -1,4 +1,5 @@
 import { responsive, type Artwork } from "./artwork";
+import { SIZES } from "./sizes";
 
 export type Service = {
   title: string;
@@ -12,11 +13,8 @@ export type Service = {
   copy: [string, string];
 };
 
-/** Every photograph is served at the same three widths. */
-const SERVICE_SIZES = "(max-width: 479px) 86vw, (max-width: 767px) 85vw, 720px";
-
 /** The three exports of one service photograph, 805px at full size. */
-const photo = (stem: string) => responsive(stem, [500, 800], 805, SERVICE_SIZES);
+const photo = (stem: string) => responsive(stem, [500, 800], 805, SIZES.service);
 
 /** The three services, in the order the page lists them. */
 export const SERVICES: Service[] = [

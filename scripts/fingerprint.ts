@@ -229,19 +229,41 @@ async function capturePage(
 ): Promise<Omit<Capture, "route" | "path" | "width">> {
   await page.setViewportSize({ width, height: VIEWPORT_HEIGHT });
 
-  // A cold `next dev` compiles the route on first request and can abort the
-  // navigation while it does. That is a build race, not a page failure, so the
-  // second attempt hits a warm route and succeeds.
   for (let attempt = 1; ; attempt++) {
+    // A cold `next dev` compiles the route on first request and can abort the
+    // navigation while it does. That is a build race, not a page failure, so the
+    // second attempt hits a warm route and succeeds.
     try {
       await page.goto(url, { waitUntil: "domcontentloaded" });
-      break;
     } catch (err) {
       if (attempt >= 3) throw err;
       await page.waitForTimeout(2000);
+      continue;
     }
-  }
 
+    const body = await settleAndCollect(page);
+
+    // `img.complete` goes true on a failed request as well as a successful one, so
+    // the stability wait can settle with every image broken — which reads out
+    // as a page-wide `naturalWidth: 0` diff and looks exactly like a regression. It
+    // is not; it is the dev server refusing image requests while it compiles
+    // something else. Retrying is the difference between a gate people trust and a
+    // gate people learn to re-baseline past.
+    const broken = body.images.filter((img) => img.naturalWidth === 0).length;
+    if (!broken || attempt >= 3) {
+      if (broken) {
+        console.log(
+          "  warning  " + broken + " image(s) still undecoded after 3 attempts; reporting anyway",
+        );
+      }
+      return body;
+    }
+    await page.waitForTimeout(2000);
+  }
+}
+
+/** Quiet the page down to something measurable, then read it. */
+async function settleAndCollect(page: Page): Promise<Omit<Capture, "route" | "path" | "width">> {
   // Kill transition and animation timing. Reveal-on-view drives opacity and
   // transform, neither of which moves a box, but a half-run transition would
   // still jitter the computed values this reads.
