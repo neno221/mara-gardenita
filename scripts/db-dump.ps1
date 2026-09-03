@@ -58,11 +58,18 @@ Write-Host ("  {0:N0} bytes" -f $dumpSize)
 
 if (-not $SkipMedia) {
     $mediaDir = Join-Path $repoRoot 'public/media'
-    if (Test-Path $mediaDir) {
+    # Compress-Archive writes nothing at all when the wildcard matches no files, so an
+    # empty upload directory has to be caught here rather than discovered downstream.
+    $mediaFiles = if (Test-Path $mediaDir) { @(Get-ChildItem -Path $mediaDir -Recurse -File) } else { @() }
+
+    if ($mediaFiles.Count -gt 0) {
         $mediaPath = Join-Path $OutDir "media-$stamp.zip"
-        Write-Host "Archiving public/media -> $mediaPath"
+        Write-Host "Archiving public/media ($($mediaFiles.Count) files) -> $mediaPath"
         Compress-Archive -Path (Join-Path $mediaDir '*') -DestinationPath $mediaPath -Force
+        if (-not (Test-Path $mediaPath)) { throw "Compress-Archive produced no file at $mediaPath" }
         Write-Host ("  {0:N0} bytes" -f (Get-Item $mediaPath).Length)
+    } elseif (Test-Path $mediaDir) {
+        Write-Host 'public/media is empty; no media archive written.'
     } else {
         Write-Host 'public/media does not exist yet; skipping the media archive.'
     }
