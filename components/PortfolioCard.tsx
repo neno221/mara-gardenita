@@ -1,8 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { PORTFOLIO_ARTWORK, PORTFOLIO_PAGE_ARTWORK } from "@/lib/artwork";
-import type { PortfolioProject } from "@/lib/projects";
+import type { Artwork } from "@/lib/artwork";
 import { useHoverZoom } from "@/lib/useHoverZoom";
 import { useRevealOnView } from "@/lib/useRevealOnView";
 import { SiteLink } from "./SiteLink";
@@ -15,11 +14,20 @@ import buttons from "./buttons.module.css";
  */
 type PortfolioCardVariant = "grid" | "feature";
 
-export function PortfolioCard({
-  name,
-  slug,
-  variant = "grid",
-}: PortfolioProject & { variant?: PortfolioCardVariant }) {
+export type PortfolioCardProps = {
+  name: string;
+  href: string;
+  /**
+   * Already resolved, hint included. Decision D gives a Project one photograph
+   * and lets the grid that renders it choose the slot width, so the card is
+   * handed the finished `Artwork` rather than looking one up by slug — which is
+   * what let two artwork tables exist for one set of files.
+   */
+  image: Artwork;
+  variant?: PortfolioCardVariant;
+};
+
+export function PortfolioCard({ name, href, image, variant = "grid" }: PortfolioCardProps) {
   const frameRef = useRef<HTMLAnchorElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
 
@@ -27,9 +35,7 @@ export function PortfolioCard({
   useRevealOnView(imageRef, 200);
 
   const feature = variant === "feature";
-  const artwork = feature ? PORTFOLIO_PAGE_ARTWORK[slug] : PORTFOLIO_ARTWORK[slug];
   const Title = feature ? "h3" : "h5";
-  const href = `/portfolio/${slug}`;
 
   return (
     <div className={styles.item} role="listitem">
@@ -37,7 +43,7 @@ export function PortfolioCard({
         <img
           ref={imageRef}
           className={`${styles.image} ${feature ? styles.imageTall : ""}`}
-          {...artwork}
+          {...image}
           loading="lazy"
           alt={name}
         />

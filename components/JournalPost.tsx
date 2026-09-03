@@ -1,16 +1,37 @@
 "use client";
 
 import { useRef } from "react";
-import type { JournalPost as JournalPostData } from "@/lib/journal";
+import type { SerializedEditorState } from "@payloadcms/richtext-lexical/lexical";
+import type { Artwork } from "@/lib/artwork";
+import { formatPublished } from "@/lib/dates";
 import { useDriftingPhoto } from "@/lib/useDriftingPhoto";
 import { useRevealOnView } from "@/lib/useRevealOnView";
 import { PageMasthead } from "./HeroTop";
+import { RichText } from "./RichText";
 import { Section } from "./Section";
 import { SiteShell } from "./SiteShell";
 import styles from "./JournalPost.module.css";
 import photo from "./photo.module.css";
 
-export function JournalPost({ title, date, published, excerpt, hero: plate }: JournalPostData) {
+export type JournalPostProps = {
+  title: string;
+  published: string;
+  excerpt: string;
+  /** The full-bleed plate at the top, 1372 x 855. */
+  hero: Artwork;
+  body: SerializedEditorState;
+};
+
+/**
+ * One journal entry.
+ *
+ * The body was hardcoded JSX — the same lorem for all four posts (§1.3) — and is
+ * now the Lexical state on the document. `components/RichText` renders it
+ * without a wrapper, so `<article>` still holds the paragraphs, headings,
+ * blockquote, list and figures directly and `globals.css` styles them as the
+ * bare elements it always did. Nothing in `JournalPost.module.css` changes.
+ */
+export function JournalPost({ title, published, excerpt, hero: plate, body }: JournalPostProps) {
   const frameRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
 
@@ -18,11 +39,13 @@ export function JournalPost({ title, date, published, excerpt, hero: plate }: Jo
 
   useDriftingPhoto(frameRef, frameRef, imageRef);
 
+  const date = formatPublished(published);
+
   return (
     <SiteShell>
       <PageMasthead
-        subtitle={date}
-        subtitleDateTime={published}
+        subtitle={date.printed}
+        subtitleDateTime={date.machine}
         heading={title}
         lede={excerpt}
       />
@@ -33,64 +56,7 @@ export function JournalPost({ title, date, published, excerpt, hero: plate }: Jo
         </div>
 
         <article className={styles.body}>
-          <p>
-            Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo,
-            rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis
-            pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean
-            vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae.
-          </p>
-          <h3>Aenean vulputate eleifend</h3>
-          <p>
-            Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur
-            ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem.
-            Donec pede justo, fringilla sociis natoque penatibus
-          </p>
-          <figure>
-            <img src="/images/journal-post-figure-one.jpg" loading="lazy" alt="" />
-          </figure>
-          <p>
-            Convallis dictum consequat amet ut et sed. Praesent netus id in vitae tristique id.
-            Vitae diam ut adipiscing elit nunc vulputate. Adipiscing cras rutrum amet ultrices
-            nibh duis. Sed velit euismod quis mollis. A dignissim a in aliquam pretium, accumsan.
-          </p>
-          <h3>Nulla consequat massa quis enim</h3>
-          <p>
-            Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet
-            adipiscing sem neque sed ipsum. Nam quam nunc.
-          </p>
-          <blockquote>
-            “Etiam lectus bibendum nam tortor, est posuere. Mauris tempus eget tempor nunc
-            ultricies. Sem morbi volutpat.”
-          </blockquote>
-          <p>
-            At hendrerit id mattis ut arcu, sociis ridiculus. Cras tempor, ante nunc, magna enim
-            lectus. Ultrices consectetur eget lorem vitae sodales. Aliquet ipsum morbi proin
-            blandit risus sagittis, enim. Risus ipsum, consectetur ultrices turpis sit in. Mauris
-            id elementum odio lectus at netus amet. Aliquet non egestas massa, a, sit morbi tempor
-            tortor, convallis. Lectus orci nunc diam arcu etiam pharetra mattis viverra gravida.
-          </p>
-          <figure>
-            <img src="/images/journal-post-figure-two.jpg" loading="lazy" alt="" />
-            <figcaption>
-              Aenean massa. Cum sociis natoque penatibus et magnis dis parturient
-            </figcaption>
-          </figure>
-          <h3>Aliquam lorem ante, dapibus</h3>
-          <p>
-            Praesent placerat proin metus enim elementum, ultrices quis ut. Vehicula urna,
-            scelerisque magnis nisi magna elit. Nulla etiam quisque sed suspendisse accumsan
-          </p>
-          <ul role="list">
-            <li>In enim justo, rhoncus ut, imperdiet a, venenatis vitae.</li>
-            <li>Nullam dictum felis eu pede mollis pretium.</li>
-            <li>Integer tincidunt. Cras dapibus.</li>
-            <li>Vivamus elementum semper nisi eleifend tellus</li>
-          </ul>
-          <p>
-            Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur
-            ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem.
-            Nulla consequat massa quis enim.
-          </p>
+          <RichText data={body} />
         </article>
       </Section>
     </SiteShell>

@@ -69,6 +69,11 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    projects: Project;
+    posts: Post;
+    services: Service;
+    testimonials: Testimonial;
+    instagram: Instagram;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -78,6 +83,11 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    projects: ProjectsSelect<false> | ProjectsSelect<true>;
+    posts: PostsSelect<false> | PostsSelect<true>;
+    services: ServicesSelect<false> | ServicesSelect<true>;
+    testimonials: TestimonialsSelect<false> | TestimonialsSelect<true>;
+    instagram: InstagramSelect<false> | InstagramSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -203,6 +213,208 @@ export interface Media {
   };
 }
 /**
+ * The case studies. Order is the sequence both portfolio grids print.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "projects".
+ */
+export interface Project {
+  id: number;
+  name: string;
+  /**
+   * The URL segment. Changing it changes a published address.
+   */
+  slug: string;
+  /**
+   * One photograph, cropped taller by CSS on /portfolio. Decision D: there is no second crop.
+   */
+  image: number | Media;
+  /**
+   * The detail page, which phase 4 builds and renders. Empty until then — the template shipped no copy for it, and decision B forbids inventing any.
+   */
+  body?: ProseBlock[] | null;
+  /**
+   * Lowest first. The published order, which no field on the document implies.
+   */
+  order: number;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ProseBlock".
+ */
+export interface ProseBlock {
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'prose';
+}
+/**
+ * Journal entries. Order is the sequence /blog prints, which is not date order.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "posts".
+ */
+export interface Post {
+  id: number;
+  title: string;
+  /**
+   * The URL segment. Changing it changes a published address.
+   */
+  slug: string;
+  /**
+   * Printed as the eyebrow and emitted as <time datetime>. One field, two forms.
+   */
+  published: string;
+  /**
+   * The index card's blurb, and the page's meta description.
+   */
+  excerpt: string;
+  /**
+   * The /blog index crop, 735 x 647.
+   */
+  card: number | Media;
+  /**
+   * The full-bleed plate at the top of the post, 1372 x 855.
+   */
+  hero: number | Media;
+  /**
+   * Paragraphs, h3, blockquote, lists and figures. globals.css already styles all of those as bare elements, so the output inherits the site's typography.
+   */
+  body: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * Lowest first. The published order, which no field on the document implies.
+   */
+  order: number;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * Order is the sequence both the home grid and /services print.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "services".
+ */
+export interface Service {
+  id: number;
+  title: string;
+  /**
+   * The flower glyph beside the title, drawn 69 x 55.
+   */
+  icon: number | Media;
+  /**
+   * The photograph above the copy on /services, 805 x 1000.
+   */
+  photo: number | Media;
+  /**
+   * The one-line blurb the home page's three-up grid prints.
+   */
+  summary: string;
+  /**
+   * The panel's prose on /services. Two paragraphs, as published.
+   */
+  copy: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * Lowest first. The published order, which no field on the document implies.
+   */
+  order: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Order is the carousel's sequence.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "testimonials".
+ */
+export interface Testimonial {
+  id: number;
+  /**
+   * Without quotation marks — the component sets those.
+   */
+  quote: string;
+  signature: string;
+  /**
+   * A petal cut-out, as published.
+   */
+  portrait: number | Media;
+  /**
+   * Lowest first. The published order, which no field on the document implies.
+   */
+  order: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Newest first. The footer prints the six most recent.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "instagram".
+ */
+export interface Instagram {
+  id: number;
+  image: number | Media;
+  /**
+   * The post on Instagram. Defaults to the profile, as published.
+   */
+  postUrl: string;
+  /**
+   * The link's accessible name. Empty on every seeded tile — the template shipped none.
+   */
+  caption?: string | null;
+  /**
+   * Sorts the feed. Newest first.
+   */
+  addedAt: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -233,6 +445,26 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'media';
         value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'projects';
+        value: number | Project;
+      } | null)
+    | ({
+        relationTo: 'posts';
+        value: number | Post;
+      } | null)
+    | ({
+        relationTo: 'services';
+        value: number | Service;
+      } | null)
+    | ({
+        relationTo: 'testimonials';
+        value: number | Testimonial;
+      } | null)
+    | ({
+        relationTo: 'instagram';
+        value: number | Instagram;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -352,6 +584,88 @@ export interface MediaSelect<T extends boolean = true> {
               filename?: T;
             };
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "projects_select".
+ */
+export interface ProjectsSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  image?: T;
+  body?:
+    | T
+    | {
+        prose?: T | ProseBlockSelect<T>;
+      };
+  order?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ProseBlock_select".
+ */
+export interface ProseBlockSelect<T extends boolean = true> {
+  content?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "posts_select".
+ */
+export interface PostsSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  published?: T;
+  excerpt?: T;
+  card?: T;
+  hero?: T;
+  body?: T;
+  order?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "services_select".
+ */
+export interface ServicesSelect<T extends boolean = true> {
+  title?: T;
+  icon?: T;
+  photo?: T;
+  summary?: T;
+  copy?: T;
+  order?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "testimonials_select".
+ */
+export interface TestimonialsSelect<T extends boolean = true> {
+  quote?: T;
+  signature?: T;
+  portrait?: T;
+  order?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "instagram_select".
+ */
+export interface InstagramSelect<T extends boolean = true> {
+  image?: T;
+  postUrl?: T;
+  caption?: T;
+  addedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

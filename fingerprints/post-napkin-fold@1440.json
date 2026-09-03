@@ -143,14 +143,18 @@
       "cls": "photo_fill",
       "alt": "Napkin fold ideas that will elevate your table",
       "loading": "eager",
-      "src": "/images/journal-napkin-fold-hero.jpg",
+      "src": "/api/media/file/journal-napkin-fold-hero.jpg",
       "srcSetWidths": [
+        500,
+        800,
         1080,
         1372
       ],
       "srcSetUrls": [
-        "/images/journal-napkin-fold-hero-1080.jpg",
-        "/images/journal-napkin-fold-hero.jpg"
+        "/api/media/file/journal-napkin-fold-hero-500x312.jpg",
+        "/api/media/file/journal-napkin-fold-hero-800x499.jpg",
+        "/api/media/file/journal-napkin-fold-hero-1080x673.jpg",
+        "/api/media/file/journal-napkin-fold-hero.jpg"
       ],
       "sizes": "(max-width: 479px) 96vw, (max-width: 767px) 95vw, 96vw",
       "naturalWidth": 1382
@@ -160,7 +164,7 @@
       "cls": "",
       "alt": "",
       "loading": "eager",
-      "src": "/images/journal-post-figure-one.jpg",
+      "src": "/api/media/file/journal-post-figure-one.jpg",
       "srcSetWidths": [],
       "srcSetUrls": [],
       "sizes": null,
@@ -171,7 +175,7 @@
       "cls": "",
       "alt": "",
       "loading": "eager",
-      "src": "/images/journal-post-figure-two.jpg",
+      "src": "/api/media/file/journal-post-figure-two.jpg",
       "srcSetWidths": [],
       "srcSetUrls": [],
       "sizes": null,

@@ -45,8 +45,7 @@
     "img.ServicePanel_icon",
     "h3.ServicePanel_title",
     "p",
-    "br",
-    "br",
+    "p",
     "div.ServicePanel_panel ServicePanel_panelDropped",
     "div.photo_frame",
     "img.photo_fill",
@@ -55,8 +54,7 @@
     "img.ServicePanel_icon",
     "h3.ServicePanel_title",
     "p",
-    "br",
-    "br",
+    "p",
     "img.ServicePanel_petals",
     "div.ServicePanel_panel ServicePanel_panelWide",
     "div.photo_frame",
@@ -66,8 +64,7 @@
     "img.ServicePanel_icon",
     "h3.ServicePanel_title",
     "p",
-    "br",
-    "br",
+    "p",
     "footer.SiteFooter_footer",
     "div.Section_content",
     "div.SiteFooter_rule",
@@ -151,16 +148,16 @@
       "cls": "photo_fill",
       "alt": "",
       "loading": "eager",
-      "src": "/images/service-weddings.jpg",
+      "src": "/api/media/file/service-weddings.jpg",
       "srcSetWidths": [
         500,
         800,
         805
       ],
       "srcSetUrls": [
-        "/images/service-weddings-500.jpg",
-        "/images/service-weddings-800.jpg",
-        "/images/service-weddings.jpg"
+        "/api/media/file/service-weddings-500x621.jpg",
+        "/api/media/file/service-weddings-800x994.jpg",
+        "/api/media/file/service-weddings.jpg"
       ],
       "sizes": "(max-width: 479px) 86vw, (max-width: 767px) 85vw, 720px",
       "naturalWidth": 720
@@ -170,7 +167,7 @@
       "cls": "ServicePanel_icon",
       "alt": "",
       "loading": "eager",
-      "src": "/images/icon-service-weddings.png",
+      "src": "/api/media/file/icon-service-weddings.png",
       "srcSetWidths": [],
       "srcSetUrls": [],
       "sizes": null,
@@ -181,16 +178,16 @@
       "cls": "photo_fill",
       "alt": "",
       "loading": "eager",
-      "src": "/images/service-event-design.jpg",
+      "src": "/api/media/file/service-event-design.jpg",
       "srcSetWidths": [
         500,
         800,
         805
       ],
       "srcSetUrls": [
-        "/images/service-event-design-500.jpg",
-        "/images/service-event-design-800.jpg",
-        "/images/service-event-design.jpg"
+        "/api/media/file/service-event-design-500x621.jpg",
+        "/api/media/file/service-event-design-800x994.jpg",
+        "/api/media/file/service-event-design.jpg"
       ],
       "sizes": "(max-width: 479px) 86vw, (max-width: 767px) 85vw, 720px",
       "naturalWidth": 720
@@ -200,7 +197,7 @@
       "cls": "ServicePanel_icon",
       "alt": "",
       "loading": "eager",
-      "src": "/images/icon-service-event-design.png",
+      "src": "/api/media/file/icon-service-event-design.png",
       "srcSetWidths": [],
       "srcSetUrls": [],
       "sizes": null,
@@ -222,16 +219,16 @@
       "cls": "photo_fill",
       "alt": "",
       "loading": "eager",
-      "src": "/images/service-branding.jpg",
+      "src": "/api/media/file/service-branding.jpg",
       "srcSetWidths": [
         500,
         800,
         805
       ],
       "srcSetUrls": [
-        "/images/service-branding-500.jpg",
-        "/images/service-branding-800.jpg",
-        "/images/service-branding.jpg"
+        "/api/media/file/service-branding-500x621.jpg",
+        "/api/media/file/service-branding-800x994.jpg",
+        "/api/media/file/service-branding.jpg"
       ],
       "sizes": "(max-width: 479px) 86vw, (max-width: 767px) 85vw, 720px",
       "naturalWidth": 720
@@ -241,7 +238,7 @@
       "cls": "ServicePanel_icon",
       "alt": "",
       "loading": "eager",
-      "src": "/images/icon-service-branding.png",
+      "src": "/api/media/file/icon-service-branding.png",
       "srcSetWidths": [],
       "srcSetUrls": [],
       "sizes": null,
@@ -377,7 +374,30 @@
       "tag": "p",
       "cls": "",
       "text": "Purus quam elit, ligula morbi facilisis. Nisl id",
-      "brs": 2,
+      "brs": 0,
+      "margin": [
+        0,
+        0,
+        32,
+        0
+      ],
+      "padding": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "w": 670,
+      "h": 97,
+      "fontSize": 18,
+      "lineHeight": 32
+    },
+    {
+      "i": 3,
+      "tag": "p",
+      "cls": "",
+      "text": "Aliquam morbi in euismod aliquet pretium. Augue ",
+      "brs": 0,
       "margin": [
         0,
         0,
@@ -391,16 +411,39 @@
         0
       ],
       "w": 670,
-      "h": 194,
+      "h": 65,
       "fontSize": 18,
       "lineHeight": 32
     },
     {
-      "i": 3,
+      "i": 4,
       "tag": "p",
       "cls": "",
       "text": "Tincidunt lacus, adipiscing sed dictum turpis gr",
-      "brs": 2,
+      "brs": 0,
+      "margin": [
+        0,
+        0,
+        32,
+        0
+      ],
+      "padding": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "w": 394,
+      "h": 162,
+      "fontSize": 18,
+      "lineHeight": 32
+    },
+    {
+      "i": 5,
+      "tag": "p",
+      "cls": "",
+      "text": "Aliquam suspendisse condimentum lobortis in. Aug",
+      "brs": 0,
       "margin": [
         0,
         0,
@@ -414,16 +457,39 @@
         0
       ],
       "w": 394,
-      "h": 292,
+      "h": 97,
       "fontSize": 18,
       "lineHeight": 32
     },
     {
-      "i": 4,
+      "i": 6,
       "tag": "p",
       "cls": "",
       "text": "Viverra commodo eget amet ut. Nisl velit sceleri",
-      "brs": 2,
+      "brs": 0,
+      "margin": [
+        0,
+        0,
+        32,
+        0
+      ],
+      "padding": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "w": 684,
+      "h": 65,
+      "fontSize": 18,
+      "lineHeight": 32
+    },
+    {
+      "i": 7,
+      "tag": "p",
+      "cls": "",
+      "text": "Lobortis faucibus tortor sed amet, cras. Fringil",
+      "brs": 0,
       "margin": [
         0,
         0,
@@ -437,7 +503,7 @@
         0
       ],
       "w": 684,
-      "h": 194,
+      "h": 97,
       "fontSize": 18,
       "lineHeight": 32
     }

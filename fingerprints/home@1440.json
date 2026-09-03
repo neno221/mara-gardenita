@@ -3,7 +3,7 @@
   "path": "/",
   "width": 1440,
   "title": "Loovio — Destination Wedding Planners & Event Designers",
-  "scrollHeight": 6087,
+  "scrollHeight": 6086,
   "classSequence": [
     "div",
     "header.SiteHeader_navbar",
@@ -243,16 +243,16 @@
       "cls": "photo_fill",
       "alt": "",
       "loading": "eager",
-      "src": "/images/hero-left.jpg",
+      "src": "/api/media/file/hero-left.jpg",
       "srcSetWidths": [
         500,
         800,
         803
       ],
       "srcSetUrls": [
-        "/images/hero-left-500.jpg",
-        "/images/hero-left-800.jpg",
-        "/images/hero-left.jpg"
+        "/api/media/file/hero-left-500x711.jpg",
+        "/api/media/file/hero-left-800x1138.jpg",
+        "/api/media/file/hero-left.jpg"
       ],
       "sizes": "(max-width: 479px) 51vw, (max-width: 767px) 49vw, 375.1875px",
       "naturalWidth": 375
@@ -262,16 +262,16 @@
       "cls": "photo_fill",
       "alt": "",
       "loading": "eager",
-      "src": "/images/hero-right.jpg",
+      "src": "/api/media/file/hero-right.jpg",
       "srcSetWidths": [
         500,
         800,
         803
       ],
       "srcSetUrls": [
-        "/images/hero-right-500.jpg",
-        "/images/hero-right-800.jpg",
-        "/images/hero-right.jpg"
+        "/api/media/file/hero-right-500x711.jpg",
+        "/api/media/file/hero-right-800x1138.jpg",
+        "/api/media/file/hero-right.jpg"
       ],
       "sizes": "(max-width: 479px) 51vw, (max-width: 767px) 49vw, 375.1875px",
       "naturalWidth": 375
@@ -281,16 +281,16 @@
       "cls": "photo_fill",
       "alt": "",
       "loading": "eager",
-      "src": "/images/hero-center.jpg",
+      "src": "/api/media/file/hero-center.jpg",
       "srcSetWidths": [
         500,
         800,
         908
       ],
       "srcSetUrls": [
-        "/images/hero-center-500.jpg",
-        "/images/hero-center-800.jpg",
-        "/images/hero-center.jpg"
+        "/api/media/file/hero-center-500x739.jpg",
+        "/api/media/file/hero-center-800x1182.jpg",
+        "/api/media/file/hero-center.jpg"
       ],
       "sizes": "(max-width: 479px) 77vw, (max-width: 767px) 73vw, 560px",
       "naturalWidth": 560
@@ -322,7 +322,7 @@
       "cls": "ServiceGrid_icon",
       "alt": "",
       "loading": "eager",
-      "src": "/images/icon-service-weddings.png",
+      "src": "/api/media/file/icon-service-weddings.png",
       "srcSetWidths": [],
       "srcSetUrls": [],
       "sizes": null,
@@ -333,7 +333,7 @@
       "cls": "ServiceGrid_icon",
       "alt": "",
       "loading": "eager",
-      "src": "/images/icon-service-event-design.png",
+      "src": "/api/media/file/icon-service-event-design.png",
       "srcSetWidths": [],
       "srcSetUrls": [],
       "sizes": null,
@@ -344,7 +344,7 @@
       "cls": "ServiceGrid_icon",
       "alt": "",
       "loading": "eager",
-      "src": "/images/icon-service-branding.png",
+      "src": "/api/media/file/icon-service-branding.png",
       "srcSetWidths": [],
       "srcSetUrls": [],
       "sizes": null,
@@ -448,14 +448,14 @@
       "cls": "PortfolioCard_image",
       "alt": "Jennifer & Oliver",
       "loading": "eager",
-      "src": "/images/portfolio-jennifer-oliver.jpg",
+      "src": "/api/media/file/portfolio-jennifer-oliver.jpg",
       "srcSetWidths": [
         500,
         628
       ],
       "srcSetUrls": [
-        "/images/portfolio-jennifer-oliver-500.jpg",
-        "/images/portfolio-jennifer-oliver.jpg"
+        "/api/media/file/portfolio-jennifer-oliver-500x693.jpg",
+        "/api/media/file/portfolio-jennifer-oliver.jpg"
       ],
       "sizes": "(max-width: 479px) 100vw, (max-width: 767px) 46vw, (max-width: 991px) 23vw, 22vw",
       "naturalWidth": 316
@@ -465,25 +465,31 @@
       "cls": "PortfolioCard_image",
       "alt": "Briana & Richard",
       "loading": "eager",
-      "src": "/images/portfolio-briana-richard.jpg",
-      "srcSetWidths": [],
-      "srcSetUrls": [],
-      "sizes": null,
-      "naturalWidth": 628
+      "src": "/api/media/file/portfolio-briana-richard.jpg",
+      "srcSetWidths": [
+        500,
+        628
+      ],
+      "srcSetUrls": [
+        "/api/media/file/portfolio-briana-richard-500x693.jpg",
+        "/api/media/file/portfolio-briana-richard.jpg"
+      ],
+      "sizes": "(max-width: 479px) 100vw, (max-width: 767px) 46vw, (max-width: 991px) 23vw, 22vw",
+      "naturalWidth": 316
     },
     {
       "i": 21,
       "cls": "PortfolioCard_image",
       "alt": "Anne & Cameron",
       "loading": "eager",
-      "src": "/images/portfolio-anne-cameron.jpg",
+      "src": "/api/media/file/portfolio-anne-cameron.jpg",
       "srcSetWidths": [
         500,
         628
       ],
       "srcSetUrls": [
-        "/images/portfolio-anne-cameron-500.jpg",
-        "/images/portfolio-anne-cameron.jpg"
+        "/api/media/file/portfolio-anne-cameron-500x693.jpg",
+        "/api/media/file/portfolio-anne-cameron.jpg"
       ],
       "sizes": "(max-width: 479px) 100vw, (max-width: 767px) 46vw, (max-width: 991px) 23vw, 22vw",
       "naturalWidth": 316
@@ -493,14 +499,14 @@
       "cls": "PortfolioCard_image",
       "alt": "Linda & Charles",
       "loading": "eager",
-      "src": "/images/portfolio-linda-charles.jpg",
+      "src": "/api/media/file/portfolio-linda-charles.jpg",
       "srcSetWidths": [
         500,
         628
       ],
       "srcSetUrls": [
-        "/images/portfolio-linda-charles-500.jpg",
-        "/images/portfolio-linda-charles.jpg"
+        "/api/media/file/portfolio-linda-charles-500x693.jpg",
+        "/api/media/file/portfolio-linda-charles.jpg"
       ],
       "sizes": "(max-width: 479px) 100vw, (max-width: 767px) 46vw, (max-width: 991px) 23vw, 22vw",
       "naturalWidth": 316
@@ -521,7 +527,7 @@
       "cls": "Testimonials_portrait",
       "alt": "",
       "loading": "eager",
-      "src": "/images/petals-rose.png",
+      "src": "/api/media/file/petals-rose.png",
       "srcSetWidths": [],
       "srcSetUrls": [],
       "sizes": null,
@@ -532,7 +538,7 @@
       "cls": "Testimonials_portrait",
       "alt": "",
       "loading": "eager",
-      "src": "/images/petals-wide.png",
+      "src": "/api/media/file/petals-wide.png",
       "srcSetWidths": [],
       "srcSetUrls": [],
       "sizes": null,
@@ -543,7 +549,7 @@
       "cls": "Testimonials_portrait",
       "alt": "",
       "loading": "eager",
-      "src": "/images/petals-tall.png",
+      "src": "/api/media/file/petals-tall.png",
       "srcSetWidths": [],
       "srcSetUrls": [],
       "sizes": null,

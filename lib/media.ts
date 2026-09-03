@@ -147,3 +147,28 @@ export function toArtwork(media: MediaLike, sizes?: SizesHint): Artwork {
 
   return { src, srcSet, sizes };
 }
+
+/**
+ * An upload field's value as an `<img>`'s worth of attributes.
+ *
+ * The composition of `asMedia` and `toArtwork` that every view performs, and it
+ * **throws** on an unpopulated relationship rather than rendering a placeholder.
+ * Every upload field on the phase-3 collections is `required`, so a bare id can
+ * only mean the query asked for too shallow a `depth` — and a silent fallback
+ * would let the fingerprint pass on a page whose photographs were missing, which
+ * is the same trap `lib/payload.ts`'s `mediaByFilename` refuses. Better a loud
+ * 500 on one route than a green check that proves nothing.
+ *
+ * `asMedia` stays exported for the optional case: a rich-text upload node, where
+ * an unresolved value is a reason to render nothing and keep the body standing.
+ */
+export function artworkFrom(value: Upload, sizes?: SizesHint): Artwork {
+  const media = asMedia(value);
+  if (!media) {
+    throw new Error(
+      `Upload field is ${value === null || value === undefined ? "empty" : `the bare id ${value}`}, ` +
+        "not a populated Media document. A required relationship read below its depth?",
+    );
+  }
+  return toArtwork(media, sizes);
+}

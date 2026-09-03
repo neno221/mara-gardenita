@@ -1,6 +1,6 @@
 import { ARTWORK } from "@/lib/artwork";
-import { toArtwork } from "@/lib/media";
-import { mediaByFilename } from "@/lib/payload";
+import { artworkFrom, toArtwork } from "@/lib/media";
+import { getProjects, getServices, getTestimonials, mediaByFilename } from "@/lib/payload";
 import { SIZES } from "@/lib/sizes";
 import { SiteShell } from "./SiteShell";
 import { Hero } from "./Hero";
@@ -20,8 +20,21 @@ import { Testimonials } from "./Testimonials";
  */
 const HERO_PLATES = ["hero-left.jpg", "hero-right.jpg", "hero-center.jpg"] as const;
 
+/**
+ * The home page.
+ *
+ * Phase 3 moves the *data* into Payload and leaves the *order* here: the two
+ * story splits still carry their copy inline, and the section sequence is still
+ * a list of JSX elements rather than a block array. Both become editable in
+ * phase 4, when Pages and `RenderBlocks` arrive and this file is deleted.
+ */
 export async function HomeView() {
-  const plates = await mediaByFilename(HERO_PLATES);
+  const [plates, services, projects, testimonials] = await Promise.all([
+    mediaByFilename(HERO_PLATES),
+    getServices(),
+    getProjects(),
+    getTestimonials(),
+  ]);
 
   return (
     <SiteShell>
@@ -30,7 +43,14 @@ export async function HomeView() {
         right={toArtwork(plates["hero-right.jpg"], SIZES.heroSide)}
         center={toArtwork(plates["hero-center.jpg"], SIZES.heroCenter)}
       />
-      <ServiceGrid />
+      <ServiceGrid
+        services={services.map((service) => ({
+          title: service.title,
+          summary: service.summary,
+          // No hint: the glyphs are drawn at a fixed 69px and shipped single-source.
+          icon: artworkFrom(service.icon),
+        }))}
+      />
       <StorySplit
         eyebrow="who we are"
         heading="Weave story into every thread of your event"
@@ -49,8 +69,22 @@ export async function HomeView() {
         petals="wide"
         side="left"
       />
-      <PortfolioGrid />
-      <Testimonials />
+      <PortfolioGrid
+        projects={projects.map((project) => ({
+          name: project.name,
+          href: `/portfolio/${project.slug}`,
+          // Four across on desktop. Decision D: one photograph, and the grid that
+          // renders it names the slot width.
+          image: artworkFrom(project.image, SIZES.portfolioGrid),
+        }))}
+      />
+      <Testimonials
+        quotes={testimonials.map((item) => ({
+          quote: item.quote,
+          signature: item.signature,
+          portrait: artworkFrom(item.portrait),
+        }))}
+      />
     </SiteShell>
   );
 }

@@ -2,19 +2,34 @@
 
 import { useRef } from "react";
 import gsap from "gsap";
+import type { SerializedEditorState } from "@payloadcms/richtext-lexical/lexical";
 import { lerp } from "@/lib/easing";
-import { PETALS } from "@/lib/artwork";
-import type { Service } from "@/lib/services";
+import { PETALS, type Artwork } from "@/lib/artwork";
 import { useDriftingPhoto } from "@/lib/useDriftingPhoto";
 import { useRevealOnView } from "@/lib/useRevealOnView";
+import { RichText } from "./RichText";
 import styles from "./ServicePanel.module.css";
 import photo from "./photo.module.css";
 
 /** Every image on this page fades in on the same 0.2s delay. */
 const REVEAL_DELAY = 200;
 
+export type ServiceDetail = {
+  title: string;
+  /** The flower glyph, drawn 69 x 55. */
+  icon: Artwork;
+  /** The photograph above the copy, 805 x 1000. */
+  photo: Artwork;
+  /**
+   * Two paragraphs, as published — but two `<p>` elements now, where the
+   * template put both runs in one and separated them with `<br><br>`. See
+   * `.block` in ServicePanel.module.css for what that costs and how it is paid.
+   */
+  copy: SerializedEditorState;
+};
+
 type ServicePanelProps = {
-  service: Service;
+  service: ServiceDetail;
   /** Set on the panel in the narrow column, which hangs below the other two. */
   dropped?: boolean;
   /** Set on the closing panel, which spans both columns. */
@@ -58,32 +73,15 @@ export function ServicePanel({ service, dropped, wide, petals }: ServicePanelPro
   return (
     <div className={panelClass} ref={panelRef}>
       <div className={photo.frame} ref={frameRef}>
-        <img
-          ref={imageRef}
-          className={photo.fill}
-          {...service.photo}
-          loading="lazy"
-          alt=""
-        />
+        <img ref={imageRef} className={photo.fill} {...service.photo} loading="lazy" alt="" />
       </div>
 
       <div className={styles.block}>
         <div className={styles.heading}>
-          <img
-            src={service.icon}
-            width={69}
-            loading="lazy"
-            alt=""
-            className={styles.icon}
-          />
+          <img {...service.icon} width={69} loading="lazy" alt="" className={styles.icon} />
           <h3 className={styles.title}>{service.title}</h3>
         </div>
-        <p>
-          {service.copy[0]}
-          <br />
-          <br />
-          {service.copy[1]}
-        </p>
+        <RichText data={service.copy} />
       </div>
 
       {petals && (

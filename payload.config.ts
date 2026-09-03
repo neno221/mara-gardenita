@@ -7,6 +7,11 @@ import sharp from "sharp";
 
 import { Users } from "./collections/Users";
 import { Media } from "./collections/Media";
+import { Projects } from "./collections/Projects";
+import { Posts } from "./collections/Posts";
+import { Services } from "./collections/Services";
+import { Testimonials } from "./collections/Testimonials";
+import { Instagram } from "./collections/Instagram";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -16,7 +21,10 @@ export default buildConfig({
     importMap: { baseDir: path.resolve(dirname) },
   },
 
-  collections: [Users, Media],
+  // Phase 3 adds the five content collections. Pages, the block library and the
+  // two globals are phase 4; until then the views keep their hardcoded section
+  // order and only their data moves.
+  collections: [Users, Media, Projects, Posts, Services, Testimonials, Instagram],
 
   editor: lexicalEditor(),
 

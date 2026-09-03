@@ -143,16 +143,18 @@
       "cls": "photo_fill",
       "alt": "Wedding guest list tool: Our best kept secret",
       "loading": "eager",
-      "src": "/images/journal-guest-list-hero.jpg",
+      "src": "/api/media/file/journal-guest-list-hero.jpg",
       "srcSetWidths": [
+        500,
         800,
         1080,
         1372
       ],
       "srcSetUrls": [
-        "/images/journal-guest-list-hero-800.jpg",
-        "/images/journal-guest-list-hero-1080.jpg",
-        "/images/journal-guest-list-hero.jpg"
+        "/api/media/file/journal-guest-list-hero-500x312.jpg",
+        "/api/media/file/journal-guest-list-hero-800x499.jpg",
+        "/api/media/file/journal-guest-list-hero-1080x673.jpg",
+        "/api/media/file/journal-guest-list-hero.jpg"
       ],
       "sizes": "(max-width: 479px) 96vw, (max-width: 767px) 95vw, 96vw",
       "naturalWidth": 1382
@@ -162,7 +164,7 @@
       "cls": "",
       "alt": "",
       "loading": "eager",
-      "src": "/images/journal-post-figure-one.jpg",
+      "src": "/api/media/file/journal-post-figure-one.jpg",
       "srcSetWidths": [],
       "srcSetUrls": [],
       "sizes": null,
@@ -173,7 +175,7 @@
       "cls": "",
       "alt": "",
       "loading": "eager",
-      "src": "/images/journal-post-figure-two.jpg",
+      "src": "/api/media/file/journal-post-figure-two.jpg",
       "srcSetWidths": [],
       "srcSetUrls": [],
       "sizes": null,

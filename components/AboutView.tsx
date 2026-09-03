@@ -1,4 +1,6 @@
 import { ABOUT_ARTWORK } from "@/lib/artwork";
+import { artworkFrom } from "@/lib/media";
+import { getTestimonials } from "@/lib/payload";
 import { AboutPhoto } from "./AboutPhoto";
 import { PageMasthead } from "./HeroTop";
 import { Section } from "./Section";
@@ -26,7 +28,19 @@ const CLOSING_ROW = [
 /** The dividers between the logos are positional, so the order is the layout. */
 const PRESS = ["mimosa", "iris", "orion", "sigma", "pristin", "polaris"];
 
-export function AboutView() {
+/**
+ * `/about`.
+ *
+ * The only thing phase 3 moves here is the testimonial carousel, which now reads
+ * the collection. The nine photographs, the two prose runs and the six press
+ * logos are still written into this file: they belong to the `photoRow`, `prose`
+ * and `pressStrip` blocks, and those arrive in phase 4 with the sectioning rule
+ * (§2) that keeps all six bodies inside one `<Section>`. Splitting them out
+ * before `RenderBlocks` exists would put 152px of padding into every seam.
+ */
+export async function AboutView() {
+  const testimonials = await getTestimonials();
+
   return (
     <SiteShell>
       <PageMasthead
@@ -124,7 +138,13 @@ export function AboutView() {
         </div>
       </Section>
 
-      <Testimonials />
+      <Testimonials
+        quotes={testimonials.map((item) => ({
+          quote: item.quote,
+          signature: item.signature,
+          portrait: artworkFrom(item.portrait),
+        }))}
+      />
     </SiteShell>
   );
 }

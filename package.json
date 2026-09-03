@@ -12,6 +12,7 @@
     "db:up": "docker compose up -d",
     "db:down": "docker compose down",
     "db:dump": "powershell -ExecutionPolicy Bypass -File scripts/db-dump.ps1",
+    "seed": "cross-env NODE_OPTIONS=--no-deprecation payload run scripts/seed.ts",
     "typecheck": "tsc --noEmit",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
     "migrate": "cross-env PAYLOAD_DB_PUSH=false NODE_OPTIONS=--no-deprecation payload migrate",

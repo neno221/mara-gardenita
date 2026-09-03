@@ -165,25 +165,31 @@
       "cls": "photo_fill",
       "alt": "Napkin fold ideas that will elevate your table",
       "loading": "eager",
-      "src": "/images/journal-napkin-fold-card.jpg",
-      "srcSetWidths": [],
-      "srcSetUrls": [],
-      "sizes": null,
-      "naturalWidth": 735
+      "src": "/api/media/file/journal-napkin-fold-card.jpg",
+      "srcSetWidths": [
+        500,
+        735
+      ],
+      "srcSetUrls": [
+        "/api/media/file/journal-napkin-fold-card-500x440.jpg",
+        "/api/media/file/journal-napkin-fold-card.jpg"
+      ],
+      "sizes": "(max-width: 479px) 96vw, (max-width: 767px) 95vw, 96vw",
+      "naturalWidth": 360
     },
     {
       "i": 5,
       "cls": "photo_fill",
       "alt": "Wedding guest list tool: Our best kept secret",
       "loading": "eager",
-      "src": "/images/journal-guest-list-card.jpg",
+      "src": "/api/media/file/journal-guest-list-card.jpg",
       "srcSetWidths": [
         500,
         735
       ],
       "srcSetUrls": [
-        "/images/journal-guest-list-card-500.jpg",
-        "/images/journal-guest-list-card.jpg"
+        "/api/media/file/journal-guest-list-card-500x440.jpg",
+        "/api/media/file/journal-guest-list-card.jpg"
       ],
       "sizes": "(max-width: 479px) 96vw, (max-width: 767px) 95vw, 96vw",
       "naturalWidth": 360
@@ -193,14 +199,14 @@
       "cls": "photo_fill",
       "alt": "What does a full service wedding planner do?",
       "loading": "eager",
-      "src": "/images/journal-full-service-card.jpg",
+      "src": "/api/media/file/journal-full-service-card.jpg",
       "srcSetWidths": [
         500,
         735
       ],
       "srcSetUrls": [
-        "/images/journal-full-service-card-500.jpg",
-        "/images/journal-full-service-card.jpg"
+        "/api/media/file/journal-full-service-card-500x440.jpg",
+        "/api/media/file/journal-full-service-card.jpg"
       ],
       "sizes": "(max-width: 479px) 96vw, (max-width: 767px) 95vw, 96vw",
       "naturalWidth": 360
@@ -210,14 +216,14 @@
       "cls": "photo_fill",
       "alt": "A Family Affair: how to plan a kid friendly wedding",
       "loading": "eager",
-      "src": "/images/journal-family-affair-card.jpg",
+      "src": "/api/media/file/journal-family-affair-card.jpg",
       "srcSetWidths": [
         500,
         735
       ],
       "srcSetUrls": [
-        "/images/journal-family-affair-card-500.jpg",
-        "/images/journal-family-affair-card.jpg"
+        "/api/media/file/journal-family-affair-card-500x440.jpg",
+        "/api/media/file/journal-family-affair-card.jpg"
       ],
       "sizes": "(max-width: 479px) 96vw, (max-width: 767px) 95vw, 96vw",
       "naturalWidth": 360

@@ -309,29 +309,46 @@ no placeholder substitution, which is what lets the diff stay exact:
 
 The existing views read from Payload; section order stays hardcoded.
 
-> **Measured in phase 2, and unresolved.** `lib/media.ts` reproduces the shipped `srcSet`
-> for **51 of the 55** rendered photographs exactly. The four exceptions are the journal
-> hero plates, all 1372w, which *gain* candidates because Payload generates all three
-> image sizes where the old export shipped one or two:
->
-> | Plate | Shipped | Payload | Delta |
-> |---|---|---|---|
-> | `journal-napkin-fold-hero` | 1080, 1372 | 500, 800, 1080, 1372 | +500, +800 |
-> | `journal-full-service-hero` | 1080, 1372 | 500, 800, 1080, 1372 | +500, +800 |
-> | `journal-family-affair-hero` | 1080, 1372 | 500, 800, 1080, 1372 | +500, +800 |
-> | `journal-guest-list-hero` | 800, 1080, 1372 | 500, 800, 1080, 1372 | +500 |
->
-> Nothing is lost and no layout moves — the `sizes` hint is unchanged, so the slot width
-> is unchanged, and a narrow viewport simply gets a smaller file than it used to. But it
-> **fails the fingerprint on 8 captures** (4 post routes × 2 widths), and decision E does
-> not distinguish an improvement from a regression. Phase 3 has to choose, explicitly:
-> accept it and re-baseline those eight with the reason recorded, or teach `toArtwork` to
-> restrict its candidates to a stated set. Re-baselining is the honest option — a
-> strictly-larger candidate list is what a CMS is *for* — but it is the first time the
-> gate is moved rather than met, so it should be a decision and not a shrug.
+> **Measured in phase 2, resolved in phase 3 — see [decision I](#i-the-srcset-gains-and-the-derivative-rounding).**
+> `lib/media.ts` reproduces the shipped `srcSet` for 51 of the 55 rendered
+> photographs exactly. The four exceptions are the journal hero plates, all 1372w,
+> which *gain* candidates because Payload generates all three image sizes where the
+> old export shipped one or two. Phase 3 measured two more of the same kind
+> (`journal-napkin-fold-card`, `portfolio-briana-richard`) and a second, unrelated
+> cause: `sharp` rounds a derivative's height down where the old exporter rounded up.
+> The full accounting is in [`fingerprints/README.md`](../fingerprints/README.md).
 
 **Done when** the fingerprint diff is clean at both widths, modulo the two known DOM changes
 in [§3](#3-fidelity-where-the-dom-cannot-stay-identical) and the four journal plates above.
+
+> **Done, 4 September 2026.** Five collections, `scripts/seed.ts`, and the five views
+> reading from Payload. All 18 captures re-check clean against a baseline re-taken
+> once, for the reasons in decision I. Three things the phase turned up that the plan
+> did not have:
+>
+> - **The `.richText` calibration came forward from phase 4.** Phase 3 is where the
+>   service panel's `copy` tuple becomes rich text, so it is where `<p><br><br></p>`
+>   becomes two `<p>` — leaving the fix a phase away would have shipped a measurably
+>   wrong `/services` and a yellow gate for the whole of phase 4. It is one rule in
+>   `ServicePanel.module.css`, and the phase-0 baseline had already corrected §3's
+>   arithmetic: two `<br>`s open **one** empty line box, not two. `/services`
+>   reproduces both band heights and its `scrollHeight` exactly.
+> - **`payload migrate` cannot run unattended.** The drizzle adapter prompts whenever
+>   `payload_migrations` holds the `batch: -1` row that dev-mode push writes, and it
+>   ignores `--forceAcceptWarning` — that flag is read by Payload's own CLI, not by
+>   the adapter that asks. Answer it by piping: `'y' | npm run migrate` in PowerShell.
+>   Every dev run rewrites that row, so this recurs in phase 4.
+> - **Projects' `body` needed a block to hold.** Payload refuses a `blocks` field with
+>   an empty list, so `blocks/Prose.ts` is pulled forward out of phase 4's thirteen.
+>   The seed leaves every project body empty: the template shipped no detail-page copy
+>   and decision B forbids inventing any.
+>
+> Phase 3 deliberately did **not** touch: `SiteFooter`'s Instagram tiles (the
+> collection is seeded, the widget waits for phase 4's Footer global), the about
+> page's photographs, prose and press strip, the block-level headings and CTA labels
+> on `ServiceGrid`/`PortfolioGrid`, and the `<Section>` lifting from §2. Each of those
+> is block work, and doing it before `RenderBlocks` exists would move a hardcoded
+> string sideways rather than make it editable.
 
 ---
 
@@ -385,6 +402,10 @@ content. What survives is the cleanup and the one durability task that still mat
   of `lib/artwork.ts` except the `Artwork` type (which `lib/media.ts` still returns) and
   `PETALS` (referenced by component constants, not by blocks). Then `CartPanel`,
   `NavDropdown` and `ChevronIcon`, orphaned since before this migration started.
+  *All three `lib/` modules have been unreferenced since phase 3;* they are left in place
+  only because this is where the plan puts their removal. `lib/artwork.ts` is pruned as it
+  is superseded — the hero plates went in phase 2, the two portfolio tables in phase 3 —
+  so what phase 6 finds there is only what phase 4 has just stopped using.
 - **Prove the restore.** Drop the Docker volume and rebuild the database from a `pg_dump`
   plus the media directory. Untested backups of a single-copy local database are the largest
   remaining risk in the project, and it is a fifteen-minute exercise.
@@ -443,6 +464,33 @@ Pixel-identical. The `.richText` wrapper calibrates its inter-paragraph gap to t
 the old `<br><br>` occupied, measured off the phase-0 baseline. The fingerprint gates every
 migrated route on computed geometry, prose included. `/contact` and `/portfolio/<slug>` are
 exempt — they are new, so there is nothing to compare them to.
+
+### I. The `srcSet` gains and the derivative rounding — **answered in phase 3**
+**Re-baseline, and record why.** Twelve of the eighteen captures moved. Two causes,
+both about images, neither a layout the migration chose:
+
+1. **Six photographs gain `srcSet` candidates.** The four journal hero plates the plan
+   already named, plus `journal-napkin-fold-card` and `portfolio-briana-richard` —
+   which shipped single-source for no reason the pixels record, since their
+   same-width siblings *did* ship a 500. Reproducing those two would take a table of
+   the ten filenames that happened to ship bare, consulted at render, which is exactly
+   what phase 6 deletes `lib/artwork.ts` to stop doing. The `sizes` hint is unchanged,
+   so no slot width moves; a narrow viewport is handed a smaller file than before.
+2. **`sharp` rounds a derivative's height down where the old exporter rounded up.**
+   `portfolio-*` at 500 wide is 693.47px tall: the old export wrote 694, Payload writes
+   693. It shows only where the layout takes its height from the image — the
+   `max-width: 479px` rule where `.image` becomes `height: 100%` — and costs
+   `home@375` 2px and `portfolio@375` 3px over four stacked cards.
+
+The first is what a CMS is *for*, and the second is a property of the resizer that
+will recur for every photograph in phases 4–6, so it is recorded as a class rather
+than chased per image. **This is the first time the gate is moved rather than met**,
+and it is moved once: the new baseline records the Payload URLs too, so
+`npm run fingerprint` is strict again without `--ignore-urls`.
+
+*Reversible.* `git show HEAD~1:fingerprints/` is the pre-phase-3 gate, and restricting
+`toArtwork`'s candidates to a stated set is still the alternative if someone decides
+the published candidate lists were load-bearing after all.
 
 ### F. Who edits
 *Blocks phase 5.* One admin, or a client editor who cannot delete Pages or touch the

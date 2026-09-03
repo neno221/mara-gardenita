@@ -1,5 +1,4 @@
-import { PROJECTS } from "@/lib/projects";
-import { PortfolioCard } from "./PortfolioCard";
+import { PortfolioCard, type PortfolioCardProps } from "./PortfolioCard";
 import { SiteLink } from "./SiteLink";
 import { Sprig } from "./Sprig";
 import { Section } from "./Section";
@@ -7,7 +6,15 @@ import styles from "./PortfolioGrid.module.css";
 import section from "./Section.module.css";
 import buttons from "./buttons.module.css";
 
-export function PortfolioGrid() {
+/**
+ * The four-up project grid on the home page.
+ *
+ * Only the projects move in phase 3. The eyebrow, the headline and the "View all
+ * portfolios" link are still written here because there is nowhere yet for an
+ * editor to put them — they belong to the `portfolioGrid` block, which phase 4
+ * builds along with the rest of §1.1's prop interface.
+ */
+export function PortfolioGrid({ projects }: { projects: PortfolioCardProps[] }) {
   return (
     <Section>
       <div className={`${section.blockHeading} ${section.blockHeadingSpaced}`}>
@@ -21,8 +28,8 @@ export function PortfolioGrid() {
 
       <div className={styles.wrapper}>
         <div className={styles.grid} role="list">
-          {PROJECTS.map((project) => (
-            <PortfolioCard key={project.slug} {...project} />
+          {projects.map((project) => (
+            <PortfolioCard key={project.href} {...project} />
           ))}
         </div>
       </div>

@@ -3,7 +3,7 @@
   "path": "/post/what-does-a-full-service-wedding-planner-do",
   "width": 375,
   "title": "What does a full service wedding planner do? — Loovio",
-  "scrollHeight": 5213,
+  "scrollHeight": 5214,
   "classSequence": [
     "div",
     "header.SiteHeader_navbar",
@@ -143,14 +143,18 @@
       "cls": "photo_fill",
       "alt": "What does a full service wedding planner do?",
       "loading": "eager",
-      "src": "/images/journal-full-service-hero.jpg",
+      "src": "/api/media/file/journal-full-service-hero.jpg",
       "srcSetWidths": [
+        500,
+        800,
         1080,
         1372
       ],
       "srcSetUrls": [
-        "/images/journal-full-service-hero-1080.jpg",
-        "/images/journal-full-service-hero.jpg"
+        "/api/media/file/journal-full-service-hero-500x312.jpg",
+        "/api/media/file/journal-full-service-hero-800x499.jpg",
+        "/api/media/file/journal-full-service-hero-1080x673.jpg",
+        "/api/media/file/journal-full-service-hero.jpg"
       ],
       "sizes": "(max-width: 479px) 96vw, (max-width: 767px) 95vw, 96vw",
       "naturalWidth": 360
@@ -160,7 +164,7 @@
       "cls": "",
       "alt": "",
       "loading": "eager",
-      "src": "/images/journal-post-figure-one.jpg",
+      "src": "/api/media/file/journal-post-figure-one.jpg",
       "srcSetWidths": [],
       "srcSetUrls": [],
       "sizes": null,
@@ -171,7 +175,7 @@
       "cls": "",
       "alt": "",
       "loading": "eager",
-      "src": "/images/journal-post-figure-two.jpg",
+      "src": "/api/media/file/journal-post-figure-two.jpg",
       "srcSetWidths": [],
       "srcSetUrls": [],
       "sizes": null,
@@ -321,7 +325,7 @@
         10
       ],
       "w": 375,
-      "h": 3446,
+      "h": 3447,
       "fontSize": 18,
       "lineHeight": 32
     },

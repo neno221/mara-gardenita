@@ -1,0 +1,59 @@
+import type { CollectionConfig } from "payload";
+import { Prose } from "../blocks/Prose";
+import { order, slug } from "./fields";
+
+/**
+ * The four case studies behind `/portfolio` and the home page's four-up grid.
+ *
+ * **One photograph, not two** (docs/payload-plan.md §1.2, decision D). The spec
+ * asked for a `gridImage` and a `featureImage`; the code uses the same file for
+ * both, and the taller `/portfolio` crop comes from `PortfolioCard`'s
+ * `styles.imageTall`, not from a second export. A second upload would mean
+ * cropping four new images, which guarantees the phase-3 diff fails. The `sizes`
+ * hint is supplied by whichever grid renders the card — `SIZES.portfolioGrid`
+ * four-up, `SIZES.portfolioList` two-up — which is what `withSizes()` does today,
+ * moved up a layer.
+ */
+export const Projects: CollectionConfig = {
+  slug: "projects",
+
+  // The photographs are public, and so is the copy. Write access is decision F,
+  // which phase 5 settles.
+  access: { read: () => true },
+
+  admin: {
+    useAsTitle: "name",
+    defaultColumns: ["name", "slug", "order"],
+    description: "The case studies. Order is the sequence both portfolio grids print.",
+  },
+
+  defaultSort: "order",
+
+  versions: { drafts: true, maxPerDoc: 20 },
+
+  fields: [
+    { name: "name", type: "text", required: true },
+    slug,
+    {
+      name: "image",
+      type: "upload",
+      relationTo: "media",
+      required: true,
+      admin: {
+        description:
+          "One photograph, cropped taller by CSS on /portfolio. Decision D: there is no second crop.",
+      },
+    },
+    {
+      name: "body",
+      type: "blocks",
+      blocks: [Prose],
+      admin: {
+        description:
+          "The detail page, which phase 4 builds and renders. Empty until then — the template " +
+          "shipped no copy for it, and decision B forbids inventing any.",
+      },
+    },
+    order,
+  ],
+};

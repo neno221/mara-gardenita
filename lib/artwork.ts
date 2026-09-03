@@ -1,4 +1,3 @@
-import type { ProjectSlug } from "./projects";
 import { SIZES } from "./sizes";
 
 /**
@@ -39,9 +38,14 @@ const single = (stem: string): Artwork => ({ src: `/images/${stem}.jpg` });
 /**
  * The story-split pair, still served from disk.
  *
- * The three hero plates that used to sit here are gone: phase 2 moved them into the
- * Media collection, and `Hero` now takes them as props. Everything below is still
- * hardcoded until the phase-3 seed.
+ * What has left this file, and when: the three hero plates in phase 2, and the two
+ * portfolio tables in phase 3 — `PORTFOLIO_ARTWORK` and `PORTFOLIO_PAGE_ARTWORK`,
+ * which were `withSizes()` over one source table and are now one `image` per Project
+ * with the hint supplied by whichever grid renders the card (decision D).
+ *
+ * What is left is the artwork with no collection to belong to yet: the story-split
+ * pair, the about page's nine photographs, and the petals. Phase 4's blocks take
+ * those, and phase 6 deletes everything here but the `Artwork` type and `PETALS`.
  */
 export const ARTWORK = {
   whoWeAre: responsive("about-who-we-are", [500, 800], 805, SIZES.story),
@@ -71,38 +75,3 @@ export const ABOUT_ARTWORK = {
   brideTulle: single("about-bride-tulle"),
   lemonCake: single("about-lemon-cake"),
 } satisfies Record<string, Artwork>;
-
-/**
- * The project photography is shared between the four-up grid on the home page
- * and the two-up grid on `/portfolio`; only the slot width differs, so the
- * sources are declared once and the `sizes` hint is applied per layout.
- */
-const PORTFOLIO_SOURCES: Record<ProjectSlug, { alternates: number[]; intrinsic: number }> = {
-  "jennifer-oliver": { alternates: [500], intrinsic: 628 },
-  // Shipped without alternates in the source library, so it stays single-source.
-  "briana-richard": { alternates: [], intrinsic: 0 },
-  "anne-cameron": { alternates: [500], intrinsic: 628 },
-  "linda-charles": { alternates: [500], intrinsic: 628 },
-};
-
-function withSizes(sizes: string): Record<ProjectSlug, Artwork> {
-  const entries = Object.entries(PORTFOLIO_SOURCES) as [
-    ProjectSlug,
-    (typeof PORTFOLIO_SOURCES)[ProjectSlug],
-  ][];
-  return Object.fromEntries(
-    entries.map(([slug, { alternates, intrinsic }]) => [
-      slug,
-      // A `sizes` hint without a `srcset` has nothing to pick from.
-      alternates.length
-        ? responsive(`portfolio-${slug}`, alternates, intrinsic, sizes)
-        : single(`portfolio-${slug}`),
-    ]),
-  ) as Record<ProjectSlug, Artwork>;
-}
-
-/** Four across on desktop — the home page grid. */
-export const PORTFOLIO_ARTWORK = withSizes(SIZES.portfolioGrid);
-
-/** Two across on desktop — the portfolio page grid. */
-export const PORTFOLIO_PAGE_ARTWORK = withSizes(SIZES.portfolioList);

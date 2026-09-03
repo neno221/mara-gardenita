@@ -2,37 +2,28 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import gsap from "gsap";
-import { PETALS } from "@/lib/artwork";
+import type { Artwork } from "@/lib/artwork";
 import { outQuad } from "@/lib/easing";
 import { Sprig } from "./Sprig";
 import { Section } from "./Section";
 import styles from "./Testimonials.module.css";
 import section from "./Section.module.css";
 
-const QUOTES = [
-  {
-    portrait: PETALS.rose,
-    quote:
-      "“Turpis nullam dictum semper non. Sit libero venenatis nec, id viverra adipiscing non ultrices volutpat. Eleifend mi augue mi auctor diam diam. Mattis elementum ullamcorper gravida id velit mauris adipiscing sed. Sollicitudin in laoreet etiam.”",
-    signature: "Mr. & Mrs. Powell",
-  },
-  {
-    portrait: PETALS.wide,
-    quote:
-      "“Donec tortor pellentesque morbi aliquam quis dui sem laoreet. Massa erat et vel malesuada ullamcorper elementum. Lobortis maecenas ullamcorper at mauris amet duis diam nascetur nunc. Dui facilisi integer eget amet aenean. Magna tincidunt justo, amet, dui tellus..”",
-    signature: "Mr. & Mrs. Wilson",
-  },
-  {
-    portrait: PETALS.tall,
-    quote:
-      "“Faucibus in vulputate et amet. Vulputate eget eget molestie lectus ultrices facilisis consequat. Neque purus nibh enim aenean. Velit sem rhoncus a arcu. Turpis id non faucibus nam nec, enim nisl. Sed eget quam sit ornare varius eu tristique malesuada. Pellentesque.”",
-    signature: "Mr. & Mrs. Johnson",
-  },
-];
+export type Quote = {
+  /**
+   * Without quotation marks. The stored text is what was said; the marks below
+   * are how it is set, which is why the seed strips the template's typed pair
+   * rather than importing them (decision B's one punctuation exception).
+   */
+  quote: string;
+  signature: string;
+  /** A petal cut-out. Single-source, so no `sizes` hint. */
+  portrait: Artwork;
+};
 
 const FADE_DURATION = 0.6;
 
-export function Testimonials() {
+export function Testimonials({ quotes }: { quotes: Quote[] }) {
   const [index, setIndex] = useState(0);
   const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
   const previous = useRef(0);
@@ -61,8 +52,8 @@ export function Testimonials() {
   }, [index]);
 
   const step = useCallback((direction: number) => {
-    setIndex((value) => (value + direction + QUOTES.length) % QUOTES.length);
-  }, []);
+    setIndex((value) => (value + direction + quotes.length) % quotes.length);
+  }, [quotes.length]);
 
   return (
     <Section>
@@ -91,7 +82,7 @@ export function Testimonials() {
         }}
       >
         <div className={styles.mask}>
-          {QUOTES.map((item, i) => (
+          {quotes.map((item, i) => (
             <div
               key={item.signature}
               ref={(node) => {
@@ -99,12 +90,12 @@ export function Testimonials() {
               }}
               className={`${styles.slide} ${i === index ? styles.slideActive : ""}`}
               role="group"
-              aria-label={`${i + 1} of ${QUOTES.length}`}
+              aria-label={`${i + 1} of ${quotes.length}`}
               aria-hidden={i !== index}
             >
               <div className={styles.testimonial}>
-                <img src={item.portrait} loading="lazy" alt="" className={styles.portrait} />
-                <p className={styles.quote}>{item.quote}</p>
+                <img {...item.portrait} loading="lazy" alt="" className={styles.portrait} />
+                <p className={styles.quote}>{`“${item.quote}”`}</p>
                 <div className={styles.signature}>{item.signature}</div>
               </div>
             </div>

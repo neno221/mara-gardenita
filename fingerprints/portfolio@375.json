@@ -3,7 +3,7 @@
   "path": "/portfolio",
   "width": 375,
   "title": "Portfolio — Loovio",
-  "scrollHeight": 4305,
+  "scrollHeight": 4302,
   "classSequence": [
     "div",
     "header.SiteHeader_navbar",
@@ -149,14 +149,14 @@
       "cls": "PortfolioCard_image PortfolioCard_imageTall",
       "alt": "Jennifer & Oliver",
       "loading": "eager",
-      "src": "/images/portfolio-jennifer-oliver.jpg",
+      "src": "/api/media/file/portfolio-jennifer-oliver.jpg",
       "srcSetWidths": [
         500,
         628
       ],
       "srcSetUrls": [
-        "/images/portfolio-jennifer-oliver-500.jpg",
-        "/images/portfolio-jennifer-oliver.jpg"
+        "/api/media/file/portfolio-jennifer-oliver-500x693.jpg",
+        "/api/media/file/portfolio-jennifer-oliver.jpg"
       ],
       "sizes": "(max-width: 479px) 96vw, (max-width: 767px) 95vw, (max-width: 991px) 47vw, 46vw",
       "naturalWidth": 360
@@ -166,25 +166,31 @@
       "cls": "PortfolioCard_image PortfolioCard_imageTall",
       "alt": "Briana & Richard",
       "loading": "eager",
-      "src": "/images/portfolio-briana-richard.jpg",
-      "srcSetWidths": [],
-      "srcSetUrls": [],
-      "sizes": null,
-      "naturalWidth": 628
+      "src": "/api/media/file/portfolio-briana-richard.jpg",
+      "srcSetWidths": [
+        500,
+        628
+      ],
+      "srcSetUrls": [
+        "/api/media/file/portfolio-briana-richard-500x693.jpg",
+        "/api/media/file/portfolio-briana-richard.jpg"
+      ],
+      "sizes": "(max-width: 479px) 96vw, (max-width: 767px) 95vw, (max-width: 991px) 47vw, 46vw",
+      "naturalWidth": 360
     },
     {
       "i": 6,
       "cls": "PortfolioCard_image PortfolioCard_imageTall",
       "alt": "Anne & Cameron",
       "loading": "eager",
-      "src": "/images/portfolio-anne-cameron.jpg",
+      "src": "/api/media/file/portfolio-anne-cameron.jpg",
       "srcSetWidths": [
         500,
         628
       ],
       "srcSetUrls": [
-        "/images/portfolio-anne-cameron-500.jpg",
-        "/images/portfolio-anne-cameron.jpg"
+        "/api/media/file/portfolio-anne-cameron-500x693.jpg",
+        "/api/media/file/portfolio-anne-cameron.jpg"
       ],
       "sizes": "(max-width: 479px) 96vw, (max-width: 767px) 95vw, (max-width: 991px) 47vw, 46vw",
       "naturalWidth": 360
@@ -194,14 +200,14 @@
       "cls": "PortfolioCard_image PortfolioCard_imageTall",
       "alt": "Linda & Charles",
       "loading": "eager",
-      "src": "/images/portfolio-linda-charles.jpg",
+      "src": "/api/media/file/portfolio-linda-charles.jpg",
       "srcSetWidths": [
         500,
         628
       ],
       "srcSetUrls": [
-        "/images/portfolio-linda-charles-500.jpg",
-        "/images/portfolio-linda-charles.jpg"
+        "/api/media/file/portfolio-linda-charles-500x693.jpg",
+        "/api/media/file/portfolio-linda-charles.jpg"
       ],
       "sizes": "(max-width: 479px) 96vw, (max-width: 767px) 95vw, (max-width: 991px) 47vw, 46vw",
       "naturalWidth": 360
@@ -327,7 +333,7 @@
         10
       ],
       "w": 375,
-      "h": 2696,
+      "h": 2693,
       "fontSize": 18,
       "lineHeight": 32
     }

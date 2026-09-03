@@ -3,7 +3,7 @@
   "path": "/post/a-family-affair-how-to-plan-a-kid-friendly-wedding",
   "width": 375,
   "title": "A Family Affair: how to plan a kid friendly wedding — Loovio",
-  "scrollHeight": 5259,
+  "scrollHeight": 5260,
   "classSequence": [
     "div",
     "header.SiteHeader_navbar",
@@ -143,14 +143,18 @@
       "cls": "photo_fill",
       "alt": "A Family Affair: how to plan a kid friendly wedding",
       "loading": "eager",
-      "src": "/images/journal-family-affair-hero.jpg",
+      "src": "/api/media/file/journal-family-affair-hero.jpg",
       "srcSetWidths": [
+        500,
+        800,
         1080,
         1372
       ],
       "srcSetUrls": [
-        "/images/journal-family-affair-hero-1080.jpg",
-        "/images/journal-family-affair-hero.jpg"
+        "/api/media/file/journal-family-affair-hero-500x312.jpg",
+        "/api/media/file/journal-family-affair-hero-800x499.jpg",
+        "/api/media/file/journal-family-affair-hero-1080x673.jpg",
+        "/api/media/file/journal-family-affair-hero.jpg"
       ],
       "sizes": "(max-width: 479px) 96vw, (max-width: 767px) 95vw, 96vw",
       "naturalWidth": 360
@@ -160,7 +164,7 @@
       "cls": "",
       "alt": "",
       "loading": "eager",
-      "src": "/images/journal-post-figure-one.jpg",
+      "src": "/api/media/file/journal-post-figure-one.jpg",
       "srcSetWidths": [],
       "srcSetUrls": [],
       "sizes": null,
@@ -171,7 +175,7 @@
       "cls": "",
       "alt": "",
       "loading": "eager",
-      "src": "/images/journal-post-figure-two.jpg",
+      "src": "/api/media/file/journal-post-figure-two.jpg",
       "srcSetWidths": [],
       "srcSetUrls": [],
       "sizes": null,
@@ -321,7 +325,7 @@
         10
       ],
       "w": 375,
-      "h": 3446,
+      "h": 3447,
       "fontSize": 18,
       "lineHeight": 32
     },

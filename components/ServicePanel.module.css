@@ -21,6 +21,31 @@
   display: flex;
 }
 
+/* The rich-text calibration from §3 of docs/payload-plan.md.
+ *
+ * The panel's copy shipped as one paragraph holding both runs, separated by
+ * `<br><br>`. Lexical stores two paragraphs and emits two `<p>` elements, and
+ * `globals.css` gives a `p` a 28px bottom margin — which is not the height the
+ * two `<br>`s occupied, so the panel would shorten and every section below it
+ * would ride up.
+ *
+ * Measured off the phase-0 baseline rather than derived from the type token, and
+ * the measurement corrects the plan: `<br><br>` inside a paragraph leaves *one*
+ * empty line box, not two. The first `<br>` ends the run's last line; the second
+ * ends the empty line that first one opened. fingerprints/services@1440.json
+ * records the three paragraphs at 194, 292 and 194px against a 32.4px line box —
+ * 6, 9 and 6 line boxes exactly, where the text alone occupies 5, 8 and 5.
+ *
+ * So the gap is one line-height, and `1lh` is that by definition: it tracks the
+ * element's own line box, so it stays correct at every breakpoint and through a
+ * type change that `1.8em` would silently miss.
+ *
+ * The last paragraph is left alone. It keeps the 28px the single `<p>` carried
+ * below itself, which is the margin the section's spacing was set against. */
+.block > p:not(:last-child) {
+  margin-bottom: 1lh;
+}
+
 .heading {
   align-items: center;
   margin-bottom: 20px;
