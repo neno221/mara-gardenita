@@ -11,6 +11,12 @@
     volume. The media copy is not optional: restoring a dump without the matching
     uploads leaves every Media document pointing at a file that is not there.
 
+    Stop the dev server first. Payload's dev schema push updates the `dev` row in
+    payload_migrations on every start, so a server running after the dump leaves the
+    live database one timestamp ahead of the file. Harmless, but it turns an exact
+    restore into a one-row diff that reads like corruption. Phase 6 hit it, then
+    dumped with the server stopped and got all 61 tables byte-identical.
+
 .PARAMETER OutDir
     Where to write the dump. Defaults to backups/ at the repo root.
 

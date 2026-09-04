@@ -535,12 +535,31 @@ clean, and a database restore has actually been performed once.
 > bookkeeping. The restore is faithful to the dump; the live database moved on. Worth
 > knowing before someone reads that diff as corruption.
 >
-> **The Docker volume was not dropped.** The rebuild ran in a throwaway `postgres:17`
-> container on an empty volume — `initdb` from nothing, then the dump — which exercises the
-> same path without spending the only copy of the data to prove a backup. What that leaves
-> untested is narrow and not about the data: `docker compose up -d` recreating the named
-> volume, which differs from the throwaway only in the volume name, the port mapping and the
-> healthcheck. Anyone who wants the literal step has a verified dump to do it with.
+> **Then the volume was dropped for real.** The rehearsal above ran in a throwaway
+> `postgres:17` container; the drill the plan actually asks for was performed afterwards, on
+> the real stack. `docker compose down -v` removed `mara_gardenita_pgdata`, `up -d` recreated
+> it, and the new database was confirmed empty — 0 tables, `relation "pages" does not exist`
+> — before anything was restored into it. The site's only copy of its data was genuinely
+> gone at that moment.
+>
+> Rebuilding it took one dump and one zip: 61 `CREATE TABLE`, 61 `COPY`, 483 `ALTER TABLE`,
+> 254 `CREATE INDEX` and 40 `setval`, zero errors. `public/media` was moved aside and
+> restored from the archive rather than left in place, so both halves were exercised. The
+> verification ran **before** any dev server started, which is what let it come back
+> **61 of 61** tables byte-identical rather than 60 — with the server stopped, nothing
+> touches `payload_migrations` between the dump and the drop. Row counts, content checksums
+> and all 40 sequences matched; the 145 media files restored byte-identical by MD5 and the
+> database referenced exactly those 145 filenames.
+>
+> The site then served off the rebuilt stack with all eighteen captures clean, `/contact`,
+> `/portfolio/<slug>`, `/blog` and `/admin` answering 200 at byte lengths identical to their
+> pre-drop measurements, and the admin account intact. The one table that moved afterwards
+> was `payload_migrations`, when the dev server's schema push touched the `dev` row —
+> the same benign delta described above, reproduced deliberately this time.
+>
+> **The sequence worth copying**, because the order is what makes it safe: dump with the dev
+> server *stopped*; snapshot counts, checksums and sequences; restore that dump into a
+> throwaway container and diff it against the live database; only then drop the volume.
 >
 > Two things the drill turned up:
 >
