@@ -7,7 +7,7 @@ import { order, slug } from "./fields";
 /**
  * The journal: four entries on `/blog`, each with a page at `/post/<slug>`.
  *
- * **One date, not two.** `lib/journal.ts` carries a `date` ("August 7, 2021")
+ * **One date, not two.** `lib/journal.ts` carried a `date` ("August 7, 2021")
  * and a `published` ("2021-08-07") side by side — the printed form and the
  * `<time datetime>` form of the same fact, kept in sync by hand. They collapse
  * into one timestamp here and `JournalCard` formats it at render, which is the

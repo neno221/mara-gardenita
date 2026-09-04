@@ -93,100 +93,6 @@
   height: 44px;
 }
 
-/* ---------- dropdowns ---------- */
-
-.dropdown {
-  z-index: 1;
-  text-align: left;
-  margin-left: auto;
-  margin-right: auto;
-  display: inline-block;
-  position: relative;
-}
-
-.dropdownToggle {
-  justify-content: center;
-  align-items: center;
-  padding: 20px 27px;
-  display: flex;
-  white-space: nowrap;
-  cursor: pointer;
-  user-select: none;
-  background: none;
-  border: 0;
-  font: inherit;
-  text-decoration: none;
-  position: relative;
-  width: 100%;
-}
-
-.dropdownToggle:focus-visible {
-  outline: 1px dotted var(--subtitle);
-}
-
-.dropdownText {
-  color: var(--heading);
-  text-align: center;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  font-family: var(--font-ui-stack);
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 140%;
-}
-
-.dropdownIcon {
-  color: var(--heading);
-  width: 1em;
-  height: 1em;
-  margin: 0 0 0 5px;
-  font-size: 10px;
-  line-height: 100%;
-  position: relative;
-}
-
-.dropdownIcon svg {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-
-.dropdownList {
-  min-width: 100%;
-  background-color: var(--white);
-  padding-top: 14px;
-  padding-bottom: 14px;
-  box-shadow: var(--shadow-panel);
-  display: none;
-  position: absolute;
-  opacity: 0;
-}
-
-.dropdownListOpen {
-  display: block;
-}
-
-.dropdownLink {
-  color: var(--heading);
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  padding: 12px 30px;
-  font-family: var(--font-ui-stack);
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 140%;
-  text-decoration: none;
-  white-space: nowrap;
-  vertical-align: top;
-  text-align: left;
-  display: block;
-  position: relative;
-}
-
-.dropdownLink:hover {
-  color: var(--accent);
-}
-
 /* ---------- mobile trigger + hairline ---------- */
 
 .menuButton {
@@ -290,23 +196,6 @@
 
   .brand {
     display: none;
-  }
-
-  .dropdown {
-    width: 100%;
-  }
-
-  .dropdownList {
-    position: relative;
-    box-shadow: none;
-    background-color: transparent;
-    padding-top: 0;
-    padding-bottom: 0;
-    text-align: center;
-  }
-
-  .dropdownLink {
-    text-align: center;
   }
 
   .menuButton {

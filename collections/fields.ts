@@ -6,7 +6,7 @@ import type { Field } from "payload";
  * Four of the five phase-3 collections render as a fixed sequence — the three
  * services, the four projects, the three testimonials, the four journal cards —
  * and none of those sequences is derivable from the content. The journal is the
- * case that proves it: `lib/journal.ts` lists the posts 7 Aug, 7 Aug, 13 Aug,
+ * case that proves it: `lib/journal.ts` listed the posts 7 Aug, 7 Aug, 13 Aug,
  * 7 Aug, so sorting by date puts the third post first and the `/blog`
  * fingerprint fails. The published order is a decision someone made, so it is
  * stored as one.

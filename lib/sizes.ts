@@ -8,11 +8,13 @@
  * a single `vw` can silently hand every visitor a different photograph than the
  * one the site was published with.
  *
- * That is why these strings are moved rather than rewritten, and why every module
- * that used to keep its own copy now reads from here. `lib/artwork.ts`,
- * `lib/services.ts` and `lib/journal.ts` all consumed one of these; leaving a
- * second copy behind would let a phase-4 edit here diverge from a hardcoded string
- * there without anything failing.
+ * That is why these strings were moved rather than rewritten, and why this is the
+ * only place they live. `lib/artwork.ts`, `lib/services.ts` and `lib/journal.ts`
+ * each kept a copy and each consumed one of these; leaving a second copy behind
+ * would have let an edit here diverge from a hardcoded string there without
+ * anything failing. Phase 6 deleted the last two of those modules and stripped
+ * `artwork.ts` to a type, so the hints now have exactly one home and `toArtwork`
+ * is their only reader.
  *
  * The fingerprint records `sizes` per `<img>` per route, so a typo in any of the
  * seven fails the phase-0 baseline immediately.

@@ -28,7 +28,7 @@ fixed 900px viewport height so `vh` units resolve alike).
 | `classSequence` | Every painted element in document order, `tag.classes`. Catches any structural change. |
 | `images[].srcSetWidths` | **Parsed** width descriptors. Payload renames derivatives to `<stem>-500x<h>.jpg`, so the URLs move in phase 2 while the widths must not. |
 | `images[].srcSetUrls`, `src` | Compared strictly by default. `--ignore-urls` is for the run in which a photograph *moves* into Payload; the phase-3 baseline already records the `/api/media/file/…` URLs, so a plain `npm run fingerprint` is strict again. |
-| `images[].sizes` | The seven hints from `lib/artwork.ts`, which phase 2 lifts into `lib/sizes.ts`. |
+| `images[].sizes` | The seven hints phase 2 lifted out of `lib/artwork.ts` into `lib/sizes.ts`. |
 | `boxes[]` | Computed margin, padding, width, height, font-size and line-height of every `<Section>` and every `<p>`. This is what decision E is gated on. |
 | `boxes[].brs` | `<br>` children. The witness for the paragraph conversion below. |
 | `scrollHeight` | One number per route; any total-height drift shows here first. |
@@ -105,7 +105,8 @@ The plan's phase-3 note anticipated the first four. The last two are the same th
 arriving through `lib/media.ts`'s first invariant: both shipped single-source for no
 reason the pixels record — their same-width siblings *did* ship a 500 — so the only
 way to reproduce them would be a table of the ten filenames that happened to ship
-bare, consulted at render. Phase 6 deletes `lib/artwork.ts` to stop doing exactly that.
+bare, consulted at render. Phase 6 deleted `lib/artwork.ts`'s tables to stop doing
+exactly that.
 
 `naturalWidth` moves with them, and is not a second finding. On an image with `w`
 descriptors the property is **density-corrected**, so it reports the CSS slot width

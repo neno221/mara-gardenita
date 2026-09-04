@@ -7,9 +7,9 @@ import { order } from "./fields";
  * The three services: summarised three-up on the home page, then set out in full
  * on `/services`.
  *
- * `copy` is rich text rather than the `[string, string]` tuple `lib/services.ts`
- * keeps. That is the conversion §3 warns about: today's markup is one `<p>`
- * holding `copy[0]<br><br>copy[1]`, and Lexical emits two `<p>` elements, which
+ * `copy` is rich text rather than the `[string, string]` tuple the hardcoded
+ * `lib/services.ts` kept. That is the conversion §3 warns about: the published markup
+ * was one `<p>` holding `copy[0]<br><br>copy[1]`, and Lexical emits two `<p>` elements, which
  * `globals.css`'s 28px paragraph margin does not render at the same height as the
  * empty line box the `<br>`s produced. `ServicePanel.module.css` calibrates the
  * gap back; see the note there for the measurement.

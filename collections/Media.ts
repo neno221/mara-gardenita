@@ -9,9 +9,9 @@ const dirname = path.dirname(fileURLToPath(import.meta.url));
  * Every photograph, glyph and ornament on the site.
  *
  * The three image sizes are the widths the existing library already ships:
- * `<stem>-500.jpg`, `-800.jpg`, `-1080.jpg`. Reproducing them exactly is what lets
- * phase 2 swap `lib/artwork.ts` for a Payload lookup without moving a single
- * `srcSet` width descriptor.
+ * `<stem>-500.jpg`, `-800.jpg`, `-1080.jpg`. Reproducing them exactly is what let
+ * phase 2 swap the hardcoded `lib/artwork.ts` tables for a Payload lookup without
+ * moving a single `srcSet` width descriptor.
  *
  * `withoutEnlargement` is the load-bearing option: upscaling a narrow original into
  * an invented derivative would hand the browser a candidate the source never had.

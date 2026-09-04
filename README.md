@@ -15,9 +15,13 @@ npm start
 
 The site runs on [Payload](https://payloadcms.com) — see
 [`docs/payload-plan.md`](docs/payload-plan.md) for the architecture and the
-phased migration behind it. Six of the eight routes below are Pages documents
-rendered by one catch-all route from a block array, so their section order is
-editable and building a seventh page needs no code.
+phased migration behind it, and [`docs/deploy.md`](docs/deploy.md) for what a
+deploy would need, which is deferred rather than done: the database is a local
+Docker volume and the uploads are a local directory.
+
+Six of the eight routes below are Pages documents rendered by one catch-all route
+from a block array, so their section order is editable and building a seventh page
+needs no code.
 
 | Route | Source | Blocks |
 | --- | --- | --- |
@@ -253,5 +257,6 @@ deleted — removing them is now a row an editor drops, not a commit.
 There is no `app/not-found.tsx`, so `notFound()` and those four fall through to
 Next's default 404.
 
-`CartPanel`, `NavDropdown` and `ChevronIcon` have had no inbound references since
-before the migration started; phase 6 deletes them.
+`CartPanel`, `NavDropdown` and `ChevronIcon` had no inbound references from before
+the migration started; phase 6 deleted them, along with the `.dropdown*` rules in
+`SiteHeader.module.css` that only `NavDropdown` used.

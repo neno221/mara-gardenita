@@ -509,6 +509,56 @@ clean, and a database restore has actually been performed once.
 > Typecheck with `npx tsc --noEmit`, not `next build` — a build shares `.next` with a running
 > dev server and will disrupt it.
 
+> **Done, 4 September 2026.** The three `lib/` modules and the three orphaned components are
+> gone, `lib/artwork.ts` is down to the `Artwork` type and `PETALS`, and `tsc --noEmit` is
+> clean. Two things went with them that the plan did not list: `CartPanel.module.css`, which
+> only `CartPanel` imported, and the thirteen rules in `SiteHeader.module.css` styling the
+> seven `.dropdown*` classes that only `NavDropdown` used — `SiteHeader.tsx` itself touches
+> none of them. A CSS module ships whether or not a class is referenced, so leaving them
+> would have meant deleting the consumer and keeping the payload. All eighteen fingerprint
+> captures stayed clean, which is what makes the CSS deletion safe rather than plausible.
+>
+> **The restore was performed, and it works.** `backups/loovio-2026-09-04_161614.sql`
+> restored into an empty cluster in 859 statements with zero errors, and the result was
+> compared against the live database rather than eyeballed: 61 of 61 tables at identical row
+> counts (232 rows), 60 of 61 byte-identical by per-table content checksum, 40 of 40
+> sequences at identical `last_value` — the classic silent restore defect, and the one worth
+> checking by name. The media half restores too: 145 files, all byte-identical by MD5, and
+> the restored database references exactly those 145 filenames — a bijection, so neither half
+> arrives without the other. Then the site was served off the restored database and
+> **all eighteen fingerprint captures matched**, which is the only version of this claim
+> that is worth anything.
+>
+> The single differing table is `payload_migrations`, and within it one field: the `dev`
+> row's `updated_at`. The dump was taken at 14:16 UTC and the live row reads 14:24, because
+> starting a dev server eight minutes later pushed the schema and touched Payload's own
+> bookkeeping. The restore is faithful to the dump; the live database moved on. Worth
+> knowing before someone reads that diff as corruption.
+>
+> **The Docker volume was not dropped.** The rebuild ran in a throwaway `postgres:17`
+> container on an empty volume — `initdb` from nothing, then the dump — which exercises the
+> same path without spending the only copy of the data to prove a backup. What that leaves
+> untested is narrow and not about the data: `docker compose up -d` recreating the named
+> volume, which differs from the throwaway only in the volume name, the port mapping and the
+> healthcheck. Anyone who wants the literal step has a verified dump to do it with.
+>
+> Two things the drill turned up:
+>
+> - **The dump carries a UTF-8 BOM and 233 lines of non-ASCII.** `Out-File -Encoding utf8` on
+>   Windows PowerShell 5.1 writes the BOM, and the content is full of em dashes and typed
+>   quotation marks. Both survive the restore command `db-dump.ps1` prints: `Get-Content`
+>   strips the BOM, and the pipe into `docker exec -i psql` preserved every byte — checked
+>   against the source database down to the three bytes of U+2014 on a known em dash. That
+>   is a property of this machine's console encoding as much as of the file, so it is worth
+>   re-checking rather than assuming on a different host.
+> - **The fingerprint's first run against a cold dev server is not a regression.** Against a
+>   just-started server, `home@1440` reported 30 differences: `naturalWidth: 0` on 26 images
+>   and a `scrollHeight` 1010px short, with the script's own "still undecoded after 3
+>   attempts" warning above it. Every other capture was clean and a warm re-run was clean
+>   too. Warm the server before believing a diff that says every image changed at once.
+>
+> `docs/deploy.md` is written.
+
 ---
 
 ## 6. Decisions and what remains open

@@ -16,6 +16,12 @@
  * volume the only copy of every edit anyone makes, so a seed that silently
  * rewrote a document an editor had touched would be a data-loss bug wearing the
  * word "idempotent". `--force` overwrites, and says so in the tally.
+ *
+ * The `lib/` modules the constants below are transcribed from — `projects.ts`,
+ * `journal.ts` and `services.ts` — were deleted in phase 6 once nothing rendered
+ * from them. The attributions are kept as provenance: this file is now the only
+ * record of what the hardcoded site said, and re-running it against an empty
+ * database is what reproduces it.
  */
 import { readdirSync } from "node:fs";
 import { join, dirname, extname } from "node:path";

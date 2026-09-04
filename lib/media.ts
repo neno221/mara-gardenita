@@ -32,7 +32,7 @@
  * fact about the export, and for those seven it is an *arbitrary* one. Inferring the
  * `srcSet` from what Payload produced would hand the browser candidates the
  * published site never offered. The caller states the intent instead, exactly as
- * `lib/artwork.ts`'s `responsive()`/`single()` split does today.
+ * `lib/artwork.ts`'s `responsive()`/`single()` split did before phase 6 deleted it.
  *
  * *(The plan and `collections/Media.ts` both say five, and name the wrong set.
  * Measured against `public/images` and the phase-0 captures, it is ten.)*
@@ -112,7 +112,7 @@ function fileUrl(media: MediaLike): string {
  * toArtwork(media, SIZES.heroSide)    // { src, srcSet, sizes }   — responsive
  * ```
  *
- * Spread straight onto an `<img>`, as `lib/artwork.ts`'s tables are today.
+ * Spread straight onto an `<img>`, as the hardcoded tables were.
  */
 export function toArtwork(media: MediaLike, sizes?: SizesHint): Artwork {
   const src = fileUrl(media);
