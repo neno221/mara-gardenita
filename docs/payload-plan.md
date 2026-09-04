@@ -439,6 +439,48 @@ compare against, so they are reviewed by eye instead.
 **Done when** an admin heading edit reaches the live page within one request, and an
 unpublished page 404s publicly but previews for an editor.
 
+> **Done, 4 September 2026.** Both criteria verified end to end against a running server
+> rather than reasoned about. A `/services` masthead edit through the REST API changed the
+> statically generated page on the next request; a draft Page answered 404 anonymously,
+> 403 with the secret but no session, 401 with a session but no secret, and rendered for a
+> signed-in editor — after which `/next/exit-preview` put it back to 404. All eighteen
+> fingerprint captures stayed clean, which is the thing `plugin-seo` most plausibly could
+> have broken: `document.title` is in the gate.
+>
+> Decision F is verified rather than assumed. Against a temporary editor account, since
+> deleted: update a Page 200, **delete a Page 403**, update either global **403**, promote
+> self to admin silently ignored (the request succeeds, the field does not change — a
+> field-level `access.update`, without which every other rule is decorative). Anonymously,
+> `/api/pages` returns the six published documents and none of the drafts, and a create
+> is 403.
+>
+> Five things the phase turned up that the plan did not have:
+>
+> - **The `meta` swap cost nothing, as designed.** Phase 4's hand-rolled group used the
+>   plugin's field names, so the migration only added `meta_image_id` and `meta_no_index`;
+>   `meta_title` and `meta_description` kept their seeded values and no page title moved.
+> - **`draftMode()` throws inside `generateStaticParams`.** The same `getPosts`/`getProjects`
+>   serve both the render path and the two detail routes' static params, and Next runs the
+>   latter with no request to read a cookie from. Caught, returning `false`: there is no
+>   preview at build time.
+> - **`revalidatePath` throws outside a request** — `Invariant: static generation store
+>   missing`. That would have taken down `scripts/seed.ts` on its next run, since every
+>   `upsert` fires an `afterChange`. Guarded, so a hook cannot make the seed depend on Next
+>   being up.
+> - **`robots.ts` must live at the root of `app/`, not in `(frontend)`.** Inside the route
+>   group it registered no route at all and `/robots.txt` fell through to the Pages
+>   catch-all, which looked for a page slugged `robots.txt` and 404'd. `sitemap.ts` happened
+>   to work in the group, which made the failure look like a bug in the file. Both are at
+>   the root now.
+> - **The spec's `/api/preview` is not available.** `app/(payload)/api/[...slug]` owns every
+>   path under `/api`. The route is `/next/preview`, which is the segment Payload's own
+>   templates reserve.
+>
+> Phase 5 deliberately did **not** add: autosave (spec §12 asks for 2s on drafts; it writes a
+> version per keystroke-pause into the single database decision C warns about, and nobody
+> has asked for it), scheduled publishing, or `meta.image` fallbacks beyond the document's
+> own photograph.
+
 ---
 
 ### Phase 6 — Consolidation

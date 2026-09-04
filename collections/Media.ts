@@ -1,6 +1,7 @@
 import path from "path";
 import { fileURLToPath } from "url";
 import type { CollectionConfig } from "payload";
+import { anyone, authenticated } from "../access";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -35,8 +36,13 @@ export const Media: CollectionConfig = {
   //
   // This is not the decision-F role work, which is about who may *write*. A public
   // site's photographs are public; that is a fact about the collection, not a policy
-  // choice waiting on phase 5.
-  access: { read: () => true },
+  // choice waiting on phase 5. The write half is decision F, and lands here.
+  access: {
+    read: anyone,
+    create: authenticated,
+    update: authenticated,
+    delete: authenticated,
+  },
 
   admin: {
     useAsTitle: "filename",

@@ -1,4 +1,7 @@
 import type { CollectionConfig } from "payload";
+import { authenticated, publishedOnly } from "../access";
+import { revalidatePost, revalidatePostDelete } from "../hooks/revalidate";
+import { previewUrl } from "../lib/preview";
 import { order, slug } from "./fields";
 
 /**
@@ -19,12 +22,35 @@ import { order, slug } from "./fields";
 export const Posts: CollectionConfig = {
   slug: "posts",
 
-  access: { read: () => true },
+  access: {
+    read: publishedOnly,
+    create: authenticated,
+    update: authenticated,
+    delete: authenticated,
+  },
+
+  hooks: {
+    afterChange: [revalidatePost],
+    afterDelete: [revalidatePostDelete],
+  },
 
   admin: {
     useAsTitle: "title",
     defaultColumns: ["title", "published", "order"],
     description: "Journal entries. Order is the sequence /blog prints, which is not date order.",
+
+    // The three widths the fingerprint captures at, plus the tablet step, so an
+    // editor checking a layout is looking at the same viewports the gate does.
+    livePreview: {
+      url: ({ data }) => previewUrl({ collection: "posts", slug: data?.slug }),
+      breakpoints: [
+        { name: "mobile", label: "Mobile", width: 375, height: 812 },
+        { name: "tablet", label: "Tablet", width: 768, height: 1024 },
+        { name: "desktop", label: "Desktop", width: 1440, height: 900 },
+      ],
+    },
+
+    preview: ({ slug }) => previewUrl({ collection: "posts", slug: slug as string }),
   },
 
   defaultSort: "order",

@@ -44,11 +44,17 @@ app/
     [[...slug]]/page.tsx    every Pages document; `home` answers at /
     post/[slug]/page.tsx    renders <JournalPost />, per-post metadata + static params
     portfolio/[slug]/page.tsx  a project's own page
+    next/preview/route.ts   turns draft mode on for a signed-in editor
+    next/exit-preview/route.ts  and off again
+  robots.ts                 disallows /admin, /api and /next/; points at the sitemap
+  sitemap.ts                every published URL, minus anything flagged noIndex
   (payload)/                the admin panel and the API — generated, not hand-edited
-payload.config.ts           collections, globals, the Postgres adapter, Lexical
+payload.config.ts           collections, globals, plugin-seo, the Postgres adapter, Lexical
 collections/                Pages · Users · Media · Projects · Posts · Services · Testimonials · Instagram
 globals/                    Header, Footer — the chrome on every page
 blocks/                     the thirteen-block library, and the shared link field
+access/                     who may read, write and delete what
+hooks/                      afterChange revalidation
 migrations/                 committed; `push` is dev-only
 components/
   RenderBlocks.tsx    the block switch, and the banding rule that owns sectioning
@@ -118,12 +124,36 @@ that opens a page body, whose leading space the hero above already carries.
 `HeroTop` renders its label as a `<time>` where the page passes
 `subtitleDateTime`, which is how a post's publication date reaches the masthead.
 
-The four route files build their metadata with `pageMetadata`, which fills in the
-matching Open Graph and Twitter cards; a post passes `article` as well, for its
-publication time and hero image. Set `NEXT_PUBLIC_SITE_URL` for a deploy and it
-becomes `metadataBase`, so the share-card image URLs are absolute; leave it unset
-and no `metadataBase` is emitted at all, which lets Next fall back to the
-deployment host rather than baking a placeholder into every card.
+The three route files build their metadata with `pageMetadata`, which fills in
+the matching Open Graph and Twitter cards; a post passes `article` as well, for
+its publication time. The values come from each document's `meta` group —
+`@payloadcms/plugin-seo` on Pages, Projects and Posts, with a `noIndex` checkbox
+appended — so a title is an edit rather than a deploy, and `lib/seo.ts` supplies
+the admin's "auto-generate" fallbacks. Set `NEXT_PUBLIC_SITE_URL` and it becomes
+`metadataBase`, so the share-card image URLs are absolute; leave it unset and no
+`metadataBase` is emitted at all, which lets Next fall back to the deployment
+host rather than baking a placeholder into every card.
+
+## Drafts, preview and publishing
+
+Pages, Projects and Posts keep drafts and up to 20 versions each. An unpublished
+document 404s for the public and is absent from the API; an editor reaches it
+through the admin's Preview button or the live-preview pane, which load
+`/next/preview` — that route wants both `PAYLOAD_PUBLIC_DRAFT_SECRET` **and** a
+signed-in session, because the secret is in the admin's own markup and so is not
+a credential. `/next/exit-preview` clears the cookie.
+
+The pages are statically generated, so publishing would otherwise land at the
+next deploy — and there is no next deploy. `hooks/revalidate.ts` runs
+`revalidatePath` on every content change: a document's own URL where it has one,
+and the whole tree where it is furniture, which is what Services, Testimonials,
+Instagram and the two globals are. An edit reaches the live page on the next
+request.
+
+`access/` holds who may do what. An editor writes all content but cannot delete
+a Page or touch the Header and Footer, and cannot change their own role; the
+site's own reads are filtered separately in `lib/payload.ts`, because the Local
+API runs as root and an access rule alone would not close the render path.
 
 Each journal card lays its photograph and its plate on the same four-track grid
 row — `1fr 50px 50px 1fr` — with the photograph spanning tracks 1-2 and the plate

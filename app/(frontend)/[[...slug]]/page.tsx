@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getChrome } from "@/lib/chrome";
 import { pageMetadata } from "@/lib/metadata";
-import { getPage } from "@/lib/payload";
+import { getPage, getPageSlugs } from "@/lib/payload";
 import { RenderBlocks } from "@/components/RenderBlocks";
 import { SiteShell } from "@/components/SiteShell";
 
@@ -19,14 +19,25 @@ import { SiteShell } from "@/components/SiteShell";
  * only slug with a path that is not its own, and `pathFor` in `lib/links.ts`
  * knows it in one line.
  *
- * **No `generateStaticParams`.** The route renders per request against a local
- * database, which is correct at every slug and costs nothing here; caching and
- * the `revalidatePath` that has to come with it are phase 5's, and adding half
- * of it now would mean an admin edit that reaches some pages and not others.
+ * Statically generated, and revalidated by the `afterChange` hooks in
+ * `hooks/revalidate.ts` — phase 5 added both halves at once, because either one
+ * alone is worse than neither: a cache with no invalidation serves stale pages,
+ * and invalidation with no cache is a no-op that looks like it works.
  */
 type Params = { params: Promise<{ slug?: string[] }> };
 
 const slugFrom = (segments?: string[]) => (segments?.length ? segments.join("/") : "home");
+
+/**
+ * Every published page, `home` as the empty segment list.
+ *
+ * `dynamicParams` stays on its default, so a page published after the last build
+ * still renders on first request rather than 404ing.
+ */
+export async function generateStaticParams() {
+  const pages = await getPageSlugs();
+  return pages.map((slug) => ({ slug: slug === "home" ? [] : slug.split("/") }));
+}
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const page = await getPage(slugFrom((await params).slug));
@@ -38,6 +49,8 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   return pageMetadata({
     title: page.meta.title,
     description: page.meta.description ?? undefined,
+    image: page.meta.image,
+    noIndex: page.meta.noIndex,
   });
 }
 

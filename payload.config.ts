@@ -3,7 +3,10 @@ import { fileURLToPath } from "url";
 import { buildConfig } from "payload";
 import { postgresAdapter } from "@payloadcms/db-postgres";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
+import { seoPlugin } from "@payloadcms/plugin-seo";
 import sharp from "sharp";
+
+import { generateDescription, generateImage, generateTitle } from "./lib/seo";
 
 import { Users } from "./collections/Users";
 import { Media } from "./collections/Media";
@@ -33,6 +36,42 @@ export default buildConfig({
   globals: [Header, Footer],
 
   editor: lexicalEditor(),
+
+  plugins: [
+    /**
+     * SEO on the three collections that have a URL (spec §8).
+     *
+     * It replaces the hand-rolled `meta` group phase 4 put on Pages, and the swap
+     * costs nothing in the database: the plugin names its fields `meta.title` and
+     * `meta.description`, which Postgres already holds as `meta_title` and
+     * `meta_description`. The seeded titles carry straight over — which matters,
+     * because `document.title` is in the fingerprint.
+     *
+     * `noIndex` is appended rather than being a field of its own. It belongs
+     * beside the description an editor is already looking at, not in a sidebar
+     * three scrolls away, and the spec asks for it per document.
+     */
+    seoPlugin({
+      collections: ["pages", "projects", "posts"],
+      uploadsCollection: "media",
+      generateTitle,
+      generateDescription,
+      generateImage,
+      fields: ({ defaultFields }) => [
+        ...defaultFields,
+        {
+          name: "noIndex",
+          type: "checkbox",
+          label: "Hide from search engines",
+          admin: {
+            description:
+              "Emits robots noindex and drops the document from the sitemap. For a page " +
+              "that is published because someone needs the link, not because it is finished.",
+          },
+        },
+      ],
+    }),
+  ],
 
   db: postgresAdapter({
     pool: { connectionString: process.env.DATABASE_URI || "" },

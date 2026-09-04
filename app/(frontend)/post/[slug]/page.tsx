@@ -20,14 +20,16 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   if (!post) return {};
 
   return pageMetadata({
-    title: `${post.title} — Loovio`,
-    description: post.excerpt.trim(),
+    title: post.meta?.title || `${post.title} — Loovio`,
+    description: post.meta?.description || post.excerpt.trim(),
+    // The plate, unless someone has chosen a different share image.
+    image: post.meta?.image ?? post.hero,
+    noIndex: post.meta?.noIndex,
     article: {
       // The date, not the timestamp: `article:published_time` read "2021-08-07"
       // before the two journal date strings collapsed into one field, and the
       // seed's midnight-UTC hour is a storage detail, not a publication fact.
       publishedTime: formatPublished(post.published).machine,
-      images: [artworkFrom(post.hero).src],
     },
   });
 }

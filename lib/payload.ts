@@ -5,13 +5,13 @@
  * components: this module reaches the database, that one only reshapes what comes
  * back.
  */
+import { draftMode } from "next/headers";
 import { getPayload } from "payload";
 import config from "@payload-config";
 import type {
   Footer,
   Header,
   Instagram,
-  Media,
   Page,
   Post,
   Project,
@@ -37,15 +37,59 @@ const DEPTH = 1;
 /**
  * Published only.
  *
- * Drafts are enabled on Projects and Posts, and Payload does *not* filter them
- * out of a `find` — `_status` is an ordinary queryable field, so an unpublished
- * document is returned like any other unless something asks it not to be. Phase
- * 5 moves this into the collections' read access, where the admin panel and the
- * REST API are covered too; until then it lives at every call site that serves
- * the public site, because a filter that is missing from one query is worse than
- * one that has not been written yet.
+ * Phase 5 added `publishedOnly` to the collections' read access, and this stayed.
+ * The two are not redundant: access functions guard the REST and GraphQL APIs and
+ * the admin panel, while the Local API defaults to `overrideAccess: true` and
+ * runs every query here as root. Deleting this line would publish drafts through
+ * the render path with the access rule still sitting there looking correct.
+ *
+ * That default is not a hole to plug, either — it is what lets the preview route
+ * render an unpublished document for an editor at all. So the filter is applied
+ * where the audience is the public, and lifted where it is a signed-in editor:
+ * `draft: true` below is the switch.
  */
 const PUBLISHED = { _status: { equals: "published" } };
+
+/**
+ * Whether this render is a draft preview.
+ *
+ * `draftMode()` reads a cookie the `/next/preview` route sets, and that route
+ * sets it only after `payload.auth()` has confirmed a signed-in user. So by the
+ * time this returns true, someone has already been authorised.
+ *
+ * It is read here rather than passed down from each route because a page renders
+ * a tree of blocks that each fetch their own content — `portfolioList` queries
+ * projects, `journalList` queries posts — and threading a flag through all of
+ * them would mean every future block had to remember to.
+ *
+ * **It throws outside a request, and that is the interesting case.** The same
+ * `getProjects` and `getPosts` that render a page also feed the two detail
+ * routes' `generateStaticParams`, which Next runs at build time with no HTTP
+ * request to read a cookie from. There is no preview at build time — nobody is
+ * signed in and nothing is being previewed — so the honest answer there is
+ * `false`, and catching is how you get it. Letting it throw would mean the
+ * static params of two routes depended on a cookie that cannot exist.
+ */
+async function isDraft(): Promise<boolean> {
+  try {
+    const { isEnabled } = await draftMode();
+    return isEnabled;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * The `where` and `draft` a public read uses, or an editor's preview.
+ *
+ * `draft: true` is what makes Payload return the *latest* version rather than the
+ * published one — without it a preview of an edited-but-unpublished page would
+ * show the last published copy and look, convincingly, like the edit had failed.
+ */
+async function visibility() {
+  const draft = await isDraft();
+  return { where: draft ? {} : PUBLISHED, draft };
+}
 
 /** The three services, in the order both the home grid and `/services` print. */
 export async function getServices(): Promise<Service[]> {
@@ -57,9 +101,11 @@ export async function getServices(): Promise<Service[]> {
 /** The four case studies, in the order both portfolio grids print. */
 export async function getProjects(): Promise<Project[]> {
   const client = await getClient();
+  const { where, draft } = await visibility();
   const { docs } = await client.find({
     collection: "projects",
-    where: PUBLISHED,
+    where,
+    draft,
     limit: 50,
     depth: DEPTH,
   });
@@ -76,9 +122,11 @@ export async function getTestimonials(): Promise<Testimonial[]> {
 /** The journal index, in the order `/blog` prints — which is not date order. */
 export async function getPosts(): Promise<Post[]> {
   const client = await getClient();
+  const { where, draft } = await visibility();
   const { docs } = await client.find({
     collection: "posts",
-    where: PUBLISHED,
+    where,
+    draft,
     limit: 100,
     depth: DEPTH,
   });
@@ -88,9 +136,11 @@ export async function getPosts(): Promise<Post[]> {
 /** One post, or null. `null` rather than a throw: an unknown slug is a 404. */
 export async function getPost(slug: string): Promise<Post | null> {
   const client = await getClient();
+  const { where, draft } = await visibility();
   const { docs } = await client.find({
     collection: "posts",
-    where: { ...PUBLISHED, slug: { equals: slug } },
+    where: { ...where, slug: { equals: slug } },
+    draft,
     limit: 1,
     depth: DEPTH,
   });
@@ -130,21 +180,79 @@ const PAGE_QUERY = {
 /** One page by slug, or null. `home` is the front page. */
 export async function getPage(slug: string): Promise<Page | null> {
   const client = await getClient();
+  const { where, draft } = await visibility();
   const { docs } = await client.find({
     collection: "pages",
-    where: { ...PUBLISHED, slug: { equals: slug } },
+    where: { ...where, slug: { equals: slug } },
+    draft,
     limit: 1,
     ...PAGE_QUERY,
   });
   return docs[0] ?? null;
 }
 
+/**
+ * Every published page's slug, for `generateStaticParams` and the sitemap.
+ *
+ * Deliberately *not* draft-aware. This answers "what does the site consist of",
+ * which has one answer regardless of who is asking — an editor previewing a
+ * draft reaches it by its own URL, and a build that pre-rendered unpublished
+ * pages would serve them to everyone.
+ */
+export async function getPageSlugs(): Promise<string[]> {
+  const client = await getClient();
+  const { docs } = await client.find({
+    collection: "pages",
+    where: PUBLISHED,
+    limit: 500,
+    depth: 0,
+    select: { slug: true },
+  });
+  return docs.map((doc) => doc.slug);
+}
+
+/**
+ * Everything with a URL, for the sitemap: slug, when it changed, and whether it
+ * has asked to be left out.
+ *
+ * One query per collection and three columns each. The sitemap is regenerated on
+ * every content change by the same hooks that revalidate the pages, so it is
+ * worth it being cheap.
+ */
+export async function getSitemapEntries(): Promise<
+  { collection: "pages" | "projects" | "posts"; slug: string; updatedAt: string }[]
+> {
+  const client = await getClient();
+  const collections = ["pages", "projects", "posts"] as const;
+
+  const results = await Promise.all(
+    collections.map(async (collection) => {
+      const { docs } = await client.find({
+        collection,
+        where: { ...PUBLISHED, "meta.noIndex": { not_equals: true } },
+        limit: 1000,
+        depth: 0,
+        select: { slug: true, updatedAt: true },
+      });
+      return docs.map((doc) => ({
+        collection,
+        slug: doc.slug as string,
+        updatedAt: doc.updatedAt as string,
+      }));
+    }),
+  );
+
+  return results.flat();
+}
+
 /** One project by slug, or null — the detail page decision A puts in scope. */
 export async function getProject(slug: string): Promise<Project | null> {
   const client = await getClient();
+  const { where, draft } = await visibility();
   const { docs } = await client.find({
     collection: "projects",
-    where: { ...PUBLISHED, slug: { equals: slug } },
+    where: { ...where, slug: { equals: slug } },
+    draft,
     limit: 1,
     ...PAGE_QUERY,
   });

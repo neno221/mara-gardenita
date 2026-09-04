@@ -1,6 +1,7 @@
 import * as migration_20260903_140934_initial from './20260903_140934_initial';
 import * as migration_20260903_224515_collections from './20260903_224515_collections';
 import * as migration_20260904_002149_pages_blocks_globals from './20260904_002149_pages_blocks_globals';
+import * as migration_20260904_133352_seo_access_preview from './20260904_133352_seo_access_preview';
 
 export const migrations = [
   {
@@ -16,6 +17,11 @@ export const migrations = [
   {
     up: migration_20260904_002149_pages_blocks_globals.up,
     down: migration_20260904_002149_pages_blocks_globals.down,
-    name: '20260904_002149_pages_blocks_globals'
+    name: '20260904_002149_pages_blocks_globals',
+  },
+  {
+    up: migration_20260904_133352_seo_access_preview.up,
+    down: migration_20260904_133352_seo_access_preview.down,
+    name: '20260904_133352_seo_access_preview'
   },
 ];

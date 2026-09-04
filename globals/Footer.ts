@@ -1,4 +1,6 @@
 import type { GlobalConfig } from "payload";
+import { admins, anyone } from "../access";
+import { revalidateGlobal } from "../hooks/revalidate";
 import { linkFields } from "../blocks/fields";
 
 /**
@@ -20,7 +22,12 @@ import { linkFields } from "../blocks/fields";
 export const Footer: GlobalConfig = {
   slug: "footer",
 
-  access: { read: () => true },
+  // Decision F: editors may not touch the globals. One mistyped nav entry is
+  // wrong on every page at once, which is a different blast radius from any
+  // single document.
+  access: { read: anyone, update: admins },
+
+  hooks: { afterChange: [revalidateGlobal] },
 
   admin: { description: "The closing band on every page." },
 

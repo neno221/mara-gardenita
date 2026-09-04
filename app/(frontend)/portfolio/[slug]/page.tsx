@@ -38,7 +38,12 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const project = await getProject((await params).slug);
   if (!project) return {};
 
-  return pageMetadata({ title: `${project.name} — Loovio` });
+  return pageMetadata({
+    title: project.meta?.title || `${project.name} — Loovio`,
+    description: project.meta?.description ?? undefined,
+    image: project.meta?.image ?? project.image,
+    noIndex: project.meta?.noIndex,
+  });
 }
 
 export default async function Page({ params }: Params) {

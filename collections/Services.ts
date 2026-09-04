@@ -1,4 +1,6 @@
 import type { CollectionConfig } from "payload";
+import { anyone, authenticated } from "../access";
+import { revalidateSiteWide, revalidateSiteWideDelete } from "../hooks/revalidate";
 import { order } from "./fields";
 
 /**
@@ -15,7 +17,20 @@ import { order } from "./fields";
 export const Services: CollectionConfig = {
   slug: "services",
 
-  access: { read: () => true },
+  // No drafts here, so there is nothing to filter — every document is live the
+  // moment it is saved. These three render inside someone else's page, which is
+  // why the hooks revalidate the whole tree rather than a path.
+  access: {
+    read: anyone,
+    create: authenticated,
+    update: authenticated,
+    delete: authenticated,
+  },
+
+  hooks: {
+    afterChange: [revalidateSiteWide],
+    afterDelete: [revalidateSiteWideDelete],
+  },
 
   admin: {
     useAsTitle: "title",

@@ -166,17 +166,19 @@ export interface Page {
     | PressStripBlock
     | InstagramFeedBlock
   )[];
-  meta?: {
-    /**
-     * The browser tab and the share card. Falls back to the site default.
-     */
-    title?: string | null;
-    /**
-     * The search result's second line, and the share card's.
-     */
-    description?: string | null;
-  };
   publishedAt?: string | null;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+    /**
+     * Emits robots noindex and drops the document from the sitemap. For a page that is published because someone needs the link, not because it is finished.
+     */
+    noIndex?: boolean | null;
+  };
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -502,6 +504,18 @@ export interface Project {
    * Lowest first. The published order, which no field on the document implies.
    */
   order: number;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+    /**
+     * Emits robots noindex and drops the document from the sitemap. For a page that is published because someone needs the link, not because it is finished.
+     */
+    noIndex?: boolean | null;
+  };
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -641,6 +655,18 @@ export interface Post {
    * Lowest first. The published order, which no field on the document implies.
    */
   order: number;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+    /**
+     * Emits robots noindex and drops the document from the sitemap. For a page that is published because someone needs the link, not because it is finished.
+     */
+    noIndex?: boolean | null;
+  };
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -897,13 +923,15 @@ export interface PagesSelect<T extends boolean = true> {
         pressStrip?: T | PressStripBlockSelect<T>;
         instagramFeed?: T | InstagramFeedBlockSelect<T>;
       };
+  publishedAt?: T;
   meta?:
     | T
     | {
         title?: T;
         description?: T;
+        image?: T;
+        noIndex?: T;
       };
-  publishedAt?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -1189,6 +1217,14 @@ export interface ProjectsSelect<T extends boolean = true> {
         photoRow?: T | PhotoRowBlockSelect<T>;
       };
   order?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+        noIndex?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -1206,6 +1242,14 @@ export interface PostsSelect<T extends boolean = true> {
   hero?: T;
   body?: T;
   order?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+        noIndex?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   _status?: T;

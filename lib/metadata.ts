@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { asMedia, type Upload } from "./media";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
 
@@ -12,39 +13,50 @@ export const SITE_URL = siteUrl ? new URL(siteUrl) : undefined;
 
 type PageMetadata = {
   title: string;
-  /**
-   * Optional since phase 4, where a Pages document supplies it and an editor may
-   * leave the field blank. Omitted rather than emitted empty, so the page falls
-   * back to the layout's description instead of declaring it has none.
-   */
   description?: string;
+  /** The share card's picture: `meta.image`, or the document's own photograph. */
+  image?: Upload;
+  /** Emits `robots: noindex`. The checkbox `plugin-seo` does not ship. */
+  noIndex?: boolean | null;
   /** Set on a journal post, which shares as an article rather than a page. */
-  article?: { publishedTime: string; images: string[] };
+  article?: { publishedTime: string };
 };
 
 /**
  * Every route sets the same four fields, with the title and description echoed
  * into the Open Graph and Twitter cards. Declared once here so a page only has
  * to say what it is.
+ *
+ * Phase 5 fed it from the documents rather than from constants in each route
+ * file, and added the two things `plugin-seo` implies: a share image, and
+ * `noIndex`. The shape of what it emits did not change — which is why
+ * `document.title` on all nine fingerprinted routes did not move.
  */
-export function pageMetadata({ title, description, article }: PageMetadata): Metadata {
+export function pageMetadata({
+  title,
+  description,
+  image,
+  noIndex,
+  article,
+}: PageMetadata): Metadata {
+  const src = asMedia(image)?.url ?? undefined;
+  const images = src ? [src] : undefined;
+
   return {
     title,
-    description,
-    openGraph: article
-      ? {
-          type: "article",
-          title,
-          description,
-          publishedTime: article.publishedTime,
-          images: article.images,
-        }
-      : { type: "website", title, description },
+    ...(description ? { description } : {}),
+    ...(noIndex ? { robots: { index: false, follow: false } } : {}),
+    openGraph: {
+      ...(article ? { type: "article", publishedTime: article.publishedTime } : { type: "website" }),
+      title,
+      ...(description ? { description } : {}),
+      ...(images ? { images } : {}),
+    },
     twitter: {
       card: "summary_large_image",
       title,
-      description,
-      ...(article ? { images: article.images } : {}),
+      ...(description ? { description } : {}),
+      ...(images ? { images } : {}),
     },
   };
 }

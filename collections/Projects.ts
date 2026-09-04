@@ -1,6 +1,9 @@
 import type { CollectionConfig } from "payload";
+import { authenticated, publishedOnly } from "../access";
 import { PhotoRow } from "../blocks/PhotoRow";
 import { Prose } from "../blocks/Prose";
+import { revalidateProject, revalidateProjectDelete } from "../hooks/revalidate";
+import { previewUrl } from "../lib/preview";
 import { order, slug } from "./fields";
 
 /**
@@ -18,14 +21,37 @@ import { order, slug } from "./fields";
 export const Projects: CollectionConfig = {
   slug: "projects",
 
-  // The photographs are public, and so is the copy. Write access is decision F,
-  // which phase 5 settles.
-  access: { read: () => true },
+  // Decision F: an editor may write and delete a case study — only Pages are
+  // protected from deletion, because a deleted Page takes a URL with it.
+  access: {
+    read: publishedOnly,
+    create: authenticated,
+    update: authenticated,
+    delete: authenticated,
+  },
+
+  hooks: {
+    afterChange: [revalidateProject],
+    afterDelete: [revalidateProjectDelete],
+  },
 
   admin: {
     useAsTitle: "name",
     defaultColumns: ["name", "slug", "order"],
     description: "The case studies. Order is the sequence both portfolio grids print.",
+
+    // The three widths the fingerprint captures at, plus the tablet step, so an
+    // editor checking a layout is looking at the same viewports the gate does.
+    livePreview: {
+      url: ({ data }) => previewUrl({ collection: "projects", slug: data?.slug }),
+      breakpoints: [
+        { name: "mobile", label: "Mobile", width: 375, height: 812 },
+        { name: "tablet", label: "Tablet", width: 768, height: 1024 },
+        { name: "desktop", label: "Desktop", width: 1440, height: 900 },
+      ],
+    },
+
+    preview: ({ slug }) => previewUrl({ collection: "projects", slug: slug as string }),
   },
 
   defaultSort: "order",
