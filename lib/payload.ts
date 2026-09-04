@@ -7,57 +7,23 @@
  */
 import { getPayload } from "payload";
 import config from "@payload-config";
-import type { Media, Post, Project, Service, Testimonial } from "@/payload-types";
+import type {
+  Footer,
+  Header,
+  Instagram,
+  Media,
+  Page,
+  Post,
+  Project,
+  Service,
+  Testimonial,
+} from "@/payload-types";
 
 /**
  * The Local API client. `getPayload` memoises per config, so calling this per render
  * costs a promise, not a connection.
  */
 export const getClient = () => getPayload({ config });
-
-/**
- * Looks Media documents up by filename, and throws if any is absent.
- *
- * Phase 2 wires the home hero through Payload before Pages exist to hold an upload
- * relationship, so the filename is the only handle the collection offers. Phase 4
- * replaces every one of these calls with a relationship on a block, at which point
- * this is only useful to the seed for its own idempotency check.
- *
- * **It throws rather than falling back to `lib/artwork.ts` on purpose.** A silent
- * fallback would let the phase-2 fingerprint pass on the hardcoded artwork while the
- * Payload path was broken or the library empty — which would make decision E's gate
- * measure nothing at all. Better a loud 500 on one route than a green check that
- * proves nothing.
- */
-export async function mediaByFilename<const T extends readonly string[]>(
-  filenames: T,
-): Promise<Record<T[number], Media>> {
-  const client = await getClient();
-  const { docs } = await client.find({
-    collection: "media",
-    where: { filename: { in: [...filenames] } },
-    limit: filenames.length,
-    depth: 0,
-  });
-
-  const found = new Map(docs.map((doc) => [doc.filename, doc]));
-  const missing = filenames.filter((filename) => !found.has(filename));
-  if (missing.length) {
-    throw new Error(
-      `Media not in the library: ${missing.join(", ")}.\n` +
-        "Phase 2 renders the home hero from Payload rather than from lib/artwork.ts. " +
-        "Upload the originals with:\n\n" +
-        "  npm run payload -- run scripts/upload-media.ts\n",
-    );
-  }
-
-  return Object.fromEntries(filenames.map((filename) => [filename, found.get(filename)!])) as Record<
-    T[number],
-    Media
-  >;
-}
-
-/* --------------------------------------------------- the phase-3 collections */
 
 /**
  * Deep enough to populate an upload field into a whole Media document — which is
@@ -129,4 +95,73 @@ export async function getPost(slug: string): Promise<Post | null> {
     depth: DEPTH,
   });
   return docs[0] ?? null;
+}
+
+/** The footer's feed, newest first. `-addedAt` is the collection's default sort. */
+export async function getInstagram(limit: number): Promise<Instagram[]> {
+  const client = await getClient();
+  const { docs } = await client.find({ collection: "instagram", limit, depth: DEPTH });
+  return docs;
+}
+
+/* ------------------------------------------------- the phase-4 pages and globals */
+
+/**
+ * A page is read two levels deep, and that is the whole join budget.
+ *
+ * Depth 1 populates what a block points at — a Service, a Project, a
+ * Testimonial, an upload. Depth 2 populates *their* uploads: the service's glyph
+ * and photograph, the project's photograph, the testimonial's portrait. Every
+ * one of those is a `toArtwork` call away from an `<img>`, so anything shallower
+ * renders a page of bare ids.
+ *
+ * The cost is the risk register's "Postgres join blow-up", and it comes from one
+ * field: a CTA's `page` relationship. Left alone it would populate the whole
+ * related Page — its `layout` array, and then that array's own relationships —
+ * once per link. Two things cap it. The field carries `maxDepth: 1`, and
+ * `populate` trims the related document to the single column `hrefFor` reads.
+ * A nav of four links then costs four slugs rather than four page trees.
+ */
+const PAGE_QUERY = {
+  depth: 2,
+  populate: { pages: { slug: true } },
+} as const;
+
+/** One page by slug, or null. `home` is the front page. */
+export async function getPage(slug: string): Promise<Page | null> {
+  const client = await getClient();
+  const { docs } = await client.find({
+    collection: "pages",
+    where: { ...PUBLISHED, slug: { equals: slug } },
+    limit: 1,
+    ...PAGE_QUERY,
+  });
+  return docs[0] ?? null;
+}
+
+/** One project by slug, or null — the detail page decision A puts in scope. */
+export async function getProject(slug: string): Promise<Project | null> {
+  const client = await getClient();
+  const { docs } = await client.find({
+    collection: "projects",
+    where: { ...PUBLISHED, slug: { equals: slug } },
+    limit: 1,
+    ...PAGE_QUERY,
+  });
+  return docs[0] ?? null;
+}
+
+/**
+ * The navigation. Populated the same way a page is, because its links are the
+ * same field and resolve through the same `hrefFor`.
+ */
+export async function getHeader(): Promise<Header> {
+  const client = await getClient();
+  return client.findGlobal({ slug: "header", ...PAGE_QUERY });
+}
+
+/** The closing band. Its Instagram tiles come from the collection, not from here. */
+export async function getFooter(): Promise<Footer> {
+  const client = await getClient();
+  return client.findGlobal({ slug: "footer", ...PAGE_QUERY });
 }

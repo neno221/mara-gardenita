@@ -1,4 +1,5 @@
 import type { CollectionConfig } from "payload";
+import { PhotoRow } from "../blocks/PhotoRow";
 import { Prose } from "../blocks/Prose";
 import { order, slug } from "./fields";
 
@@ -47,11 +48,15 @@ export const Projects: CollectionConfig = {
     {
       name: "body",
       type: "blocks",
-      blocks: [Prose],
+      // Two of the thirteen, both banded `shared`, so a write-up coalesces into
+      // one band the way the about page's six bodies do. Not the whole library:
+      // a project page has no use for a masthead it already has, or for an index
+      // of every other project.
+      blocks: [Prose, PhotoRow],
       admin: {
         description:
-          "The detail page, which phase 4 builds and renders. Empty until then — the template " +
-          "shipped no copy for it, and decision B forbids inventing any.",
+          "The detail page. Empty on all four seeded projects — the template shipped no copy " +
+          "for it, and decision B forbids inventing any.",
       },
     },
     order,

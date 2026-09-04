@@ -379,6 +379,54 @@ its slug with no developer involved — and the five migrated pages still finger
 `/contact` and `/portfolio/<slug>` are **exempt from the diff**: they have no "before" to
 compare against, so they are reviewed by eye instead.
 
+> **Done, 4 September 2026.** Thirteen blocks, six Pages documents, both globals,
+> `RenderBlocks`, the two new routes, and the five views deleted. All eighteen captures
+> re-check clean against a re-taken baseline, and **not one of them moved in geometry** —
+> every `scrollHeight` is byte-identical, as is every `srcSetWidths`, `sizes`, `alt`,
+> `loading` and `naturalWidth`. After canonicalising four CSS-module renames, the only
+> structural change anywhere is §3's two calibrated paragraph conversions on `/about`.
+> [`fingerprints/README.md`](../fingerprints/README.md) has the accounting. Six things
+> the phase turned up that the plan did not have:
+>
+> - **Six Pages, not seven.** Spec §5 seeds "`home`, `about`, `services`, `portfolio`,
+>   `blog`, and a new `contact`" — its six already include the page decision A adds, so
+>   "seven, not six" double-counts it. What decision A adds beyond the spec is the
+>   `/portfolio/<slug>` route, which is not a Pages document.
+> - **Decision G contradicts this phase's own text and loses.** G says the three
+>   `/template-info/*` links are "dropped at seed unless real destinations exist"; the
+>   paragraph above says phase 4 leaves them dead. They are seeded through the link
+>   field's `externalUrl` escape hatch — which is the half of G that matters, since
+>   dropping them is now a row an editor removes rather than a commit. Every other link
+>   the site renders resolves; the audit is in the README's Scope section.
+> - **Decision I's `srcSet` gains did not recur.** I recorded "a photograph gains
+>   candidates" as a class expected to repeat through phases 4–6. It did not, because
+>   `photoRow` takes its `sizes` hint from the count of photographs in the row: three
+>   across was published single-source, two across responsive, and the grid the count
+>   selects *is* the slot the hint describes. No table of filenames was needed.
+> - **The header's height hangs off a `<br>`.** The template's export left a trailing
+>   `<br>` inside the first nav link and nowhere else. `.navLink` is an inline-block with
+>   a 140% line box, so that link is 73.6px tall against its neighbours' 56.8px, and the
+>   nav grid centres on its tallest cell — the bar is 13.6px shorter without it, on every
+>   page. `SiteHeader` reproduces it deliberately.
+> - **A dev server pushed the phase-4 schema before the migration existed.** Push and
+>   `migrate:create` write the same DDL, so `migrate` would then have failed on tables
+>   that were already there — the phase-3 note's prompt is a different problem. Resolved
+>   without touching the live data: the three migrations were run against a scratch
+>   database, `pg_dump --schema-only` on both came back identical line for line, and the
+>   migration was then recorded in `payload_migrations`. **The lesson is ordering** —
+>   `migrate:create` and `migrate` belong *before* a dev server sees the new config.
+> - **The README had drifted since phase 1.** It documented five deleted views, the
+>   pre-route-group `app/` tree, and a `LIVE_ROUTES` allowlist that no longer exists.
+>   Its Pages, Layout, Images and Scope sections are rewritten; Motion and the CSS notes
+>   were still accurate and are untouched.
+>
+> Phase 4 deliberately did **not** touch: the three `lib/` data modules or the two dead
+> tables left in `lib/artwork.ts`, all of which are now unreferenced — the phase-6 bullet
+> above explicitly assigns "what phase 4 has just stopped using" to phase 6. Nor the
+> access functions (decision F, phase 5), nor `generateStaticParams` on the catch-all,
+> which is a caching decision that belongs with phase 5's `revalidatePath` rather than
+> half of it landing here.
+
 ---
 
 ### Phase 5 — SEO, drafts, preview, revalidation

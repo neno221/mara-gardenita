@@ -3,19 +3,37 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import gsap from "gsap";
+import type { HeaderProps } from "@/lib/chrome";
+import type { ResolvedLink } from "@/lib/links";
 import { useScrollProgress } from "@/lib/useScrollProgress";
 import { SiteLink } from "./SiteLink";
 import styles from "./SiteHeader.module.css";
 
 const MOBILE_NAV = "(max-width: 991px)";
 
-export function SiteHeader({ pageRef }: { pageRef: React.RefObject<HTMLDivElement | null> }) {
-  const pathname = usePathname();
+/**
+ * The bar on every page.
+ *
+ * The four links were written into this file, which made adding a menu entry a
+ * code change; they come from the Header global now. The grid is still three
+ * columns — links, wordmark, links — so the nav is split at its midpoint, with
+ * the odd one out going left.
+ */
+export function SiteHeader({
+  logo,
+  logoAlt,
+  nav,
+  pageRef,
+}: HeaderProps & { pageRef: React.RefObject<HTMLDivElement | null> }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const borderRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLElement>(null);
 
   const closeMenu = useCallback(() => setMenuOpen(false), []);
+
+  const split = Math.ceil(nav.length / 2);
+  const leading = nav.slice(0, split);
+  const trailing = nav.slice(split);
 
   // The hairline under the header fades in over the first sliver of scroll.
   useScrollProgress(pageRef, { smoothing: 94 }, (progress) => {
@@ -69,7 +87,7 @@ export function SiteHeader({ pageRef }: { pageRef: React.RefObject<HTMLDivElemen
   return (
     <header className={styles.navbar}>
       <SiteLink href="/" className={styles.brandMobile} onClick={closeMenu}>
-        <img src="/images/logo.svg" alt="Loovio" className={styles.logoMobile} />
+        <img {...logo} alt={logoAlt} className={styles.logoMobile} />
       </SiteLink>
 
       {/* Transparent on desktop; becomes the drop-down panel and its backdrop when collapsed. */}
@@ -82,44 +100,17 @@ export function SiteHeader({ pageRef }: { pageRef: React.RefObject<HTMLDivElemen
         <nav className={styles.navMenu} ref={menuRef} aria-label="Primary">
           <div className={styles.navGrid}>
             <div className={`${styles.navGroup} ${styles.navGroupLeading}`}>
-              <SiteLink
-                href="/portfolio"
-                className={styles.navLink}
-                aria-current={pathname === "/portfolio" ? "page" : undefined}
-                onClick={closeMenu}
-              >
-                Portfolio
-                <br />
-              </SiteLink>
-              <SiteLink
-                href="/about"
-                className={styles.navLink}
-                aria-current={pathname === "/about" ? "page" : undefined}
-                onClick={closeMenu}
-              >
-                About
-              </SiteLink>
+              {leading.map((item, index) => (
+                <NavLink key={item.href} item={item} first={index === 0} onNavigate={closeMenu} />
+              ))}
             </div>
             <SiteLink href="/" className={styles.brand} onClick={closeMenu}>
-              <img src="/images/logo.svg" alt="Loovio" className={styles.logo} />
+              <img {...logo} alt={logoAlt} className={styles.logo} />
             </SiteLink>
             <div className={`${styles.navGroup} ${styles.navGroupTrailing}`}>
-              <SiteLink
-                href="/blog"
-                className={styles.navLink}
-                aria-current={pathname === "/blog" ? "page" : undefined}
-                onClick={closeMenu}
-              >
-                Journal
-              </SiteLink>
-              <SiteLink
-                href="/services"
-                className={styles.navLink}
-                aria-current={pathname === "/services" ? "page" : undefined}
-                onClick={closeMenu}
-              >
-                Services
-              </SiteLink>
+              {trailing.map((item) => (
+                <NavLink key={item.href} item={item} onNavigate={closeMenu} />
+              ))}
             </div>
           </div>
         </nav>
@@ -137,5 +128,40 @@ export function SiteHeader({ pageRef }: { pageRef: React.RefObject<HTMLDivElemen
 
       <div className={styles.borderNav} ref={borderRef} />
     </header>
+  );
+}
+
+/**
+ * One entry in the navigation.
+ *
+ * `first` reproduces a trailing `<br>` that the template's export left inside the
+ * opening link and nowhere else. It is not decoration: `.navLink` is an
+ * inline-block with a 140% line box, so the extra empty line makes that one link
+ * 73.6px tall against its neighbours' 56.8px — and since the nav grid centres on
+ * its tallest cell, it is what sets the header's height on every page. Dropping
+ * it lifts the whole bar by 13.6px, which is exactly the kind of change decision
+ * E's gate exists to refuse.
+ */
+function NavLink({
+  item,
+  first,
+  onNavigate,
+}: {
+  item: ResolvedLink;
+  first?: boolean;
+  onNavigate: () => void;
+}) {
+  const pathname = usePathname();
+
+  return (
+    <SiteLink
+      href={item.href}
+      className={styles.navLink}
+      aria-current={pathname === item.href ? "page" : undefined}
+      onClick={onNavigate}
+    >
+      {item.label}
+      {first && <br />}
+    </SiteLink>
   );
 }

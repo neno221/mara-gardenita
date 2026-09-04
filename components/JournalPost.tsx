@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import type { SerializedEditorState } from "@payloadcms/richtext-lexical/lexical";
 import type { Artwork } from "@/lib/artwork";
+import type { ChromeProps } from "@/lib/chrome";
 import { formatPublished } from "@/lib/dates";
 import { useDriftingPhoto } from "@/lib/useDriftingPhoto";
 import { useRevealOnView } from "@/lib/useRevealOnView";
@@ -14,6 +15,8 @@ import styles from "./JournalPost.module.css";
 import photo from "./photo.module.css";
 
 export type JournalPostProps = {
+  /** The header and footer, read by the route — see `lib/chrome.ts`. */
+  chrome: ChromeProps;
   title: string;
   published: string;
   excerpt: string;
@@ -31,7 +34,14 @@ export type JournalPostProps = {
  * blockquote, list and figures directly and `globals.css` styles them as the
  * bare elements it always did. Nothing in `JournalPost.module.css` changes.
  */
-export function JournalPost({ title, published, excerpt, hero: plate, body }: JournalPostProps) {
+export function JournalPost({
+  chrome,
+  title,
+  published,
+  excerpt,
+  hero: plate,
+  body,
+}: JournalPostProps) {
   const frameRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
 
@@ -42,7 +52,7 @@ export function JournalPost({ title, published, excerpt, hero: plate, body }: Jo
   const date = formatPublished(published);
 
   return (
-    <SiteShell>
+    <SiteShell {...chrome}>
       <PageMasthead
         subtitle={date.printed}
         subtitleDateTime={date.machine}

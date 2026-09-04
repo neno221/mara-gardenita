@@ -4,11 +4,10 @@ The committed "before" for the Payload migration. First captured on 3 September 
 from the site at commit `63de302` — the last commit before any Payload work — and
 gating every migrated route from phase 1 onward (docs/payload-plan.md, decision E).
 
-**Re-baselined once, in phase 3.** Twelve of the eighteen captures moved; the reasons
-are enumerated under [What moved in phase 3](#what-moved-in-phase-3) below, and the
-decision to move the gate rather than meet it is recorded as decision I in the plan.
-Everything else — including all nine `about` and `services` band heights and every
-`scrollHeight` outside the two noted — reproduced exactly.
+**Re-baselined twice.** In phase 3, where twelve of the eighteen captures moved —
+see [What moved in phase 3](#what-moved-in-phase-3), and decision I in the plan for
+why the gate was moved rather than met. And in phase 4, where all eighteen moved and
+**not one of them moved in geometry** — see [What moved in phase 4](#what-moved-in-phase-4).
 
 ```bash
 npm run db:up                       # not needed for the fingerprint, but phase 1 wants it
@@ -132,6 +131,65 @@ appear in the committed JSON but were never reported as diffs.
 Nothing else in the eighteen captures moved. `/about` is byte-identical apart from the
 media URLs, and `/services` moved only in `classSequence` — three `<p>` becoming six,
 which is [the calibrated conversion](#the-decision-e-calibration-constant) above.
+
+## What moved in phase 4
+
+All eighteen captures, and **none of them in geometry**. Every `scrollHeight` is
+byte-identical to the phase-3 baseline, at both widths, on all nine routes. So is
+every `srcSetWidths`, every `sizes`, every `alt`, every `loading` and every
+`naturalWidth` — the attributes the migration is actually gated on did not move at
+all. Three things did.
+
+**1. Twenty-three photographs moved into Payload.** The about page's eight, the two
+story-split plates, the six press logos, the six Instagram tiles and the wordmark,
+`/images/<name>` → `/api/media/file/<name>`. This is the phase-2 URL move arriving
+for the artwork phase 4 gives a home to, and nothing more: the width descriptors
+behind those URLs are unchanged in every case, including the two-up about pair,
+which reproduces its published `[500, 761]` exactly.
+
+Note what did *not* recur here. Decision I recorded "a photograph gains `srcSet`
+candidates" as a class expected to repeat through phases 4–6. It did not, because
+`photoRow` takes its `sizes` hint from the count of photographs in the row: three
+across was published single-source and stays bare, two across was published
+responsive and stays responsive. The invariant held without a table of filenames.
+
+**2. Four CSS modules were renamed by the code moving.** `AboutView` became
+`PhotoRow`, `Prose` and `PressStrip`; `ServicesView_grid` became
+`ServicePanels_grid`; `SiteFooter`'s Instagram rules became `InstagramFeed`'s. The
+normaliser strips the content hash but not the module name, so each shows as a
+`structure` diff on every element that uses it. Canonicalising those four renames
+and re-diffing the class sequences leaves **four operations across all eighteen
+captures**, all of them item 3 below.
+
+The press strip's `.press1` … `.press5` are gone with them. They encoded the column
+count by ordinal; `:nth-child` encodes it directly, so the strip is correct for any
+number of logos rather than exactly six. The rules resolve to the same pixels — the
+`border-bottom`-on-every-row-but-the-last became `border-top`-on-every-row-but-the-first,
+which is the same line at the same `y` once `grid-row-gap` is 0 at those widths.
+
+**3. The about page's two prose runs converted, and the calibration paid for it.**
+The last two `<p><br><br></p>` on the site became four `<p>`, so `about` gains two
+measured boxes and loses four `<br>` elements — net −2 elements, which is the whole
+of its `element count` diff. The
+[calibration constant](#the-decision-e-calibration-constant) reproduces the
+footprint to the pixel:
+
+| | baseline | current |
+|---|---|---|
+| `about@1440` run 1 | 259 + 28 margin = **287** | 130 + 32, then 97 + 28 = **287** |
+| `about@1440` run 2 | 259 + 28 = **287** | 97 + 32, then 130 + 28 = **287** |
+| `about@375` run 1 | 551 + 28 = **579** | 292 + 32, then 227 + 28 = **579** |
+| `about@375` run 2 | 551 + 28 = **579** | 194 + 32, then 324 + 28 = **578** |
+
+The one 1px is integer rounding of a 32.4px line box reported twice, not a move:
+the enclosing band reads 6070 either way and `scrollHeight` is unchanged. The
+README's open question from phase 3 — whether `.prose`'s 110px context wants the
+trailing 28px — is answered by that table. It does. The rule is the same one the
+service panel carries, `p:not(:last-child) { margin-bottom: 1lh }`, and for the same
+reason.
+
+`/contact` and `/portfolio/<slug>` are not in the eighteen. They are new, so there
+is nothing to compare them to; decision E exempts them and they are reviewed by eye.
 
 ## Known noise, and why it is absent
 

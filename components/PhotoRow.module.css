@@ -1,0 +1,61 @@
+/* Lifted verbatim out of AboutView.module.css. Two grids, and the count of
+   photographs in the row picks between them — see PhotoRow.tsx. */
+
+.gridThree {
+  width: 100%;
+  grid-column-gap: 20px;
+  grid-row-gap: 20px;
+  grid-template-rows: auto;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-auto-columns: 1fr;
+  align-items: start;
+  display: grid;
+}
+
+.gridPair {
+  width: 100%;
+  grid-column-gap: 20px;
+  grid-row-gap: 20px;
+  grid-template-rows: auto;
+  grid-template-columns: 1fr 1fr;
+  grid-auto-columns: 1fr;
+  display: grid;
+}
+
+@media screen and (max-width: 991px) {
+  .gridThree {
+    grid-column-gap: 15px;
+    grid-row-gap: 15px;
+  }
+
+  .gridPair {
+    grid-column-gap: 15px;
+    grid-row-gap: 15px;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .gridThree {
+    grid-column-gap: 15px;
+    grid-row-gap: 75px;
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+
+  .gridPair {
+    grid-template-columns: 1fr;
+    grid-row-gap: 75px;
+  }
+}
+
+@media screen and (max-width: 479px) {
+  .gridThree {
+    grid-column-gap: 10px;
+    grid-row-gap: 65px;
+  }
+
+  .gridPair {
+    grid-column-gap: 10px;
+    grid-row-gap: 65px;
+  }
+}

@@ -1,0 +1,58 @@
+/* Lifted verbatim out of AboutView.module.css, plus the one rule §3 of
+   docs/payload-plan.md asks for. */
+
+.prose {
+  width: 100%;
+  max-width: 720px;
+  text-align: center;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  margin-top: 110px;
+  margin-bottom: 110px;
+  display: flex;
+}
+
+.ornament {
+  max-width: none;
+  object-fit: contain;
+  margin-bottom: 22px;
+}
+
+/* The rich-text calibration, and the second place it is applied — the first is
+ * `.block` in ServicePanel.module.css, where phase 3 converted the services copy.
+ *
+ * The published run is one paragraph holding both halves with `<br><br>` between
+ * them. Two `<br>`s open **one** empty line box: the first ends the run's last
+ * line, the second ends the empty line the first opened. `globals.css` gives a
+ * `p` a 28px bottom margin, which is 4.4px short of the 32.4px line box that gap
+ * actually occupied — invisible by eye, and it compounds, because each of the
+ * about page's two prose runs carries one.
+ *
+ * `1lh` is that line box by definition, so it stays correct at every breakpoint
+ * and through a type change that a literal `32.4px` would silently miss.
+ *
+ * The trailing margin is left alone, and that is the measurement the phase-0
+ * baseline asked for rather than an omission. The published `.prose` is a flex
+ * column whose single `<p>` carried 28px below itself, inside the 110px margin;
+ * zeroing it here would shorten every prose run by 28px. Same rule as the
+ * service panel, same reason. */
+.prose > p:not(:last-child) {
+  margin-bottom: 1lh;
+}
+
+@media screen and (max-width: 991px) {
+  .prose {
+    margin-top: 90px;
+    margin-bottom: 90px;
+    padding-left: 5%;
+    padding-right: 5%;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .prose {
+    margin-top: 80px;
+    margin-bottom: 80px;
+  }
+}

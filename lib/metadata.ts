@@ -12,7 +12,12 @@ export const SITE_URL = siteUrl ? new URL(siteUrl) : undefined;
 
 type PageMetadata = {
   title: string;
-  description: string;
+  /**
+   * Optional since phase 4, where a Pages document supplies it and an editor may
+   * leave the field blank. Omitted rather than emitted empty, so the page falls
+   * back to the layout's description instead of declaring it has none.
+   */
+  description?: string;
   /** Set on a journal post, which shares as an article rather than a page. */
   article?: { publishedTime: string; images: string[] };
 };

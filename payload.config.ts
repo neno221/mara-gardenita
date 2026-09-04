@@ -7,11 +7,14 @@ import sharp from "sharp";
 
 import { Users } from "./collections/Users";
 import { Media } from "./collections/Media";
+import { Pages } from "./collections/Pages";
 import { Projects } from "./collections/Projects";
 import { Posts } from "./collections/Posts";
 import { Services } from "./collections/Services";
 import { Testimonials } from "./collections/Testimonials";
 import { Instagram } from "./collections/Instagram";
+import { Header } from "./globals/Header";
+import { Footer } from "./globals/Footer";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -21,10 +24,13 @@ export default buildConfig({
     importMap: { baseDir: path.resolve(dirname) },
   },
 
-  // Phase 3 adds the five content collections. Pages, the block library and the
-  // two globals are phase 4; until then the views keep their hardcoded section
-  // order and only their data moves.
-  collections: [Users, Media, Projects, Posts, Services, Testimonials, Instagram],
+  // Pages is listed first because it is the one collection an editor opens to
+  // change what the site *is*; the other six hold what it is made of.
+  collections: [Pages, Users, Media, Projects, Posts, Services, Testimonials, Instagram],
+
+  // Both rendered by `SiteShell` on every page, which is why they are globals
+  // rather than a document someone could delete.
+  globals: [Header, Footer],
 
   editor: lexicalEditor(),
 

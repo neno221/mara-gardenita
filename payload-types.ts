@@ -67,6 +67,7 @@ export interface Config {
   };
   blocks: {};
   collections: {
+    pages: Page;
     users: User;
     media: Media;
     projects: Project;
@@ -81,6 +82,7 @@ export interface Config {
   };
   collectionsJoins: {};
   collectionsSelect: {
+    pages: PagesSelect<false> | PagesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     projects: ProjectsSelect<false> | ProjectsSelect<true>;
@@ -97,8 +99,14 @@ export interface Config {
     defaultIDType: number;
   };
   fallbackLocale: null;
-  globals: {};
-  globalsSelect: {};
+  globals: {
+    header: Header;
+    footer: Footer;
+  };
+  globalsSelect: {
+    header: HeaderSelect<false> | HeaderSelect<true>;
+    footer: FooterSelect<false> | FooterSelect<true>;
+  };
   locale: null;
   widgets: {
     collections: CollectionsWidget;
@@ -128,33 +136,90 @@ export interface UserAuthOperations {
   };
 }
 /**
+ * One document per URL. `home` is the front page.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users".
+ * via the `definition` "pages".
  */
-export interface User {
+export interface Page {
   id: number;
+  title: string;
   /**
-   * Admins may delete Pages and edit the Header and Footer globals; editors may not.
+   * The URL segment. Changing it changes a published address.
    */
-  role: 'admin' | 'editor';
+  slug: string;
+  /**
+   * The page, in order. Drag to rearrange.
+   */
+  layout: (
+    | HeroBlock
+    | MastheadBlock
+    | StorySplitBlock
+    | ServiceGridBlock
+    | ServicePanelsBlock
+    | PortfolioGridBlock
+    | PortfolioListBlock
+    | JournalListBlock
+    | TestimonialsBlock
+    | PhotoRowBlock
+    | ProseBlock
+    | PressStripBlock
+    | InstagramFeedBlock
+  )[];
+  meta?: {
+    /**
+     * The browser tab and the share card. Falls back to the site default.
+     */
+    title?: string | null;
+    /**
+     * The search result's second line, and the share card's.
+     */
+    description?: string | null;
+  };
+  publishedAt?: string | null;
   updatedAt: string;
   createdAt: string;
-  email: string;
-  resetPasswordToken?: string | null;
-  resetPasswordExpiration?: string | null;
-  salt?: string | null;
-  hash?: string | null;
-  loginAttempts?: number | null;
-  lockUntil?: string | null;
-  sessions?:
-    | {
-        id: string;
-        createdAt?: string | null;
-        expiresAt: string;
-      }[]
-    | null;
-  password?: string | null;
-  collection: 'users';
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HeroBlock".
+ */
+export interface HeroBlock {
+  /**
+   * The uppercase label above the headline.
+   */
+  eyebrow: string;
+  heading: string;
+  cta?: {
+    /**
+     * Leave empty to omit the link entirely.
+     */
+    label?: string | null;
+    /**
+     * Where it goes. Renaming that page's slug updates this link.
+     */
+    page?: (number | null) | Page;
+    /**
+     * Used instead of the page, for a destination this site does not hold.
+     */
+    externalUrl?: string | null;
+  };
+  /**
+   * Hangs left, tilted.
+   */
+  collageLeft: number | Media;
+  /**
+   * The taller plate in the middle.
+   */
+  collageCenter: number | Media;
+  /**
+   * Hangs right, tilted the other way.
+   */
+  collageRight: number | Media;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'hero';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -213,6 +278,206 @@ export interface Media {
   };
 }
 /**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "MastheadBlock".
+ */
+export interface MastheadBlock {
+  /**
+   * The uppercase label above the headline.
+   */
+  eyebrow: string;
+  heading: string;
+  /**
+   * A paragraph under the headline, where the page opens on prose.
+   */
+  lede?: string | null;
+  cta?: {
+    /**
+     * Leave empty to omit the link entirely.
+     */
+    label?: string | null;
+    /**
+     * Where it goes. Renaming that page's slug updates this link.
+     */
+    page?: (number | null) | Page;
+    /**
+     * Used instead of the page, for a destination this site does not hold.
+     */
+    externalUrl?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'masthead';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StorySplitBlock".
+ */
+export interface StorySplitBlock {
+  /**
+   * The uppercase label above the headline.
+   */
+  eyebrow: string;
+  heading: string;
+  copy: string;
+  cta?: {
+    /**
+     * Leave empty to omit the link entirely.
+     */
+    label?: string | null;
+    /**
+     * Where it goes. Renaming that page's slug updates this link.
+     */
+    page?: (number | null) | Page;
+    /**
+     * Used instead of the page, for a destination this site does not hold.
+     */
+    externalUrl?: string | null;
+  };
+  image: number | Media;
+  side: 'left' | 'right';
+  /**
+   * Which cut-out drifts behind the frame.
+   */
+  petals: 'tall' | 'wide';
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'storySplit';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ServiceGridBlock".
+ */
+export interface ServiceGridBlock {
+  /**
+   * In the order they are printed.
+   */
+  services: (number | Service)[];
+  cta?: {
+    /**
+     * Leave empty to omit the link entirely.
+     */
+    label?: string | null;
+    /**
+     * Where it goes. Renaming that page's slug updates this link.
+     */
+    page?: (number | null) | Page;
+    /**
+     * Used instead of the page, for a destination this site does not hold.
+     */
+    externalUrl?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'serviceGrid';
+}
+/**
+ * Order is the sequence both the home grid and /services print.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "services".
+ */
+export interface Service {
+  id: number;
+  title: string;
+  /**
+   * The flower glyph beside the title, drawn 69 x 55.
+   */
+  icon: number | Media;
+  /**
+   * The photograph above the copy on /services, 805 x 1000.
+   */
+  photo: number | Media;
+  /**
+   * The one-line blurb the home page's three-up grid prints.
+   */
+  summary: string;
+  /**
+   * The panel's prose on /services. Two paragraphs, as published.
+   */
+  copy: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * Lowest first. The published order, which no field on the document implies.
+   */
+  order: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ServicePanelsBlock".
+ */
+export interface ServicePanelsBlock {
+  /**
+   * One panel per service, in grid order.
+   */
+  panels: {
+    service: number | Service;
+    /**
+     * Hangs below its neighbours.
+     */
+    dropped?: boolean | null;
+    /**
+     * Spans both columns.
+     */
+    wide?: boolean | null;
+    /**
+     * A cut-out drifts behind it.
+     */
+    petals?: boolean | null;
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'servicePanels';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PortfolioGridBlock".
+ */
+export interface PortfolioGridBlock {
+  /**
+   * The uppercase label above the headline.
+   */
+  eyebrow: string;
+  heading: string;
+  /**
+   * In the order they are printed.
+   */
+  projects: (number | Project)[];
+  cta?: {
+    /**
+     * Leave empty to omit the link entirely.
+     */
+    label?: string | null;
+    /**
+     * Where it goes. Renaming that page's slug updates this link.
+     */
+    page?: (number | null) | Page;
+    /**
+     * Used instead of the page, for a destination this site does not hold.
+     */
+    externalUrl?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'portfolioGrid';
+}
+/**
  * The case studies. Order is the sequence both portfolio grids print.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -230,9 +495,9 @@ export interface Project {
    */
   image: number | Media;
   /**
-   * The detail page, which phase 4 builds and renders. Empty until then — the template shipped no copy for it, and decision B forbids inventing any.
+   * The detail page. Empty on all four seeded projects — the template shipped no copy for it, and decision B forbids inventing any.
    */
-  body?: ProseBlock[] | null;
+  body?: (ProseBlock | PhotoRowBlock)[] | null;
   /**
    * Lowest first. The published order, which no field on the document implies.
    */
@@ -246,6 +511,14 @@ export interface Project {
  * via the `definition` "ProseBlock".
  */
 export interface ProseBlock {
+  /**
+   * The leaves drawing above the heading.
+   */
+  ornament?: boolean | null;
+  /**
+   * Optional. Set as an h3.
+   */
+  heading?: string | null;
   content: {
     root: {
       type: string;
@@ -264,6 +537,58 @@ export interface ProseBlock {
   id?: string | null;
   blockName?: string | null;
   blockType: 'prose';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PhotoRowBlock".
+ */
+export interface PhotoRowBlock {
+  /**
+   * Two across, or three. The count sets the grid.
+   */
+  photos: (number | Media)[];
+  /**
+   * Milliseconds between each tile's fade-in.
+   */
+  stagger: number;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'photoRow';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PortfolioListBlock".
+ */
+export interface PortfolioListBlock {
+  /**
+   * Every published project, in collection order. Ignores the list below.
+   */
+  showAll?: boolean | null;
+  /**
+   * In the order they are printed.
+   */
+  projects?: (number | Project)[] | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'portfolioList';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "JournalListBlock".
+ */
+export interface JournalListBlock {
+  mode: 'latest' | 'picked';
+  /**
+   * How many to print. Empty prints them all.
+   */
+  limit?: number | null;
+  /**
+   * In the order they are printed.
+   */
+  posts?: (number | Post)[] | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'journalList';
 }
 /**
  * Journal entries. Order is the sequence /blog prints, which is not date order.
@@ -321,50 +646,22 @@ export interface Post {
   _status?: ('draft' | 'published') | null;
 }
 /**
- * Order is the sequence both the home grid and /services print.
- *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "services".
+ * via the `definition` "TestimonialsBlock".
  */
-export interface Service {
-  id: number;
-  title: string;
+export interface TestimonialsBlock {
   /**
-   * The flower glyph beside the title, drawn 69 x 55.
+   * The uppercase label above the headline.
    */
-  icon: number | Media;
+  eyebrow: string;
+  heading: string;
   /**
-   * The photograph above the copy on /services, 805 x 1000.
+   * The carousel's order.
    */
-  photo: number | Media;
-  /**
-   * The one-line blurb the home page's three-up grid prints.
-   */
-  summary: string;
-  /**
-   * The panel's prose on /services. Two paragraphs, as published.
-   */
-  copy: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  };
-  /**
-   * Lowest first. The published order, which no field on the document implies.
-   */
-  order: number;
-  updatedAt: string;
-  createdAt: string;
+  quotes: (number | Testimonial)[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'testimonials';
 }
 /**
  * Order is the carousel's sequence.
@@ -389,6 +686,70 @@ export interface Testimonial {
   order: number;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PressStripBlock".
+ */
+export interface PressStripBlock {
+  /**
+   * Sits on the rule, punching a gap in it.
+   */
+  label: string;
+  logos: {
+    logo: number | Media;
+    /**
+     * The publication. Used as the admin label — the logos render decoratively, with alt="", exactly as published.
+     */
+    name: string;
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'pressStrip';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "InstagramFeedBlock".
+ */
+export interface InstagramFeedBlock {
+  heading: string;
+  /**
+   * How many tiles, newest first.
+   */
+  limit: number;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'instagramFeed';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "users".
+ */
+export interface User {
+  id: number;
+  /**
+   * Admins may delete Pages and edit the Header and Footer globals; editors may not.
+   */
+  role: 'admin' | 'editor';
+  updatedAt: string;
+  createdAt: string;
+  email: string;
+  resetPasswordToken?: string | null;
+  resetPasswordExpiration?: string | null;
+  salt?: string | null;
+  hash?: string | null;
+  loginAttempts?: number | null;
+  lockUntil?: string | null;
+  sessions?:
+    | {
+        id: string;
+        createdAt?: string | null;
+        expiresAt: string;
+      }[]
+    | null;
+  password?: string | null;
+  collection: 'users';
 }
 /**
  * Newest first. The footer prints the six most recent.
@@ -438,6 +799,10 @@ export interface PayloadKv {
 export interface PayloadLockedDocument {
   id: number;
   document?:
+    | ({
+        relationTo: 'pages';
+        value: number | Page;
+      } | null)
     | ({
         relationTo: 'users';
         value: number | User;
@@ -507,6 +872,230 @@ export interface PayloadMigration {
   batch?: number | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages_select".
+ */
+export interface PagesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  layout?:
+    | T
+    | {
+        hero?: T | HeroBlockSelect<T>;
+        masthead?: T | MastheadBlockSelect<T>;
+        storySplit?: T | StorySplitBlockSelect<T>;
+        serviceGrid?: T | ServiceGridBlockSelect<T>;
+        servicePanels?: T | ServicePanelsBlockSelect<T>;
+        portfolioGrid?: T | PortfolioGridBlockSelect<T>;
+        portfolioList?: T | PortfolioListBlockSelect<T>;
+        journalList?: T | JournalListBlockSelect<T>;
+        testimonials?: T | TestimonialsBlockSelect<T>;
+        photoRow?: T | PhotoRowBlockSelect<T>;
+        prose?: T | ProseBlockSelect<T>;
+        pressStrip?: T | PressStripBlockSelect<T>;
+        instagramFeed?: T | InstagramFeedBlockSelect<T>;
+      };
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+      };
+  publishedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HeroBlock_select".
+ */
+export interface HeroBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  cta?:
+    | T
+    | {
+        label?: T;
+        page?: T;
+        externalUrl?: T;
+      };
+  collageLeft?: T;
+  collageCenter?: T;
+  collageRight?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "MastheadBlock_select".
+ */
+export interface MastheadBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  lede?: T;
+  cta?:
+    | T
+    | {
+        label?: T;
+        page?: T;
+        externalUrl?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StorySplitBlock_select".
+ */
+export interface StorySplitBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  copy?: T;
+  cta?:
+    | T
+    | {
+        label?: T;
+        page?: T;
+        externalUrl?: T;
+      };
+  image?: T;
+  side?: T;
+  petals?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ServiceGridBlock_select".
+ */
+export interface ServiceGridBlockSelect<T extends boolean = true> {
+  services?: T;
+  cta?:
+    | T
+    | {
+        label?: T;
+        page?: T;
+        externalUrl?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ServicePanelsBlock_select".
+ */
+export interface ServicePanelsBlockSelect<T extends boolean = true> {
+  panels?:
+    | T
+    | {
+        service?: T;
+        dropped?: T;
+        wide?: T;
+        petals?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PortfolioGridBlock_select".
+ */
+export interface PortfolioGridBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  projects?: T;
+  cta?:
+    | T
+    | {
+        label?: T;
+        page?: T;
+        externalUrl?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PortfolioListBlock_select".
+ */
+export interface PortfolioListBlockSelect<T extends boolean = true> {
+  showAll?: T;
+  projects?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "JournalListBlock_select".
+ */
+export interface JournalListBlockSelect<T extends boolean = true> {
+  mode?: T;
+  limit?: T;
+  posts?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TestimonialsBlock_select".
+ */
+export interface TestimonialsBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  quotes?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PhotoRowBlock_select".
+ */
+export interface PhotoRowBlockSelect<T extends boolean = true> {
+  photos?: T;
+  stagger?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ProseBlock_select".
+ */
+export interface ProseBlockSelect<T extends boolean = true> {
+  ornament?: T;
+  heading?: T;
+  content?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PressStripBlock_select".
+ */
+export interface PressStripBlockSelect<T extends boolean = true> {
+  label?: T;
+  logos?:
+    | T
+    | {
+        logo?: T;
+        name?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "InstagramFeedBlock_select".
+ */
+export interface InstagramFeedBlockSelect<T extends boolean = true> {
+  heading?: T;
+  limit?: T;
+  id?: T;
+  blockName?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -597,20 +1186,12 @@ export interface ProjectsSelect<T extends boolean = true> {
     | T
     | {
         prose?: T | ProseBlockSelect<T>;
+        photoRow?: T | PhotoRowBlockSelect<T>;
       };
   order?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "ProseBlock_select".
- */
-export interface ProseBlockSelect<T extends boolean = true> {
-  content?: T;
-  id?: T;
-  blockName?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -706,6 +1287,143 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * The navigation on every page.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "header".
+ */
+export interface Header {
+  id: number;
+  /**
+   * The wordmark, drawn 124 x 44.
+   */
+  logo: number | Media;
+  /**
+   * Split around the wordmark: the first half left, the rest right.
+   */
+  nav: {
+    /**
+     * Leave empty to omit the link entirely.
+     */
+    label?: string | null;
+    /**
+     * Where it goes. Renaming that page's slug updates this link.
+     */
+    page?: (number | null) | Page;
+    /**
+     * Used instead of the page, for a destination this site does not hold.
+     */
+    externalUrl?: string | null;
+    id?: string | null;
+  }[];
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * The closing band on every page.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "footer".
+ */
+export interface Footer {
+  id: number;
+  /**
+   * Above the feed. The tiles themselves are the Instagram collection.
+   */
+  instagramHeading: string;
+  socialHeading: string;
+  /**
+   * Off-site, so each opens in a new tab.
+   */
+  social?:
+    | {
+        label: string;
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  quickLinksHeading: string;
+  quickLinks?:
+    | {
+        /**
+         * Leave empty to omit the link entirely.
+         */
+        label?: string | null;
+        /**
+         * Where it goes. Renaming that page's slug updates this link.
+         */
+        page?: (number | null) | Page;
+        /**
+         * Used instead of the page, for a destination this site does not hold.
+         */
+        externalUrl?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * The wordmark above the credit, drawn 100px wide.
+   */
+  logo: number | Media;
+  credit?: {
+    label?: string | null;
+    url?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "header_select".
+ */
+export interface HeaderSelect<T extends boolean = true> {
+  logo?: T;
+  nav?:
+    | T
+    | {
+        label?: T;
+        page?: T;
+        externalUrl?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "footer_select".
+ */
+export interface FooterSelect<T extends boolean = true> {
+  instagramHeading?: T;
+  socialHeading?: T;
+  social?:
+    | T
+    | {
+        label?: T;
+        url?: T;
+        id?: T;
+      };
+  quickLinksHeading?: T;
+  quickLinks?:
+    | T
+    | {
+        label?: T;
+        page?: T;
+        externalUrl?: T;
+        id?: T;
+      };
+  logo?: T;
+  credit?:
+    | T
+    | {
+        label?: T;
+        url?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

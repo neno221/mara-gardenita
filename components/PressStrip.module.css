@@ -1,0 +1,134 @@
+/* Lifted out of AboutView.module.css. The rule, the label and the grid are
+   verbatim; the dividers are the §3 rewrite. */
+
+/* The rule itself, fading out at both ends. The label sits on top of it and
+   paints the page colour behind its own padding to break the line. */
+.pressRule {
+  width: 100%;
+  height: 1px;
+  background-image: var(--rule);
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 50px;
+  display: flex;
+}
+
+.pressLabel {
+  background-color: var(--background);
+  color: var(--subtitle);
+  text-align: center;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 0;
+  padding-left: 20px;
+  padding-right: 20px;
+  font-family: var(--font-ui-stack);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 140%;
+  position: relative;
+}
+
+.pressGrid {
+  width: 100%;
+  grid-column-gap: 0px;
+  grid-row-gap: 20px;
+  grid-template-rows: auto;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+  grid-auto-columns: 1fr;
+  margin-bottom: 70px;
+  display: grid;
+}
+
+.press {
+  border-left: 1px solid var(--border);
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding-left: 7%;
+  padding-right: 7%;
+  display: flex;
+}
+
+.pressLogo {
+  max-height: 42px;
+}
+
+/* --------------------------------------------------------- the dividers ---
+ *
+ * §3 of docs/payload-plan.md: the published rules were written by ordinal —
+ * `.press1` … `.press5`, restated at three breakpoints — because the grid goes
+ * 6-up, 3-up, 2-up and whichever logo *opens* a row drops its left rule. Six
+ * logos was not a default; it was the arithmetic, and an editable array of any
+ * length breaks it on the first added logo.
+ *
+ * Rewritten as `:nth-child` against the column count, which is the fact those
+ * five class names were encoding. Two rules per breakpoint replace nine:
+ *
+ *   opener      :nth-child(Cn + 1)   drops its left rule
+ *   not-first-row :nth-child(n + C+1)  carries a rule above it
+ *
+ * The second is a `border-top` where the original wrote `border-bottom` on
+ * every row *but* the last — which cannot be expressed without knowing the
+ * count. With `grid-row-gap: 0` at these widths the two are the same line at
+ * the same y: row 1's bottom border and row 2's top border both sit in the 1px
+ * between them, and the grid's total height is unchanged either way.
+ *
+ * The ranges are exclusive, so no rule has to undo another's. That is the one
+ * place this stylesheet reaches for `min-width` — a column count is a range,
+ * not a threshold, and layering max-width rules was how the original ended up
+ * needing `.press4 { border-left-style: solid }` to take back what a wider
+ * breakpoint had removed. */
+
+@media screen and (max-width: 991px) {
+  .pressRule {
+    margin-bottom: 40px;
+  }
+}
+
+/* Six across. */
+@media screen and (min-width: 768px) {
+  .press:nth-child(6n + 1) {
+    border-left-style: none;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .press {
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
+
+  /* Rows sit flush, which is what makes the top/bottom equivalence above hold. */
+  .pressGrid {
+    grid-row-gap: 0px;
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+/* Three across. */
+@media screen and (min-width: 480px) and (max-width: 767px) {
+  .press:nth-child(3n + 1) {
+    border-left-style: none;
+  }
+
+  .press:nth-child(n + 4) {
+    border-top: 1px solid var(--border);
+  }
+}
+
+/* Two across. */
+@media screen and (max-width: 479px) {
+  .pressGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .press:nth-child(2n + 1) {
+    border-left-style: none;
+  }
+
+  .press:nth-child(n + 3) {
+    border-top: 1px solid var(--border);
+  }
+}

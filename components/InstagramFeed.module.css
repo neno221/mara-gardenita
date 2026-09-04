@@ -1,0 +1,55 @@
+/* Lifted verbatim out of SiteFooter.module.css, along with the widget itself. */
+
+.instagramGrid {
+  width: 100%;
+  grid-column-gap: 12px;
+  grid-row-gap: 12px;
+  grid-template-rows: auto;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+  grid-auto-columns: 1fr;
+  align-items: start;
+  display: grid;
+}
+
+.instagramTile {
+  width: 100%;
+  background-color: var(--preload);
+  transition-property: box-shadow;
+  transition-duration: 0.7s;
+  max-width: 100%;
+  display: inline-block;
+  overflow: hidden;
+}
+
+.instagramTile:hover {
+  box-shadow: var(--shadow-photo-hover);
+}
+
+.instagramTileDropped {
+  margin-top: 34px;
+}
+
+.instagramImage {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  opacity: 0;
+}
+
+@media screen and (max-width: 991px) {
+  .instagramTileDropped {
+    margin-top: 30px;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .instagramGrid {
+    grid-column-gap: 10px;
+    grid-row-gap: 10px;
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+
+  .instagramTileDropped {
+    margin-top: 0;
+  }
+}

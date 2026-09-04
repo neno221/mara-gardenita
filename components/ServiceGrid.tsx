@@ -1,10 +1,8 @@
 import type { Artwork } from "@/lib/artwork";
+import type { ResolvedLink } from "@/lib/links";
 import { SiteLink } from "./SiteLink";
-import { Section } from "./Section";
 import styles from "./ServiceGrid.module.css";
 import buttons from "./buttons.module.css";
-
-const SERVICES_HREF = "/services/services-b";
 
 export type ServiceSummary = {
   title: string;
@@ -13,32 +11,47 @@ export type ServiceSummary = {
   icon: Artwork;
 };
 
+type ServiceGridProps = {
+  services: ServiceSummary[];
+  /**
+   * Printed on every card — once as the title's link, once as the button under
+   * the blurb. It was `SERVICES_HREF`, a const pointing at
+   * `/services/services-b`: one of the dead links §1.4 inventories, and dead
+   * because it was a typed path. It is a Pages relationship now, resolved by
+   * `hrefFor`, so it cannot point at a page that does not exist.
+   */
+  cta: ResolvedLink | null;
+};
+
 /**
- * The three-up services summary on the home page.
+ * The three-up services summary.
  *
- * The services arrive as props rather than being imported (§1.1). What has *not*
- * moved is `SERVICES_HREF`: it still points at `/services/services-b`, which is
- * one of the dead links §1.4 inventories, and it stays dead until phase 4 turns
- * it into a Page relationship. Passing the hardcoded string down as a prop now
- * would move the deadness, not fix it.
+ * The `<Section>` has been lifted out (§2): `RenderBlocks` owns all sectioning,
+ * because the about page needs six blocks inside *one* band and a component that
+ * brings its own cannot be put there. This one is banded `own`, so it looks
+ * exactly as it did.
  */
-export function ServiceGrid({ services }: { services: ServiceSummary[] }) {
+export function ServiceGrid({ services, cta }: ServiceGridProps) {
   return (
-    <Section>
-      <div className={styles.grid}>
-        {services.map((service) => (
-          <div className={styles.service} key={service.title}>
-            <img {...service.icon} width={69} loading="lazy" alt="" className={styles.icon} />
-            <SiteLink href={SERVICES_HREF} className={styles.titleLink}>
+    <div className={styles.grid}>
+      {services.map((service) => (
+        <div className={styles.service} key={service.title}>
+          <img {...service.icon} width={69} loading="lazy" alt="" className={styles.icon} />
+          {cta ? (
+            <SiteLink href={cta.href} className={styles.titleLink}>
               <h4 className={styles.title}>{service.title}</h4>
             </SiteLink>
-            <p className={styles.copy}>{service.summary}</p>
-            <SiteLink href={SERVICES_HREF} className={buttons.link}>
-              learn more
+          ) : (
+            <h4 className={styles.title}>{service.title}</h4>
+          )}
+          <p className={styles.copy}>{service.summary}</p>
+          {cta && (
+            <SiteLink href={cta.href} className={buttons.link}>
+              {cta.label}
             </SiteLink>
-          </div>
-        ))}
-      </div>
-    </Section>
+          )}
+        </div>
+      ))}
+    </div>
   );
 }

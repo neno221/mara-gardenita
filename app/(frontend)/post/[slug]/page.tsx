@@ -4,6 +4,7 @@ import { formatPublished } from "@/lib/dates";
 import { artworkFrom } from "@/lib/media";
 import { pageMetadata } from "@/lib/metadata";
 import { getPost, getPosts } from "@/lib/payload";
+import { getChrome } from "@/lib/chrome";
 import { SIZES } from "@/lib/sizes";
 import { JournalPost } from "@/components/JournalPost";
 
@@ -32,11 +33,13 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 }
 
 export default async function Page({ params }: Params) {
-  const post = await getPost((await params).slug);
+  const slug = (await params).slug;
+  const [post, chrome] = await Promise.all([getPost(slug), getChrome()]);
   if (!post) notFound();
 
   return (
     <JournalPost
+      chrome={chrome}
       title={post.title}
       published={post.published}
       excerpt={post.excerpt}

@@ -4,11 +4,11 @@ import { useRef } from "react";
 import gsap from "gsap";
 import { lerp } from "@/lib/easing";
 import { PETALS, type Artwork } from "@/lib/artwork";
+import type { ResolvedLink } from "@/lib/links";
 import { useScrollProgress } from "@/lib/useScrollProgress";
 import { useRevealOnView } from "@/lib/useRevealOnView";
 import { SiteLink } from "./SiteLink";
 import { Sprig } from "./Sprig";
-import { Section } from "./Section";
 import styles from "./StorySplit.module.css";
 import photo from "./photo.module.css";
 import section from "./Section.module.css";
@@ -18,7 +18,8 @@ type StorySplitProps = {
   eyebrow: string;
   heading: string;
   copy: string;
-  cta: { label: string; href: string };
+  /** The button under the copy. Omitted when the block carries no label. */
+  cta: ResolvedLink | null;
   image: Artwork;
   /** "tall" hangs off the lower-left corner, "wide" tucks into the lower-right. */
   petals: "tall" | "wide";
@@ -89,27 +90,29 @@ export function StorySplit({
       </div>
       <h2 className={section.heading}>{heading}</h2>
       <p className={section.paragraph}>{copy}</p>
-      <SiteLink href={cta.href} className={buttons.button}>
-        {cta.label}
-      </SiteLink>
+      {cta && (
+        <SiteLink href={cta.href} className={buttons.button}>
+          {cta.label}
+        </SiteLink>
+      )}
     </div>
   );
 
+  // The `<Section>` this returned is lifted out under §2's rule; the block is
+  // banded `own`, so `RenderBlocks` wraps it in exactly the same band.
   return (
-    <Section>
-      <div className={styles.grid}>
-        {side === "left" ? (
-          <>
-            {artwork}
-            {prose}
-          </>
-        ) : (
-          <>
-            {prose}
-            {artwork}
-          </>
-        )}
-      </div>
-    </Section>
+    <div className={styles.grid}>
+      {side === "left" ? (
+        <>
+          {artwork}
+          {prose}
+        </>
+      ) : (
+        <>
+          {prose}
+          {artwork}
+        </>
+      )}
+    </div>
   );
 }

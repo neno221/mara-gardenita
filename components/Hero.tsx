@@ -4,6 +4,7 @@ import { useRef } from "react";
 import gsap from "gsap";
 import { lerp } from "@/lib/easing";
 import { PETALS, type Artwork } from "@/lib/artwork";
+import type { ResolvedLink } from "@/lib/links";
 import { useScrollProgress } from "@/lib/useScrollProgress";
 import { useRevealOnView } from "@/lib/useRevealOnView";
 import { HeroSection, HeroTop } from "./HeroTop";
@@ -11,6 +12,9 @@ import styles from "./Hero.module.css";
 import photo from "./photo.module.css";
 
 type HeroProps = {
+  eyebrow: string;
+  heading: string;
+  cta: ResolvedLink | null;
   /** The three collage plates, already resolved to src/srcSet/sizes. */
   left: Artwork;
   right: Artwork;
@@ -21,13 +25,15 @@ type HeroProps = {
  * The home page's opening band: the masthead, and the collage of three
  * photographs that drifts apart as the page scrolls past it.
  *
- * The plates arrive as props rather than being imported. Phase 2 of
- * docs/payload-plan.md puts them in the Media collection, and an `Artwork` is all
- * this component ever needed — it never cared where the URLs came from. The rest
- * of the prop interface in §1.1 (eyebrow, heading, cta) lands in phase 4 with the
- * `hero` block; the petals stay hardcoded, as ornament rather than content.
+ * Nothing here is written into the file any more. The plates arrived as props in
+ * phase 2; the masthead's three strings follow in phase 4 with the `hero` block,
+ * which completes §1.1's interface. The petals stay hardcoded — they are the same
+ * two cut-outs on every hero the template ships, ornament rather than content.
+ *
+ * The band is still this component's own (`HeroSection`), which is what banding
+ * `none` means in §2's rule: `RenderBlocks` does not wrap a hero.
  */
-export function Hero({ left, right, center }: HeroProps) {
+export function Hero({ eyebrow, heading, cta, left, right, center }: HeroProps) {
   const collageRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<HTMLDivElement>(null);
   const frameLeftRef = useRef<HTMLDivElement>(null);
@@ -86,11 +92,7 @@ export function Hero({ left, right, center }: HeroProps) {
 
   return (
     <HeroSection>
-      <HeroTop
-        subtitle="Legendary parties"
-        heading="Destination Wedding Planners & Event Designers"
-        cta={{ label: "Book A Consult", href: "/contact" }}
-      />
+      <HeroTop subtitle={eyebrow} heading={heading} cta={cta ?? undefined} />
 
       <div className={styles.collage} ref={collageRef}>
         <div className={styles.collageInner}>

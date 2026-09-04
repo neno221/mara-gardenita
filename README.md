@@ -13,14 +13,22 @@ npm start
 
 ## Pages
 
-| Route | Source page | Notes |
+The site runs on [Payload](https://payloadcms.com) — see
+[`docs/payload-plan.md`](docs/payload-plan.md) for the architecture and the
+phased migration behind it. Six of the eight routes below are Pages documents
+rendered by one catch-all route from a block array, so their section order is
+editable and building a seventh page needs no code.
+
+| Route | Source | Blocks |
 | --- | --- | --- |
-| `/` | Home B | hero collage, services, story splits, portfolio grid, testimonials |
-| `/portfolio` | Portfolio | masthead + two-up project grid |
-| `/about/about-c` | About C | masthead + photo rows, prose, press row, testimonials |
-| `/blog` | Blog | masthead + the journal entries, photo overlapping a white plate |
-| `/post/<slug>` | Post | masthead, drifting hero plate, long-form prose |
-| `/services/services-c` | Services C | masthead + three service panels on an unequal two-column grid |
+| `/` | `home` page | hero · serviceGrid · storySplit ×2 · portfolioGrid · testimonials |
+| `/portfolio` | `portfolio` page | masthead · portfolioList |
+| `/about` | `about` page | masthead · photoRow · prose · photoRow · prose · pressStrip · photoRow · testimonials |
+| `/blog` | `blog` page | masthead · journalList |
+| `/services` | `services` page | masthead · servicePanels |
+| `/contact` | `contact` page | masthead · prose |
+| `/post/<slug>` | Posts collection | masthead, drifting hero plate, the Lexical body |
+| `/portfolio/<slug>` | Projects collection | masthead, the project's photograph, its block body |
 
 The about headline reads "About Lovio" — one `o` — because that is the word the
 source page sets, even though the wordmark beside it reads Loovio. The metadata
@@ -30,53 +38,75 @@ follows the wordmark, as the other pages do.
 
 ```
 app/
-  layout.tsx              fonts + document metadata
-  page.tsx                renders <HomeView />
-  portfolio/page.tsx      renders <PortfolioView />, page metadata
-  about/about-c/page.tsx  renders <AboutView />, page metadata
-  blog/page.tsx           renders <JournalView />, page metadata
-  post/[slug]/page.tsx    renders <JournalPost />, per-post metadata + static params
-  services/services-c/page.tsx  renders <ServicesView />, page metadata
-  globals.css             design tokens, reset, typography scale
+  (frontend)/
+    layout.tsx              fonts + document metadata
+    globals.css             design tokens, reset, typography scale
+    [[...slug]]/page.tsx    every Pages document; `home` answers at /
+    post/[slug]/page.tsx    renders <JournalPost />, per-post metadata + static params
+    portfolio/[slug]/page.tsx  a project's own page
+  (payload)/                the admin panel and the API — generated, not hand-edited
+payload.config.ts           collections, globals, the Postgres adapter, Lexical
+collections/                Pages · Users · Media · Projects · Posts · Services · Testimonials · Instagram
+globals/                    Header, Footer — the chrome on every page
+blocks/                     the thirteen-block library, and the shared link field
+migrations/                 committed; `push` is dev-only
 components/
+  RenderBlocks.tsx    the block switch, and the banding rule that owns sectioning
   SiteShell.tsx       header + clipping page body + footer, shared by every page
-  SiteHeader.tsx      sticky bar, dropdowns, cart, collapsed menu
-  SiteFooter.tsx      Instagram row, link columns, wordmark
+  SiteHeader.tsx      sticky bar, collapsed menu, nav from the Header global
+  SiteFooter.tsx      link columns and wordmark, from the Footer global
+  InstagramFeed.tsx   the scattered tile grid, from the Instagram collection
   Section.tsx         a page section: the padded band + the 1200px column
   HeroTop.tsx         the masthead block, plus HeroSection and PageMasthead
-  HomeView.tsx        home page section order
   Hero.tsx            HeroTop + the parallax photo collage
-  ServiceGrid.tsx     three-up services, read from lib/services
+  ServiceGrid.tsx     three-up services summary
+  ServicePanel.tsx    one service: a drifting photograph, then glyph, title and copy
   StorySplit.tsx      the mirrored text/photo sections
-  AboutView.tsx       the about page
-  AboutPhoto.tsx      one framed, scroll-drifting photograph on the about page
+  PhotoRow.tsx        two or three framed photographs; the count sets the grid
+  AboutPhoto.tsx      one framed, scroll-drifting photograph
+  Prose.tsx           a centred run of rich text under an ornament and a heading
+  PressStrip.tsx      the publication logos, divided by `:nth-child` rules
   PortfolioCard.tsx   one project tile, `grid` (four-up) or `feature` (two-up)
   PortfolioGrid.tsx   the four-up grid on the home page
-  PortfolioView.tsx   the portfolio page
   JournalCard.tsx     one journal entry: photograph overlapped by a white plate
-  JournalView.tsx     the journal page
   JournalPost.tsx     a single post: drifting hero plate + the prose body
-  ServicesView.tsx    the services page
-  ServicePanel.tsx    one service: a drifting photograph, then glyph, title and copy
   Testimonials.tsx    cross-fading quote slider
+  RichText.tsx        Lexical -> the markup this site publishes
+  SiteLink.tsx        an internal link, or a plain anchor for an off-site URL
   photo.module.css    the shared photo plate and the picture that fills it
   Section.module.css  section rhythm, block headings, shared type
   buttons.module.css  the outlined button and the underlined link
-  JournalList.module.css    (no component) the run of entries, used by JournalView
-  PortfolioList.module.css  (no component) the two-up grid, used by PortfolioView
+  JournalList.module.css    (no component) the run of entries, used by the block
+  PortfolioList.module.css  (no component) the two-up grid, used by the block
   *.module.css        otherwise one stylesheet per component, alongside it
 lib/
+  payload.ts          the Local API client and every read the site performs
+  media.ts            a Media document as src/srcSet/sizes
+  sizes.ts            the seven `sizes` hints the layout was published with
+  links.ts            a stored link -> an href; `home` resolves to /
+  chrome.ts           the Header and Footer globals as props for the shell
+  instagram.ts        the feed as tiles, for the footer and the block alike
+  lexical.ts          builders for the serialized rich text the seed writes
   metadata.ts         the shared page/article metadata shape + the site URL
+  dates.ts            one stored timestamp -> its printed and machine forms
   easing.ts           cubic-bezier solvers used as GSAP eases
   useScrollProgress.ts  scroll-linked, damped 0-1 progress
   useDriftingPhoto.ts   the shared frame-drift + picture-zoom parallax
   useRevealOnView.ts    staggered fade-in on first intersection
   useHoverZoom.ts       paired frame/photo hover scale
-  artwork.ts            responsive sources for the photography, and the petals
-  projects.ts           the four case studies
-  journal.ts            the four journal entries and their artwork
-  services.ts           the three services, their photography and their copy
+  artwork.ts            the `Artwork` shape and the petals
+  projects.ts · journal.ts · services.ts   superseded by the collections; phase 6 deletes them
+scripts/
+  seed.ts             imports the published site into Payload
+  fingerprint.ts      the acceptance gate — see fingerprints/README.md
+  db-dump.ps1         the database and the media directory, before every migration
 ```
+
+`RenderBlocks` owns all sectioning. Four components that used to bring their own
+`<Section>` had it lifted out, because the about page needs six blocks inside
+*one* band: each block declares whether it brings its own band, takes one to
+itself, or coalesces with the blocks adjacent to it. The rule and its
+justification are in `components/RenderBlocks.tsx` and §2 of the plan.
 
 `SiteShell`, `SiteHeader`, `SiteFooter`, `Section` and `Testimonials` are shared
 across the pages; `PortfolioCard` is shared by the two project grids. Every
@@ -157,30 +187,41 @@ the parked panel's drop shadow does not smudge the bar above it.
 ## Images
 
 `next/image` optimisation is off (`next.config.mjs`). The artwork ships at the sizes
-the layout was designed around, and the `srcset` widths in `lib/artwork.ts`,
-`lib/journal.ts` and `lib/services.ts` mirror those sizes — re-encoding them
-would only soften the photography and shift the intrinsic aspect ratios the
-layout depends on. The project photography is shared
-between the two grids, so the sources are declared once and only the `sizes` hint
-differs per layout.
+the layout was designed around — re-encoding it would only soften the
+photography and shift the intrinsic aspect ratios the layout depends on. Payload
+generates the alternates instead, at the same three widths the old export
+pipeline used (`collections/Media.ts`), and `lib/media.ts` turns a Media document
+into the `src`/`srcSet`/`sizes` triple every `<img>` on the site already took.
 
-Each of those files builds its `srcSet` from the file stem and the widths that
-were exported, rather than spelling the candidate list out: the alternates are
-named `<stem>-<width>.jpg` and the full-size export keeps the bare stem and
-carries its own intrinsic width as the last candidate. A photograph that shipped
-without alternates stays single-source, because a `sizes` hint with no `srcset`
-has nothing to pick from.
+Two invariants live there, both measured rather than assumed. **The `sizes` hint
+is the switch:** pass one and you get a `srcSet`, omit it and you get a bare
+`src` — because "did this photograph ship alternates?" is a fact about the old
+export, not about the pixels, and ten of them shipped single-source for no reason
+the file records. **No hint without a `srcSet` to pick from:** a slot width with
+no candidates behind it is a promise with nothing to keep it. The block that
+renders a photograph states the intent, which is also why the project photography
+is one upload and only the hint differs between the four-up and two-up grids.
+
+Which files the browser is offered is gated by `npm run fingerprint` — see
+[`fingerprints/README.md`](fingerprints/README.md).
 
 ## Scope
 
-The header, footer and cards link to the rest of the template's sitemap
-(`/shop`, `/about/about-a`, `/portfolio/<slug>`, …), which does not exist yet.
-`components/SiteLink.tsx` keeps a `LIVE_ROUTES` set and disables prefetching for
-everything outside it; add each route there as its page lands. Posts are matched
-by the `/post/` prefix rather than by importing `JOURNAL_POSTS`, which would pull
-every post's copy and srcSets into the client bundle of every page.
+Every link the site renders now resolves, bar four. A CTA stores a relationship
+to a Pages document rather than a typed path, so it cannot point at a page that
+does not exist and renaming a slug moves every link to it at once — which is what
+retired `/services/services-b`, `/about/about-b`, `/contact` and the eight
+`/portfolio/<slug>` links in one go. `components/SiteLink.tsx` used to keep a
+`LIVE_ROUTES` allowlist to stop the router prefetching 404s; it is gone, because
+the thing it guarded against cannot happen any more.
 
-There is no `app/not-found.tsx`, so `notFound()` and the dead sitemap links fall
-through to Next's default 404.
+What is left dead is the footer's `/template-info/{licensing,style-guide,changelog}`
+and the `#` on its credit. Those have no destination on this site and never did,
+so they are seeded through the link field's `externalUrl` escape hatch rather than
+deleted — removing them is now a row an editor drops, not a commit.
 
-The cart button opens the empty-cart dialog. There is no commerce backend behind it.
+There is no `app/not-found.tsx`, so `notFound()` and those four fall through to
+Next's default 404.
+
+`CartPanel`, `NavDropdown` and `ChevronIcon` have had no inbound references since
+before the migration started; phase 6 deletes them.

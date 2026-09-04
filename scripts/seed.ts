@@ -143,7 +143,7 @@ function mediaId(library: Map<string, Media>, filename: string): number {
   return doc.id;
 }
 
-type ContentSlug = "projects" | "posts" | "services" | "testimonials" | "instagram";
+type ContentSlug = "pages" | "projects" | "posts" | "services" | "testimonials" | "instagram";
 
 /**
  * Creates a document unless one already answers to `where`.
@@ -172,6 +172,71 @@ async function upsert(
   }
   await payload.create({ collection, data: data as never });
   created++;
+}
+
+/**
+ * `upsert` for Pages, which needs the id back.
+ *
+ * Every CTA on the home page is a relationship to another Pages document, so
+ * the other five pages are seeded first and `home` last — the only ordering
+ * constraint in the file, and the reason this returns an id at all.
+ */
+async function upsertPage(
+  payload: Payload,
+  slug: string,
+  data: Record<string, unknown>,
+): Promise<number> {
+  const { docs } = await payload.find({
+    collection: "pages",
+    where: { slug: { equals: slug } },
+    limit: 1,
+    depth: 0,
+  });
+  const found = docs[0];
+
+  if (found && !force) {
+    skipped++;
+    return found.id;
+  }
+  if (found) {
+    const doc = await payload.update({ collection: "pages", id: found.id, data: data as never });
+    replaced++;
+    return doc.id;
+  }
+  const doc = await payload.create({ collection: "pages", data: data as never });
+  created++;
+  return doc.id;
+}
+
+/**
+ * A seeded collection, keyed by the natural key the blocks name it with.
+ *
+ * The relationship arrays on `serviceGrid`, `portfolioGrid` and `testimonials`
+ * store their own order, so they are built from the published tables above
+ * rather than from whatever order a query returns — the order *is* the layout,
+ * and reading it back would make the seed depend on a sort it also sets.
+ */
+async function keyed(
+  payload: Payload,
+  collection: ContentSlug,
+  field: string,
+): Promise<Map<string, number>> {
+  const { docs } = await payload.find({ collection, limit: 100, depth: 0 });
+  return new Map(
+    docs.map((doc) => [String((doc as unknown as Record<string, unknown>)[field]), doc.id]),
+  );
+}
+
+/** A related document's id, or a loud failure naming what is missing. */
+function relatedId(index: Map<string, number>, key: string, what: string): number {
+  const id = index.get(key);
+  if (id === undefined) {
+    throw new Error(
+      `No ${what} answers to "${key}". Seed the collections before the pages: ` +
+        "npm run seed",
+    );
+  }
+  return id;
 }
 
 /** `lib/services.ts`, whose `[string, string]` copy tuple becomes two paragraphs. */
@@ -356,6 +421,72 @@ const INSTAGRAM_EPOCH = Date.UTC(2021, 7, 1, 12, 0, 0);
 const DAY = 86_400_000;
 const INSTAGRAM_URL = "https://www.instagram.com/";
 
+/* ------------------------------------------------------------- the pages */
+
+/**
+ * The about page's two prose runs.
+ *
+ * Each was one `<p>` holding both halves with `<br><br>` between them; Lexical
+ * stores two paragraphs. The trailing space the first run carried before its
+ * break is dropped — it sits at the end of a paragraph, where it renders
+ * nothing and only shows up as invisible whitespace in the admin. Everything
+ * that a reader can see is verbatim.
+ */
+const ABOUT_PROSE = [
+  {
+    heading: "Who we are",
+    paragraphs: [
+      "Gravida accumsan cras arcu hac vestibulum viverra. Ridiculus ut tincidunt accumsan id etiam sed posuere. Cursus tortor imperdiet urna ipsum. Lacus at cras enim arcu feugiat ac felis orci nunc. Ac purus ut auctor faucibus. Egestas scelerisque ornare posuere sed adipiscing mauris congue viverra sit.",
+      "Ac quisque quis id amet, odio mauris faucibus fames. Sagittis semper laoreet fusce ac velit vulputate est. Urna tempus in vitae risus sed nascetur aliquet. Faucibus nascetur nibh. Cursus purus ut auctor faucibus ornare posuere.",
+    ],
+  },
+  {
+    heading: "Our process",
+    paragraphs: [
+      "Feugiat massa in consectetur ac, quis amet nulla. Ac purus massa quis massa et. Amet, nisi, neque augue habitasse semper tempor ultricies. Massa sed in elit, commodo. Scelerisque turpis aliquam, urna aenean.",
+      "At vel dui egestas eget et sodales. Dis nisl adipiscing pulvinar sit dolor diam sit gravida leo. Ut sed eu, felis sed odio. Scelerisque fringilla sed viverra consectetur sagittis, nisl id nunc vestibulum. In viverra diam quis ut nibh lorem aliquet sagittis, vehicula. Gravida suscipit malesuada elementum pharetra pharetra. Ut et auctor ultrices non.",
+    ],
+  },
+] as const;
+
+/** The six logos, in the order the dividers were written for. */
+const PRESS = ["mimosa", "iris", "orion", "sigma", "pristin", "polaris"] as const;
+
+/** Each row fades in a tile at a time, 0.2s apart — `STAGGER` in `AboutView`. */
+const STAGGER = 200;
+
+/**
+ * The address on the contact page.
+ *
+ * The one string in this file with no source. Decision A adds a contact page
+ * the template never had, so there is nothing to copy verbatim and something
+ * has to stand in the place a real address goes. Named here rather than buried
+ * in the layout so whoever has the real one knows where to put it.
+ */
+const CONTACT_EMAIL = "hello@loovio.com";
+
+/* ------------------------------------------------------------ the globals */
+
+const SOCIAL = [
+  { label: "Instagram", url: INSTAGRAM_URL },
+  { label: "Facebook", url: "https://www.facebook.com/" },
+  { label: "Twitter", url: "https://twitter.com/" },
+] as const;
+
+/**
+ * Decision G, seeded rather than dropped.
+ *
+ * `/template-info/licensing`, `/style-guide` and `/changelog` are dead and
+ * always were; the plan's phase 4 leaves them dead, and this is where they
+ * survive as `externalUrl` values instead of typed paths in `SiteFooter.tsx`.
+ * The escape hatch is the point: deleting them is now a row an editor removes.
+ */
+const QUICK_LINKS = [
+  { label: "Licensing", externalUrl: "/template-info/licensing" },
+  { label: "Style Guide", externalUrl: "/template-info/style-guide" },
+  { label: "Changelog", externalUrl: "/template-info/changelog" },
+] as const;
+
 /* --------------------------------------------------------------------- run */
 
 const payload = await getPayload({ config });
@@ -461,6 +592,273 @@ if (wants("instagram")) {
     );
   }
   console.log("  instagram       6  (backdated a day apart, newest first)");
+}
+
+if (wants("pages")) {
+  const services = await keyed(payload, "services", "title");
+  const projects = await keyed(payload, "projects", "slug");
+  const quotes = await keyed(payload, "testimonials", "signature");
+
+  const serviceIds = SERVICES.map((item) => relatedId(services, item.title, "service"));
+  const projectIds = PROJECTS.map((item) => relatedId(projects, item.slug, "project"));
+  const quoteIds = TESTIMONIALS.map((item) => relatedId(quotes, item.signature, "testimonial"));
+
+  /** The carousel, which the home and about pages both print — spec §6's reuse case. */
+  const testimonialsBlock = {
+    blockType: "testimonials",
+    eyebrow: "Testimonials",
+    heading: "What our clients say",
+    quotes: quoteIds,
+  };
+
+  const photoRow = (filenames: string[]) => ({
+    blockType: "photoRow",
+    photos: filenames.map((filename) => mediaId(library, filename)),
+    stagger: STAGGER,
+  });
+
+  /* Everything but home first: nothing on those five points at another page. */
+
+  const about = await upsertPage(payload, "about", {
+    title: "About",
+    slug: "about",
+    _status: "published",
+    meta: {
+      title: "About — Loovio",
+      description:
+        "Who we are and how we work: the studio behind Loovio's weddings and celebrations, from first concept through to the last table setting.",
+    },
+    layout: [
+      {
+        blockType: "masthead",
+        eyebrow: "who we are",
+        heading: "About Lovio",
+        lede: "Metus ultricies ut at faucibus. Fames eget imperdiet sit ipsum pellentesque pretium. Adipiscing egestas tellus eu imperdiet pellentesque orci.",
+      },
+      // Six `shared` blocks, which RenderBlocks coalesces into one <Section>.
+      // This is the sequence §2 of the plan is written around.
+      photoRow(["about-lace-gown.jpg", "about-poppy-field.jpg", "about-florists.jpg"]),
+      {
+        blockType: "prose",
+        ornament: true,
+        heading: ABOUT_PROSE[0].heading,
+        content: editorState(ABOUT_PROSE[0].paragraphs.map((text) => paragraph(text))),
+      },
+      photoRow(["about-golden-field.jpg", "about-veil-kiss.jpg"]),
+      {
+        blockType: "prose",
+        ornament: true,
+        heading: ABOUT_PROSE[1].heading,
+        content: editorState(ABOUT_PROSE[1].paragraphs.map((text) => paragraph(text))),
+      },
+      {
+        blockType: "pressStrip",
+        label: "Featured in",
+        logos: PRESS.map((name) => ({ logo: mediaId(library, `press-${name}.svg`), name })),
+      },
+      photoRow(["about-hat-box.jpg", "about-bride-tulle.jpg", "about-lemon-cake.jpg"]),
+      testimonialsBlock,
+    ],
+  });
+
+  const servicesPage = await upsertPage(payload, "services", {
+    title: "Services",
+    slug: "services",
+    _status: "published",
+    meta: {
+      title: "Services — Loovio",
+      description:
+        "What we take on: weddings, event design and branding, from the first conversation through to the day itself.",
+    },
+    layout: [
+      { blockType: "masthead", eyebrow: "Services", heading: "Our Services" },
+      {
+        blockType: "servicePanels",
+        // The three booleans are properties of a position, not of a service —
+        // the second panel drops and carries petals, the third spans both
+        // columns. They were written into `ServicesView`'s JSX; they are the
+        // layout now, which is what lets a fourth service land somewhere.
+        panels: [
+          { service: serviceIds[0] },
+          { service: serviceIds[1], dropped: true, petals: true },
+          { service: serviceIds[2], wide: true },
+        ],
+      },
+    ],
+  });
+
+  const portfolio = await upsertPage(payload, "portfolio", {
+    title: "Portfolio",
+    slug: "portfolio",
+    _status: "published",
+    meta: {
+      title: "Portfolio — Loovio",
+      description:
+        "Weddings and celebrations designed by Loovio, from first concept through to the last table setting.",
+    },
+    layout: [
+      {
+        blockType: "masthead",
+        eyebrow: "Portfolio",
+        heading: "Event design to make your heart skip a beat",
+      },
+      // An index, not a selection: a project added next year appears here
+      // without anyone editing this page.
+      { blockType: "portfolioList", showAll: true },
+    ],
+  });
+
+  await upsertPage(payload, "blog", {
+    title: "Journal",
+    slug: "blog",
+    _status: "published",
+    meta: {
+      title: "Journal — Loovio",
+      description:
+        "Notes from the Loovio studio on planning, styling and hosting a wedding worth remembering.",
+    },
+    layout: [
+      { blockType: "masthead", eyebrow: "Blog", heading: "Journal" },
+      { blockType: "journalList", mode: "latest" },
+    ],
+  });
+
+  // Decision A's new page. The hero's "Book A Consult" has pointed at /contact
+  // since the template shipped; this is the first time the link resolves.
+  const contact = await upsertPage(payload, "contact", {
+    title: "Contact",
+    slug: "contact",
+    _status: "published",
+    meta: {
+      title: "Contact — Loovio",
+      description: "Talk to Loovio about planning and designing your celebration.",
+    },
+    layout: [
+      { blockType: "masthead", eyebrow: "Contact", heading: "Get in touch" },
+      { blockType: "prose", ornament: true, content: editorState([paragraph(CONTACT_EMAIL)]) },
+    ],
+  });
+
+  /* Then home, whose four CTAs point at four of the pages above. */
+
+  await upsertPage(payload, "home", {
+    title: "Home",
+    slug: "home",
+    _status: "published",
+    // No meta. The layout's own title and description are the site's, and the
+    // front page is the page they describe, so `generateMetadata` returns {}
+    // and Next inherits them rather than restating them here.
+    layout: [
+      {
+        blockType: "hero",
+        eyebrow: "Legendary parties",
+        heading: "Destination Wedding Planners & Event Designers",
+        cta: { label: "Book A Consult", page: contact },
+        collageLeft: mediaId(library, "hero-left.jpg"),
+        collageCenter: mediaId(library, "hero-center.jpg"),
+        collageRight: mediaId(library, "hero-right.jpg"),
+      },
+      {
+        blockType: "serviceGrid",
+        services: serviceIds,
+        // Was `SERVICES_HREF = "/services/services-b"`, a typed path at a page
+        // that never existed — six rendered dead links, by §1.4's count.
+        cta: { label: "learn more", page: servicesPage },
+      },
+      {
+        blockType: "storySplit",
+        eyebrow: "who we are",
+        heading: "Weave story into every thread of your event",
+        copy: "Cras urna sed purus magna morbi morbi congue suspendisse. Est faucibus hendrerit donec nisi, feugiat suscipit eu, sit. Orci euismod nibh.",
+        cta: { label: "more about us", page: about },
+        image: mediaId(library, "about-who-we-are.jpg"),
+        petals: "tall",
+        side: "right",
+      },
+      {
+        blockType: "storySplit",
+        eyebrow: "What We Do",
+        heading: "We are concept creators. We tell your story.",
+        copy: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Enim tincidunt magna viverra nibh scelerisque lorem ipsum adipiscing dolor.",
+        cta: { label: "more Services", page: servicesPage },
+        image: mediaId(library, "about-what-we-do.jpg"),
+        petals: "wide",
+        side: "left",
+      },
+      {
+        blockType: "portfolioGrid",
+        eyebrow: "Portfolio",
+        heading: "Event design to make your heart skip a beat",
+        projects: projectIds,
+        cta: { label: "View all portfolios", page: portfolio },
+      },
+      testimonialsBlock,
+    ],
+  });
+
+  // Six, not the plan's seven. Spec §5 seeds "home, about, services, portfolio,
+  // blog, and a new contact" — its six already include the page decision A adds,
+  // so the plan double-counts it. What decision A really adds beyond the spec is
+  // the /portfolio/<slug> route, and that is not a Pages document.
+  console.log("  pages           6  (the five without a page CTA, then home)");
+}
+
+if (wants("globals")) {
+  const pages = await keyed(payload, "pages", "slug");
+  const logo = mediaId(library, "logo.svg");
+  const navItem = (label: string, slug: string) => ({
+    label,
+    page: relatedId(pages, slug, "page"),
+  });
+
+  // A global always exists, so "already seeded" is a question about its content
+  // rather than its presence — and silently overwriting a nav someone had
+  // edited is the same data-loss bug `upsert` refuses.
+  const header = await payload.findGlobal({ slug: "header", depth: 0 });
+  if (header.nav?.length && !force) {
+    skipped++;
+  } else {
+    await payload.updateGlobal({
+      slug: "header",
+      data: {
+        logo,
+        // Split around the wordmark at its midpoint: two left, two right, as
+        // `SiteHeader` printed them.
+        nav: [
+          navItem("Portfolio", "portfolio"),
+          navItem("About", "about"),
+          navItem("Journal", "blog"),
+          navItem("Services", "services"),
+        ],
+      },
+    });
+    if (header.nav?.length) replaced++;
+    else created++;
+  }
+
+  const footer = await payload.findGlobal({ slug: "footer", depth: 0 });
+  if (footer.social?.length && !force) {
+    skipped++;
+  } else {
+    await payload.updateGlobal({
+      slug: "footer",
+      data: {
+        instagramHeading: "Instagram",
+        socialHeading: "Social",
+        social: SOCIAL.map((item) => ({ ...item })),
+        quickLinksHeading: "Quick Links",
+        quickLinks: QUICK_LINKS.map((item) => ({ ...item })),
+        logo,
+        // The `#` is the fourteenth dead link in §1.4's inventory, and the one
+        // phase 4 leaves standing alongside decision G's three.
+        credit: { label: "Made by Maxim W.", url: "#" },
+      },
+    });
+    if (footer.social?.length) replaced++;
+    else created++;
+  }
+
+  console.log("  globals         2  (header, footer)");
 }
 
 console.log(

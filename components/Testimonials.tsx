@@ -5,7 +5,6 @@ import gsap from "gsap";
 import type { Artwork } from "@/lib/artwork";
 import { outQuad } from "@/lib/easing";
 import { Sprig } from "./Sprig";
-import { Section } from "./Section";
 import styles from "./Testimonials.module.css";
 import section from "./Section.module.css";
 
@@ -23,7 +22,18 @@ export type Quote = {
 
 const FADE_DURATION = 0.6;
 
-export function Testimonials({ quotes }: { quotes: Quote[] }) {
+type TestimonialsProps = {
+  eyebrow: string;
+  heading: string;
+  quotes: Quote[];
+};
+
+/**
+ * The band appears on two pages, which is the reuse the spec's block table
+ * points at. Its `<Section>` is lifted out under §2 and put back by
+ * `RenderBlocks`, which is banding `own`.
+ */
+export function Testimonials({ eyebrow, heading, quotes }: TestimonialsProps) {
   const [index, setIndex] = useState(0);
   const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
   const previous = useRef(0);
@@ -56,14 +66,14 @@ export function Testimonials({ quotes }: { quotes: Quote[] }) {
   }, [quotes.length]);
 
   return (
-    <Section>
+    <>
       <div className={`${section.blockHeading} ${section.blockHeadingSpaced}`}>
         <Sprig className={section.sprig} />
         <div className={section.subtitle}>
-          Testimonials
+          {eyebrow}
           <br />
         </div>
-        <h2 className={section.heading}>What our clients say</h2>
+        <h2 className={section.heading}>{heading}</h2>
       </div>
 
       <div
@@ -119,6 +129,6 @@ export function Testimonials({ quotes }: { quotes: Quote[] }) {
           <img src="/images/arrow-right.png" width={23} loading="lazy" alt="" className={styles.arrow} />
         </button>
       </div>
-    </Section>
+    </>
   );
 }
