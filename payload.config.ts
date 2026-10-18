@@ -91,7 +91,12 @@ export default buildConfig({
   ],
 
   db: postgresAdapter({
-    pool: { connectionString: process.env.DATABASE_URI || "" },
+    // `DATABASE_URI` locally; the Neon integration on Vercel provides
+    // `DATABASE_URL` (pooled) and `POSTGRES_URL` instead, so those are accepted too.
+    pool: {
+      connectionString:
+        process.env.DATABASE_URI || process.env.DATABASE_URL || process.env.POSTGRES_URL || "",
+    },
 
     // Push reconciles the schema straight from the config, which is fast in dev but
     // silently mutates the database — and decision C makes that database the only
