@@ -35,6 +35,16 @@ const REPO = dirname(dirname(fileURLToPath(import.meta.url)));
 const IMAGES = join(REPO, "public", "images");
 
 const force = process.argv.includes("--force");
+
+/**
+ * `--apply-copy` is the deploy-time run: it rewrites only the documents the
+ * client's "changes" copy touches (the home and contact pages and the three
+ * services), and only once. A marker — the home hero's `lede`, a field that did
+ * not exist before — says the copy is already in, after which the run exits, so
+ * later deploys never overwrite what an editor has changed since. Nothing is
+ * uploaded: the media library must already hold the photographs.
+ */
+const applyCopy = process.argv.includes("--apply-copy");
 const onlyArg = process.argv.find((arg) => arg.startsWith("--only="));
 const only = onlyArg ? onlyArg.slice("--only=".length).split(",") : null;
 const wants = (step: string) => !only || only.includes(step);
@@ -108,6 +118,7 @@ async function seedMedia(payload: Payload): Promise<Map<string, Media>> {
     };
 
     const found = library.get(filename);
+    if (applyCopy) continue;
     if (found && !force) {
       skipped++;
       continue;
@@ -164,11 +175,12 @@ async function upsert(
   where: Where,
   data: Record<string, unknown>,
   gr?: Record<string, unknown>,
+  overwrite = false,
 ): Promise<void> {
   const { docs } = await payload.find({ collection, where, limit: 1, depth: 0 });
   const found = docs[0];
 
-  if (found && !force) {
+  if (found && !force && !overwrite) {
     skipped++;
     return;
   }
@@ -198,6 +210,7 @@ async function upsertPage(
   slug: string,
   data: Record<string, unknown>,
   gr?: Record<string, unknown>,
+  overwrite = false,
 ): Promise<number> {
   const { docs } = await payload.find({
     collection: "pages",
@@ -207,7 +220,7 @@ async function upsertPage(
   });
   const found = docs[0];
 
-  if (found && !force) {
+  if (found && !force && !overwrite) {
     skipped++;
     return found.id;
   }
@@ -601,6 +614,7 @@ if (wants("services")) {
       // `required` is checked per locale, so the Greek write restates the prose
       // the document does not translate.
       { ...service.gr, copy: editorState(service.copy.map((text) => paragraph(text))) },
+      applyCopy,
     );
   }
   console.log(`  services        ${SERVICES.length}`);
@@ -841,6 +855,7 @@ if (wants("pages")) {
       layout: contactLayout("en"),
     },
     { title: "Επικοινωνία", layout: contactLayout("gr") },
+    applyCopy,
   );
 
   /* Then home, whose four CTAs point at four of the pages above. */
@@ -909,6 +924,7 @@ if (wants("pages")) {
       layout: homeLayout("en"),
     },
     { title: "Home", layout: homeLayout("gr") },
+    applyCopy,
   );
 
   // Six, not the plan's seven. Spec §5 seeds "home, about, services, portfolio,
