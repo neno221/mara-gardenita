@@ -22,6 +22,16 @@ export const ServiceGrid: Block = {
   labels: { singular: "Service grid", plural: "Service grids" },
   fields: [
     {
+      name: "heading",
+      type: "text",
+      admin: { description: "Printed above the cards. Optional." },
+    },
+    {
+      name: "intro",
+      type: "textarea",
+      admin: { description: "A paragraph under the heading. Optional." },
+    },
+    {
       name: "services",
       type: "relationship",
       relationTo: "services",

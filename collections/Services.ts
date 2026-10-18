@@ -41,7 +41,7 @@ export const Services: CollectionConfig = {
   defaultSort: "order",
 
   fields: [
-    { name: "title", type: "text", required: true },
+    { name: "title", type: "text", required: true, localized: true },
     {
       name: "icon",
       type: "upload",
@@ -60,12 +60,14 @@ export const Services: CollectionConfig = {
       name: "summary",
       type: "textarea",
       required: true,
+      localized: true,
       admin: { description: "The one-line blurb the home page's three-up grid prints." },
     },
     {
       name: "copy",
       type: "richText",
       required: true,
+      localized: true,
       admin: { description: "The panel's prose on /services. Two paragraphs, as published." },
     },
     order,

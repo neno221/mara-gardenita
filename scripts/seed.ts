@@ -163,6 +163,7 @@ async function upsert(
   collection: ContentSlug,
   where: Where,
   data: Record<string, unknown>,
+  gr?: Record<string, unknown>,
 ): Promise<void> {
   const { docs } = await payload.find({ collection, where, limit: 1, depth: 0 });
   const found = docs[0];
@@ -171,13 +172,18 @@ async function upsert(
     skipped++;
     return;
   }
+  let id: number;
   if (found) {
-    await payload.update({ collection, id: found.id, data: data as never });
+    id = found.id;
+    await payload.update({ collection, id, data: data as never, locale: "en" });
     replaced++;
-    return;
+  } else {
+    id = (await payload.create({ collection, data: data as never, locale: "en" })).id;
+    created++;
   }
-  await payload.create({ collection, data: data as never });
-  created++;
+  // Greek is a second write to the same document. Whatever it leaves out falls
+  // back to the English text (localization.fallback in payload.config.ts).
+  if (gr) await payload.update({ collection, id, data: gr as never, locale: "gr" });
 }
 
 /**
@@ -191,6 +197,7 @@ async function upsertPage(
   payload: Payload,
   slug: string,
   data: Record<string, unknown>,
+  gr?: Record<string, unknown>,
 ): Promise<number> {
   const { docs } = await payload.find({
     collection: "pages",
@@ -204,14 +211,16 @@ async function upsertPage(
     skipped++;
     return found.id;
   }
+  let id: number;
   if (found) {
-    const doc = await payload.update({ collection: "pages", id: found.id, data: data as never });
+    id = (await payload.update({ collection: "pages", id: found.id, data: data as never, locale: "en" })).id;
     replaced++;
-    return doc.id;
+  } else {
+    id = (await payload.create({ collection: "pages", data: data as never, locale: "en" })).id;
+    created++;
   }
-  const doc = await payload.create({ collection: "pages", data: data as never });
-  created++;
-  return doc.id;
+  if (gr) await payload.update({ collection: "pages", id, data: gr as never, locale: "gr" });
+  return id;
 }
 
 /**
@@ -248,33 +257,46 @@ function relatedId(index: Map<string, number>, key: string, what: string): numbe
 /** `lib/services.ts`, whose `[string, string]` copy tuple becomes two paragraphs. */
 const SERVICES = [
   {
-    title: "Weddings",
+    title: "Wedding Planning",
+    gr: {
+      title: "Wedding Planning",
+      summary: "Δημιουργούμε τον γάμο που έχετε φανταστεί, με φροντίδα σε κάθε μικρή λεπτομέρεια.",
+    },
     icon: "icon-service-weddings.png",
     photo: "service-weddings.jpg",
-    summary:
-      "Adipiscing mauris sed metus dictum eget morbi aliquet. Sit neque tempus eget dictum velit tristique.",
+    summary: "We bring your dream wedding to life, with thoughtful attention to every detail.",
     copy: [
       "Purus quam elit, ligula morbi facilisis. Nisl id nisi, mattis eget elit etiam risus commodo, congue. Vitae placerat tincidunt adipiscing id porta sed. Gravida nulla mi felis gravida odio.",
       "Aliquam morbi in euismod aliquet pretium. Augue bibendum proin tempus non, massa aliquet. Egestas nisi ultrices curabitur.",
     ],
   },
   {
-    title: "Event Design",
+    title: "Event Planning",
+    gr: {
+      title: "Event Planning",
+      summary:
+        "Αναλαμβάνουμε τον σχεδιασμό και την οργάνωση κάθε εκδήλωσης με αισθητική, συνέπεια και επαγγελματισμό.",
+    },
     icon: "icon-service-event-design.png",
     photo: "service-event-design.jpg",
     summary:
-      "Lectus sit turpis iaculis eu non sed turpis suscipit facilisi. Lorem morbi non morbi id aliquam. Urna adipiscing odio.",
+      "We take care of every aspect of event planning and coordination, with refined aesthetics, consistency, and professionalism.",
     copy: [
       "Tincidunt lacus, adipiscing sed dictum turpis gravida arcu. Odio scelerisque commodo eu tincidunt odio pulvinar ullamcorper sit gravida. Nunc dui nunc, nulla sed convallis sed. Dictum venenatis facilisis ac adipiscing",
       "Aliquam suspendisse condimentum lobortis in. Augue vulputate egestas in porta fermentum nunc id arcu ultricies.",
     ],
   },
   {
-    title: "Branding",
+    title: "Special Occasion Arrangements",
+    gr: {
+      title: "Special Occasion Arrangements",
+      summary:
+        "Δίνουμε ζωή στις στιγμές σας με ιδιαίτερες ανθοσυνθέσεις και κομψές διακοσμητικές πινελιές.",
+    },
     icon: "icon-service-branding.png",
     photo: "service-branding.jpg",
     summary:
-      "Tristique sodales consectetur lectus feugiat molestie. Condimentum eu faucibus dictum adipiscing.",
+      "We bring your moments to life with unique floral arrangements and elegant decorative touches.",
     copy: [
       "Viverra commodo eget amet ut. Nisl velit scelerisque malesuada commodo ullamcorper integer. Et vestibulum morbi.",
       "Lobortis faucibus tortor sed amet, cras. Fringilla orci cras eget consequat, ut viverra sed. Ornare faucibus nibh eget id euismod viverra ut porttitor. Augue consectetur elit consectetur nisl, et vel. Libero tellus dolor nibh diam.",
@@ -462,14 +484,75 @@ const PRESS = ["mimosa", "iris", "orion", "sigma", "pristin", "polaris"] as cons
 const STAGGER = 200;
 
 /**
- * The address on the contact page.
- *
- * The one string in this file with no source. Decision A adds a contact page
- * the template never had, so there is nothing to copy verbatim and something
- * has to stand in the place a real address goes. Named here rather than buried
- * in the layout so whoever has the real one knows where to put it.
+ * The home and contact copy from the client's "changes" document, verbatim, in
+ * both languages. Where the Greek column repeats the English text (the service
+ * names, "Signature Offering", the contact labels) it is because the document
+ * does, and it is seeded as given.
  */
-const CONTACT_EMAIL = "hello@loovio.com";
+const COPY = {
+  en: {
+    heroEyebrow: "Wedding Planning | Floral Design | Event Décor· Est. 1988",
+    heroHeading: "The most beautiful moments begin with an idea...",
+    heroLede:
+      "With years of experience in event planning, décor, and bespoke floral design, we create memorable moments for every occasion, tailored to your unique needs and vision.",
+    servicesHeading: "Services crafted for every occasion.",
+    servicesIntro:
+      "Complete event planning, décor, and floral design services, thoughtfully crafted with elegance, consistency, and attention to detail.",
+    aboutHeading: "Designing moments with character and style…",
+    aboutCopy: [
+      "For over 40 years, Mara Gardenita Flower Boutique has been a part of my life and my creative journey.",
+      "With a love for flowers and a strong attention to detail, I work alongside my team to create unique experiences for every occasion — from weddings and christenings to corporate and social events — always tailored to your style and budget.",
+      "To me, every event is unique. That’s why I personally take care of every detail, from concept to execution, ensuring that the final result truly reflects you.",
+      "In our boutique, you will find a wide selection of fresh flowers, indoor and outdoor plants, as well as distinctive floral arrangements that bring character to every moment.",
+      "With consistency, experience, and creativity, I continue to do what I love most: creating beautiful moments that last.",
+    ],
+    aboutSignature: "Maria Tsestou, Owner",
+    offerEyebrow: "Signature Offering",
+    offerHeading: "Tailored Celebrations",
+    offerCopy:
+      "Combining creative design with refined aesthetics, we offer bespoke décor and floral solutions that highlight the character of every event. Each proposal is unique, thoughtfully designed with care and consistency. Complete our contact form to receive a personalized quote for your wedding or event – we would be delighted to get in touch with you.",
+    contactEyebrow: "Get in Touch",
+    contactHeading: "Let's create something beautiful.",
+    contactLede:
+      "Every beautiful idea begins with a conversation. Reach out to us and let’s create something truly special together.",
+    contactHours: "Monday – Friday, 8am – 7pm\nSaturday, 8am – 5pm",
+  },
+  gr: {
+    heroEyebrow: "Wedding Planning | Floral Design | Event Décor· Est. 1988",
+    heroHeading: "Οι πιο όμορφες στιγμές ξεκινούν από μια ιδέα...",
+    heroLede:
+      "Με πολυετή εμπειρία στον σχεδιασμό εκδηλώσεων, τη διακόσμηση και τη δημιουργία μοναδικών ανθοσυνθέσεων, δημιουργούμε ξεχωριστές στιγμές για κάθε περίσταση, προσαρμοσμένες στις δικές σας ανάγκες και επιθυμίες.",
+    servicesHeading: "Services crafted for every occasion.",
+    servicesIntro:
+      "Ολοκληρωμένες υπηρεσίες σχεδιασμού εκδηλώσεων, διακόσμησης και ανθοσύνθεσης, δημιουργημένες με αισθητική, συνέπεια και προσοχή στη λεπτομέρεια.",
+    aboutHeading: "Σχεδιάζοντας στιγμές με χαρακτήρα και αισθητική…",
+    aboutCopy: [
+      "Για περισσότερα από 40 χρόνια, το Mara Gardenita Flower Boutique αποτελεί ένα κομμάτι της ζωής μου και της δημιουργικότητάς μου.",
+      "Με αγάπη για τα λουλούδια και έμφαση στη λεπτομέρεια, δημιουργώ μαζί με την ομάδα μου ξεχωριστές εμπειρίες για κάθε περίσταση — από γάμους και βαπτίσεις μέχρι εταιρικές και κοινωνικές εκδηλώσεις — πάντα προσαρμοσμένες στο ύφος και το budget σας.",
+      "Για μένα, κάθε εκδήλωση είναι μοναδική. Γι’ αυτό και φροντίζω προσωπικά κάθε λεπτομέρεια, από τον σχεδιασμό μέχρι την υλοποίηση, ώστε το αποτέλεσμα να εκφράζει απόλυτα εσάς.",
+      "Στον χώρο μας θα βρείτε μια μεγάλη ποικιλία από φρέσκα λουλούδια, φυτά εσωτερικού και εξωτερικού χώρου, καθώς και ιδιαίτερες ανθοσυνθέσεις που μπορούν να δώσουν χαρακτήρα σε κάθε στιγμή.",
+      "Με συνέπεια, εμπειρία και δημιουργικότητα, συνεχίζω να κάνω αυτό που αγαπώ περισσότερο: να δημιουργώ όμορφες στιγμές που μένουν αξέχαστες.",
+    ],
+    aboutSignature: "Μαρια Τσεστου, Ιδιοκτήτρια",
+    offerEyebrow: "Signature Offering",
+    offerHeading: "Tailored Celebrations",
+    offerCopy:
+      "Συνδυάζοντας δημιουργικό σχεδιασμό με υψηλή αισθητική, προσφέρουμε εξατομικευμένες λύσεις διακόσμησης και ανθοσύνθεσης που αναδεικνύουν τον χαρακτήρα κάθε εκδήλωσης. Κάθε πρόταση είναι μοναδική, σχεδιασμένη με φροντίδα και συνέπεια. Συμπληρώστε τη φόρμα επικοινωνίας για να λάβετε μια εξατομικευμένη προσφορά για τον γάμο ή την εκδήλωσή σας και θα χαρούμε να επικοινωνήσουμε μαζί σας.",
+    contactEyebrow: "Get in Touch",
+    contactHeading: "Let's create something beautiful.",
+    contactLede:
+      "Κάθε όμορφη ιδέα ξεκινά από μια συζήτηση. Επικοινωνήστε μαζί μας και ας δημιουργήσουμε μαζί κάτι μοναδικό.",
+    contactHours: "Δευτέρα – Παρασκευή, 8π.μ. – 7μ.μ.\nΣάββατο, 8π.μ. – 5μ.μ",
+  },
+} as const;
+
+/** The same in both languages, because the document gives one value for each. */
+const CONTACT_ITEMS = (hours: string) => [
+  { label: "Email", value: "info@maragardenita.com", href: "mailto:info@maragardenita.com" },
+  { label: "Phone", value: "+357 99666595", href: "tel:+35799666595" },
+  { label: "Studio", value: "Γεράσιμου Μαρκορά 26Β, 1075 Λευκωσία, Κύπρος" },
+  { label: "Studio Hours", value: hours },
+];
 
 /* ------------------------------------------------------------ the globals */
 
@@ -506,7 +589,7 @@ if (wants("services")) {
     await upsert(
       payload,
       "services",
-      { title: { equals: service.title } },
+      { order: { equals: index } },
       {
         title: service.title,
         icon: mediaId(library, service.icon),
@@ -515,6 +598,9 @@ if (wants("services")) {
         copy: editorState(service.copy.map((text) => paragraph(text))),
         order: index,
       },
+      // `required` is checked per locale, so the Greek write restates the prose
+      // the document does not translate.
+      { ...service.gr, copy: editorState(service.copy.map((text) => paragraph(text))) },
     );
   }
   console.log(`  services        ${SERVICES.length}`);
@@ -601,11 +687,11 @@ if (wants("instagram")) {
 }
 
 if (wants("pages")) {
-  const services = await keyed(payload, "services", "title");
+  const services = await keyed(payload, "services", "order");
   const projects = await keyed(payload, "projects", "slug");
   const quotes = await keyed(payload, "testimonials", "signature");
 
-  const serviceIds = SERVICES.map((item) => relatedId(services, item.title, "service"));
+  const serviceIds = SERVICES.map((_, index) => relatedId(services, String(index), "service"));
   const projectIds = PROJECTS.map((item) => relatedId(projects, item.slug, "project"));
   const quoteIds = TESTIMONIALS.map((item) => relatedId(quotes, item.signature, "testimonial"));
 
@@ -731,34 +817,42 @@ if (wants("pages")) {
 
   // Decision A's new page. The hero's "Book A Consult" has pointed at /contact
   // since the template shipped; this is the first time the link resolves.
-  const contact = await upsertPage(payload, "contact", {
-    title: "Contact",
-    slug: "contact",
-    _status: "published",
-    meta: {
-      title: "Contact — Loovio",
-      description: "Talk to Loovio about planning and designing your celebration.",
+  const contactLayout = (lang: "en" | "gr") => [
+    {
+      blockType: "masthead",
+      eyebrow: COPY[lang].contactEyebrow,
+      heading: COPY[lang].contactHeading,
+      lede: COPY[lang].contactLede,
     },
-    layout: [
-      { blockType: "masthead", eyebrow: "Contact", heading: "Get in touch" },
-      { blockType: "prose", ornament: true, content: editorState([paragraph(CONTACT_EMAIL)]) },
-    ],
-  });
+    { blockType: "contactDetails", items: CONTACT_ITEMS(COPY[lang].contactHours) },
+  ];
+
+  const contact = await upsertPage(
+    payload,
+    "contact",
+    {
+      title: "Contact",
+      slug: "contact",
+      _status: "published",
+      meta: {
+        title: "Contact — Loovio",
+        description: "Talk to Loovio about planning and designing your celebration.",
+      },
+      layout: contactLayout("en"),
+    },
+    { title: "Επικοινωνία", layout: contactLayout("gr") },
+  );
 
   /* Then home, whose four CTAs point at four of the pages above. */
 
-  await upsertPage(payload, "home", {
-    title: "Home",
-    slug: "home",
-    _status: "published",
-    // No meta. The layout's own title and description are the site's, and the
-    // front page is the page they describe, so `generateMetadata` returns {}
-    // and Next inherits them rather than restating them here.
-    layout: [
+  const homeLayout = (lang: "en" | "gr") => {
+    const text = COPY[lang];
+    return [
       {
         blockType: "hero",
-        eyebrow: "Legendary parties",
-        heading: "Destination Wedding Planners & Event Designers",
+        eyebrow: text.heroEyebrow,
+        heading: text.heroHeading,
+        lede: text.heroLede,
         cta: { label: "Book A Consult", page: contact },
         collageLeft: mediaId(library, "hero-left.jpg"),
         collageCenter: mediaId(library, "hero-center.jpg"),
@@ -766,6 +860,8 @@ if (wants("pages")) {
       },
       {
         blockType: "serviceGrid",
+        heading: text.servicesHeading,
+        intro: text.servicesIntro,
         services: serviceIds,
         // Was `SERVICES_HREF = "/services/services-b"`, a typed path at a page
         // that never existed — six rendered dead links, by §1.4's count.
@@ -773,20 +869,18 @@ if (wants("pages")) {
       },
       {
         blockType: "storySplit",
-        eyebrow: "who we are",
-        heading: "Weave story into every thread of your event",
-        copy: "Cras urna sed purus magna morbi morbi congue suspendisse. Est faucibus hendrerit donec nisi, feugiat suscipit eu, sit. Orci euismod nibh.",
-        cta: { label: "more about us", page: about },
+        heading: text.aboutHeading,
+        copy: text.aboutCopy.join("\n"),
+        signature: text.aboutSignature,
         image: mediaId(library, "about-who-we-are.jpg"),
         petals: "tall",
         side: "right",
       },
       {
         blockType: "storySplit",
-        eyebrow: "What We Do",
-        heading: "We are concept creators. We tell your story.",
-        copy: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Enim tincidunt magna viverra nibh scelerisque lorem ipsum adipiscing dolor.",
-        cta: { label: "more Services", page: servicesPage },
+        eyebrow: text.offerEyebrow,
+        heading: text.offerHeading,
+        copy: text.offerCopy,
         image: mediaId(library, "about-what-we-do.jpg"),
         petals: "wide",
         side: "left",
@@ -799,8 +893,23 @@ if (wants("pages")) {
         cta: { label: "View all portfolios", page: portfolio },
       },
       testimonialsBlock,
-    ],
-  });
+    ];
+  };
+
+  await upsertPage(
+    payload,
+    "home",
+    {
+      title: "Home",
+      slug: "home",
+      _status: "published",
+      // No meta. The layout's own title and description are the site's, and the
+      // front page is the page they describe, so `generateMetadata` returns {}
+      // and Next inherits them rather than restating them here.
+      layout: homeLayout("en"),
+    },
+    { title: "Home", layout: homeLayout("gr") },
+  );
 
   // Six, not the plan's seven. Spec §5 seeds "home, about, services, portfolio,
   // blog, and a new contact" — its six already include the page decision A adds,

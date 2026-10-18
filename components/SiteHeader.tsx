@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import gsap from "gsap";
 import type { HeaderProps } from "@/lib/chrome";
+import { switchLocalePath, withLocale, type Locale } from "@/lib/i18n";
 import type { ResolvedLink } from "@/lib/links";
 import { useScrollProgress } from "@/lib/useScrollProgress";
 import { SiteLink } from "./SiteLink";
@@ -20,6 +21,7 @@ const MOBILE_NAV = "(max-width: 991px)";
  * the odd one out going left.
  */
 export function SiteHeader({
+  locale,
   logo,
   logoAlt,
   nav,
@@ -30,6 +32,9 @@ export function SiteHeader({
   const menuRef = useRef<HTMLElement>(null);
 
   const closeMenu = useCallback(() => setMenuOpen(false), []);
+  const pathname = usePathname();
+  const home = withLocale("/", locale);
+  const other: Locale = locale === "gr" ? "en" : "gr";
 
   const split = Math.ceil(nav.length / 2);
   const leading = nav.slice(0, split);
@@ -86,7 +91,7 @@ export function SiteHeader({
 
   return (
     <header className={styles.navbar}>
-      <SiteLink href="/" className={styles.brandMobile} onClick={closeMenu}>
+      <SiteLink href={home} className={styles.brandMobile} onClick={closeMenu}>
         <img {...logo} alt={logoAlt} className={styles.logoMobile} />
       </SiteLink>
 
@@ -104,13 +109,22 @@ export function SiteHeader({
                 <NavLink key={item.href} item={item} first={index === 0} onNavigate={closeMenu} />
               ))}
             </div>
-            <SiteLink href="/" className={styles.brand} onClick={closeMenu}>
+            <SiteLink href={home} className={styles.brand} onClick={closeMenu}>
               <img {...logo} alt={logoAlt} className={styles.logo} />
             </SiteLink>
             <div className={`${styles.navGroup} ${styles.navGroupTrailing}`}>
               {trailing.map((item) => (
                 <NavLink key={item.href} item={item} onNavigate={closeMenu} />
               ))}
+              <SiteLink
+                href={switchLocalePath(pathname, other)}
+                className={styles.navLink}
+                hrefLang={other === "gr" ? "el" : "en"}
+                lang={other === "gr" ? "el" : "en"}
+                onClick={closeMenu}
+              >
+                {other === "gr" ? "GR" : "EN"}
+              </SiteLink>
             </div>
           </div>
         </nav>
