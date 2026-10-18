@@ -35,6 +35,18 @@ export default buildConfig({
   // rather than a document someone could delete.
   globals: [Header, Footer],
 
+  // English is the default and the fallback: a field with no Greek yet shows its
+  // English text rather than an empty string. English lives at the root, Greek
+  // under `/gr` (lib/i18n.ts).
+  localization: {
+    locales: [
+      { label: "English", code: "en" },
+      { label: "Ελληνικά", code: "gr" },
+    ],
+    defaultLocale: "en",
+    fallback: true,
+  },
+
   editor: lexicalEditor(),
 
   plugins: [
@@ -58,7 +70,12 @@ export default buildConfig({
       generateDescription,
       generateImage,
       fields: ({ defaultFields }) => [
-        ...defaultFields,
+        // Title, description and image are per language; `noIndex` below is not.
+        ...defaultFields.map((field) =>
+          "name" in field && ["title", "description"].includes(field.name as string)
+            ? { ...field, localized: true }
+            : field,
+        ),
         {
           name: "noIndex",
           type: "checkbox",
@@ -74,7 +91,12 @@ export default buildConfig({
   ],
 
   db: postgresAdapter({
-    pool: { connectionString: process.env.DATABASE_URI || "" },
+    // `DATABASE_URI` locally; the Neon integration on Vercel provides
+    // `DATABASE_URL` (pooled) and `POSTGRES_URL` instead, so those are accepted too.
+    pool: {
+      connectionString:
+        process.env.DATABASE_URI || process.env.DATABASE_URL || process.env.POSTGRES_URL || "",
+    },
 
     // Push reconciles the schema straight from the config, which is fast in dev but
     // silently mutates the database — and decision C makes that database the only

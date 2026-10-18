@@ -1,5 +1,5 @@
 import type { Block } from "payload";
-import { eyebrow, heading, link } from "./fields";
+import { heading, link } from "./fields";
 
 /**
  * A photograph on one side, a short run of copy and a button on the other.
@@ -20,9 +20,23 @@ export const StorySplit: Block = {
   interfaceName: "StorySplitBlock",
   labels: { singular: "Story split", plural: "Story splits" },
   fields: [
-    eyebrow,
+    {
+      name: "eyebrow",
+      type: "text",
+      admin: { description: "The uppercase label above the headline. Optional." },
+    },
     heading,
-    { name: "copy", type: "textarea", required: true },
+    {
+      name: "copy",
+      type: "textarea",
+      required: true,
+      admin: { description: "A new line starts a new paragraph." },
+    },
+    {
+      name: "signature",
+      type: "text",
+      admin: { description: "A closing line under the copy, such as a name and role." },
+    },
     link("cta", "Button"),
     {
       name: "image",

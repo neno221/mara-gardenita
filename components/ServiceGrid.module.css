@@ -68,3 +68,13 @@
     grid-row-gap: 65px;
   }
 }
+
+.intro {
+  margin-bottom: 60px;
+  text-align: center;
+}
+
+.intro > * {
+  margin-left: auto;
+  margin-right: auto;
+}

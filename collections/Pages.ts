@@ -61,12 +61,15 @@ export const Pages: CollectionConfig = {
   versions: { drafts: true, maxPerDoc: 20 },
 
   fields: [
-    { name: "title", type: "text", required: true },
+    { name: "title", type: "text", required: true, localized: true },
     slug,
     {
       name: "layout",
       type: "blocks",
       required: true,
+      // The whole page is written once per language, so the Greek layout may
+      // order and pick blocks differently from the English one.
+      localized: true,
       minRows: 1,
       blocks,
       admin: { description: "The page, in order. Drag to rearrange." },

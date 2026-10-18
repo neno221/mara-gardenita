@@ -23,6 +23,11 @@ export const Hero: Block = {
   fields: [
     eyebrow,
     heading,
+    {
+      name: "lede",
+      type: "textarea",
+      admin: { description: "A paragraph under the headline." },
+    },
     link("cta", "Call to action"),
     {
       type: "row",

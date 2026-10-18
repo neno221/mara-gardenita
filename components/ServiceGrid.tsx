@@ -2,6 +2,7 @@ import type { Artwork } from "@/lib/artwork";
 import type { ResolvedLink } from "@/lib/links";
 import { SiteLink } from "./SiteLink";
 import styles from "./ServiceGrid.module.css";
+import section from "./Section.module.css";
 import buttons from "./buttons.module.css";
 
 export type ServiceSummary = {
@@ -12,6 +13,8 @@ export type ServiceSummary = {
 };
 
 type ServiceGridProps = {
+  heading?: string;
+  intro?: string;
   services: ServiceSummary[];
   /**
    * Printed on every card — once as the title's link, once as the button under
@@ -31,8 +34,15 @@ type ServiceGridProps = {
  * brings its own cannot be put there. This one is banded `own`, so it looks
  * exactly as it did.
  */
-export function ServiceGrid({ services, cta }: ServiceGridProps) {
+export function ServiceGrid({ heading, intro, services, cta }: ServiceGridProps) {
   return (
+    <>
+      {(heading || intro) && (
+        <div className={styles.intro}>
+          {heading && <h2 className={section.heading}>{heading}</h2>}
+          {intro && <p className={section.paragraph}>{intro}</p>}
+        </div>
+      )}
     <div className={styles.grid}>
       {services.map((service) => (
         <div className={styles.service} key={service.title}>
@@ -53,5 +63,6 @@ export function ServiceGrid({ services, cta }: ServiceGridProps) {
         </div>
       ))}
     </div>
+    </>
   );
 }

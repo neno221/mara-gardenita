@@ -14,6 +14,7 @@ import photo from "./photo.module.css";
 type HeroProps = {
   eyebrow: string;
   heading: string;
+  lede?: string;
   cta: ResolvedLink | null;
   /** The three collage plates, already resolved to src/srcSet/sizes. */
   left: Artwork;
@@ -33,7 +34,7 @@ type HeroProps = {
  * The band is still this component's own (`HeroSection`), which is what banding
  * `none` means in §2's rule: `RenderBlocks` does not wrap a hero.
  */
-export function Hero({ eyebrow, heading, cta, left, right, center }: HeroProps) {
+export function Hero({ eyebrow, heading, lede, cta, left, right, center }: HeroProps) {
   const collageRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<HTMLDivElement>(null);
   const frameLeftRef = useRef<HTMLDivElement>(null);
@@ -92,7 +93,7 @@ export function Hero({ eyebrow, heading, cta, left, right, center }: HeroProps) 
 
   return (
     <HeroSection>
-      <HeroTop subtitle={eyebrow} heading={heading} cta={cta ?? undefined} />
+      <HeroTop subtitle={eyebrow} heading={heading} lede={lede} cta={cta ?? undefined} />
 
       <div className={styles.collage} ref={collageRef}>
         <div className={styles.collageInner}>

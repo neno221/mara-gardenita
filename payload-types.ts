@@ -98,7 +98,7 @@ export interface Config {
   db: {
     defaultIDType: number;
   };
-  fallbackLocale: null;
+  fallbackLocale: ('false' | 'none' | 'null') | false | null | ('en' | 'gr') | ('en' | 'gr')[];
   globals: {
     header: Header;
     footer: Footer;
@@ -107,7 +107,7 @@ export interface Config {
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
   };
-  locale: null;
+  locale: 'en' | 'gr';
   widgets: {
     collections: CollectionsWidget;
   };
@@ -163,6 +163,7 @@ export interface Page {
     | TestimonialsBlock
     | PhotoRowBlock
     | ProseBlock
+    | ContactDetailsBlock
     | PressStripBlock
     | InstagramFeedBlock
   )[];
@@ -193,6 +194,10 @@ export interface HeroBlock {
    */
   eyebrow: string;
   heading: string;
+  /**
+   * A paragraph under the headline.
+   */
+  lede?: string | null;
   cta?: {
     /**
      * Leave empty to omit the link entirely.
@@ -317,11 +322,18 @@ export interface MastheadBlock {
  */
 export interface StorySplitBlock {
   /**
-   * The uppercase label above the headline.
+   * The uppercase label above the headline. Optional.
    */
-  eyebrow: string;
+  eyebrow?: string | null;
   heading: string;
+  /**
+   * A new line starts a new paragraph.
+   */
   copy: string;
+  /**
+   * A closing line under the copy, such as a name and role.
+   */
+  signature?: string | null;
   cta?: {
     /**
      * Leave empty to omit the link entirely.
@@ -351,6 +363,14 @@ export interface StorySplitBlock {
  * via the `definition` "ServiceGridBlock".
  */
 export interface ServiceGridBlock {
+  /**
+   * Printed above the cards. Optional.
+   */
+  heading?: string | null;
+  /**
+   * A paragraph under the heading. Optional.
+   */
+  intro?: string | null;
   /**
    * In the order they are printed.
    */
@@ -715,6 +735,24 @@ export interface Testimonial {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ContactDetailsBlock".
+ */
+export interface ContactDetailsBlock {
+  items: {
+    label: string;
+    value: string;
+    /**
+     * Makes the value a link, e.g. mailto:… or tel:…
+     */
+    href?: string | null;
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'contactDetails';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "PressStripBlock".
  */
 export interface PressStripBlock {
@@ -920,6 +958,7 @@ export interface PagesSelect<T extends boolean = true> {
         testimonials?: T | TestimonialsBlockSelect<T>;
         photoRow?: T | PhotoRowBlockSelect<T>;
         prose?: T | ProseBlockSelect<T>;
+        contactDetails?: T | ContactDetailsBlockSelect<T>;
         pressStrip?: T | PressStripBlockSelect<T>;
         instagramFeed?: T | InstagramFeedBlockSelect<T>;
       };
@@ -943,6 +982,7 @@ export interface PagesSelect<T extends boolean = true> {
 export interface HeroBlockSelect<T extends boolean = true> {
   eyebrow?: T;
   heading?: T;
+  lede?: T;
   cta?:
     | T
     | {
@@ -982,6 +1022,7 @@ export interface StorySplitBlockSelect<T extends boolean = true> {
   eyebrow?: T;
   heading?: T;
   copy?: T;
+  signature?: T;
   cta?:
     | T
     | {
@@ -1000,6 +1041,8 @@ export interface StorySplitBlockSelect<T extends boolean = true> {
  * via the `definition` "ServiceGridBlock_select".
  */
 export interface ServiceGridBlockSelect<T extends boolean = true> {
+  heading?: T;
+  intro?: T;
   services?: T;
   cta?:
     | T
@@ -1096,6 +1139,22 @@ export interface ProseBlockSelect<T extends boolean = true> {
   ornament?: T;
   heading?: T;
   content?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ContactDetailsBlock_select".
+ */
+export interface ContactDetailsBlockSelect<T extends boolean = true> {
+  items?:
+    | T
+    | {
+        label?: T;
+        value?: T;
+        href?: T;
+        id?: T;
+      };
   id?: T;
   blockName?: T;
 }

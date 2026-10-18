@@ -15,9 +15,10 @@ import section from "./Section.module.css";
 import buttons from "./buttons.module.css";
 
 type StorySplitProps = {
-  eyebrow: string;
+  eyebrow?: string;
   heading: string;
   copy: string;
+  signature?: string;
   /** The button under the copy. Omitted when the block carries no label. */
   cta: ResolvedLink | null;
   image: Artwork;
@@ -31,6 +32,7 @@ export function StorySplit({
   eyebrow,
   heading,
   copy,
+  signature,
   cta,
   image,
   petals,
@@ -84,12 +86,19 @@ export function StorySplit({
   const prose = (
     <div className={styles.text}>
       <Sprig className={section.sprig} />
-      <div className={section.subtitle}>
-        {eyebrow}
-        <br />
-      </div>
+      {eyebrow && (
+        <div className={section.subtitle}>
+          {eyebrow}
+          <br />
+        </div>
+      )}
       <h2 className={section.heading}>{heading}</h2>
-      <p className={section.paragraph}>{copy}</p>
+      {copy.split(/\r?\n+/).map((paragraph, index) => (
+        <p className={section.paragraph} key={index}>
+          {paragraph}
+        </p>
+      ))}
+      {signature && <p className={section.paragraph}>{signature}</p>}
       {cta && (
         <SiteLink href={cta.href} className={buttons.button}>
           {cta.label}
