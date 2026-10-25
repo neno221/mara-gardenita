@@ -1,11 +1,25 @@
 import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
 
+/**
+ * English and Greek (`en`, `gr`), with English as the fallback.
+ *
+ * First written as `20261018_114737_localization`, against a schema that still
+ * had the journal. Production then removed the journal
+ * (`20261025_152204_remove_journal_header_button`) before this ran, so it was
+ * regenerated to come after that migration, and its posts and journal-list
+ * statements were dropped. The hand edits from the original are kept: new
+ * `_locale` columns arrive with a temporary `'en'` default, and existing values
+ * are copied into the `*_locales` tables as English before the old columns are
+ * dropped. Checked against Payload's own generated SQL: the resulting schemas
+ * are identical, whether the database starts empty, before the journal
+ * removal, or after it.
+ */
+
 export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   await db.execute(sql`
    CREATE TYPE "public"."_locales" AS ENUM('en', 'gr');
   CREATE TYPE "public"."enum__pages_v_published_locale" AS ENUM('en', 'gr');
   CREATE TYPE "public"."enum__projects_v_published_locale" AS ENUM('en', 'gr');
-  CREATE TYPE "public"."enum__posts_v_published_locale" AS ENUM('en', 'gr');
   CREATE TABLE "pages_blocks_contact_details_items" (
   	"_order" integer NOT NULL,
   	"_parent_id" varchar NOT NULL,
@@ -84,24 +98,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"_parent_id" integer NOT NULL
   );
   
-  CREATE TABLE "posts_locales" (
-  	"meta_title" varchar,
-  	"meta_description" varchar,
-  	"meta_image_id" integer,
-  	"id" serial PRIMARY KEY NOT NULL,
-  	"_locale" "_locales" NOT NULL,
-  	"_parent_id" integer NOT NULL
-  );
-  
-  CREATE TABLE "_posts_v_locales" (
-  	"version_meta_title" varchar,
-  	"version_meta_description" varchar,
-  	"version_meta_image_id" integer,
-  	"id" serial PRIMARY KEY NOT NULL,
-  	"_locale" "_locales" NOT NULL,
-  	"_parent_id" integer NOT NULL
-  );
-  
   CREATE TABLE "services_locales" (
   	"title" varchar NOT NULL,
   	"summary" varchar NOT NULL,
@@ -119,24 +115,16 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   
   ALTER TABLE "_projects_v" DROP CONSTRAINT "_projects_v_version_meta_image_id_media_id_fk";
   
-  ALTER TABLE "posts" DROP CONSTRAINT "posts_meta_image_id_media_id_fk";
-  
-  ALTER TABLE "_posts_v" DROP CONSTRAINT "_posts_v_version_meta_image_id_media_id_fk";
-  
   DROP INDEX "pages_meta_meta_image_idx";
   DROP INDEX "_pages_v_version_meta_version_meta_image_idx";
   DROP INDEX "projects_meta_meta_image_idx";
   DROP INDEX "_projects_v_version_meta_version_meta_image_idx";
-  DROP INDEX "posts_meta_meta_image_idx";
-  DROP INDEX "_posts_v_version_meta_version_meta_image_idx";
   DROP INDEX "pages_rels_services_id_idx";
   DROP INDEX "pages_rels_projects_id_idx";
-  DROP INDEX "pages_rels_posts_id_idx";
   DROP INDEX "pages_rels_testimonials_id_idx";
   DROP INDEX "pages_rels_media_id_idx";
   DROP INDEX "_pages_v_rels_services_id_idx";
   DROP INDEX "_pages_v_rels_projects_id_idx";
-  DROP INDEX "_pages_v_rels_posts_id_idx";
   DROP INDEX "_pages_v_rels_testimonials_id_idx";
   DROP INDEX "_pages_v_rels_media_id_idx";
   ALTER TABLE "pages_blocks_hero" ADD COLUMN "_locale" "_locales" NOT NULL DEFAULT 'en';
@@ -151,7 +139,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   ALTER TABLE "pages_blocks_service_panels" ADD COLUMN "_locale" "_locales" NOT NULL DEFAULT 'en';
   ALTER TABLE "pages_blocks_portfolio_grid" ADD COLUMN "_locale" "_locales" NOT NULL DEFAULT 'en';
   ALTER TABLE "pages_blocks_portfolio_list" ADD COLUMN "_locale" "_locales" NOT NULL DEFAULT 'en';
-  ALTER TABLE "pages_blocks_journal_list" ADD COLUMN "_locale" "_locales" NOT NULL DEFAULT 'en';
   ALTER TABLE "pages_blocks_testimonials" ADD COLUMN "_locale" "_locales" NOT NULL DEFAULT 'en';
   ALTER TABLE "pages_blocks_photo_row" ADD COLUMN "_locale" "_locales" NOT NULL DEFAULT 'en';
   ALTER TABLE "pages_blocks_prose" ADD COLUMN "_locale" "_locales" NOT NULL DEFAULT 'en';
@@ -171,7 +158,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   ALTER TABLE "_pages_v_blocks_service_panels" ADD COLUMN "_locale" "_locales" NOT NULL DEFAULT 'en';
   ALTER TABLE "_pages_v_blocks_portfolio_grid" ADD COLUMN "_locale" "_locales" NOT NULL DEFAULT 'en';
   ALTER TABLE "_pages_v_blocks_portfolio_list" ADD COLUMN "_locale" "_locales" NOT NULL DEFAULT 'en';
-  ALTER TABLE "_pages_v_blocks_journal_list" ADD COLUMN "_locale" "_locales" NOT NULL DEFAULT 'en';
   ALTER TABLE "_pages_v_blocks_testimonials" ADD COLUMN "_locale" "_locales" NOT NULL DEFAULT 'en';
   ALTER TABLE "_pages_v_blocks_photo_row" ADD COLUMN "_locale" "_locales" NOT NULL DEFAULT 'en';
   ALTER TABLE "_pages_v_blocks_prose" ADD COLUMN "_locale" "_locales" NOT NULL DEFAULT 'en';
@@ -183,8 +169,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   ALTER TABLE "_pages_v_rels" ADD COLUMN "locale" "_locales";
   ALTER TABLE "_projects_v" ADD COLUMN "snapshot" boolean;
   ALTER TABLE "_projects_v" ADD COLUMN "published_locale" "enum__projects_v_published_locale";
-  ALTER TABLE "_posts_v" ADD COLUMN "snapshot" boolean;
-  ALTER TABLE "_posts_v" ADD COLUMN "published_locale" "enum__posts_v_published_locale";
   ALTER TABLE "pages_blocks_contact_details_items" ADD CONSTRAINT "pages_blocks_contact_details_items_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."pages_blocks_contact_details"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "pages_blocks_contact_details" ADD CONSTRAINT "pages_blocks_contact_details_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."pages"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "pages_locales" ADD CONSTRAINT "pages_locales_meta_image_id_media_id_fk" FOREIGN KEY ("meta_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
@@ -197,10 +181,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   ALTER TABLE "projects_locales" ADD CONSTRAINT "projects_locales_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."projects"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "_projects_v_locales" ADD CONSTRAINT "_projects_v_locales_version_meta_image_id_media_id_fk" FOREIGN KEY ("version_meta_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "_projects_v_locales" ADD CONSTRAINT "_projects_v_locales_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."_projects_v"("id") ON DELETE cascade ON UPDATE no action;
-  ALTER TABLE "posts_locales" ADD CONSTRAINT "posts_locales_meta_image_id_media_id_fk" FOREIGN KEY ("meta_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
-  ALTER TABLE "posts_locales" ADD CONSTRAINT "posts_locales_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."posts"("id") ON DELETE cascade ON UPDATE no action;
-  ALTER TABLE "_posts_v_locales" ADD CONSTRAINT "_posts_v_locales_version_meta_image_id_media_id_fk" FOREIGN KEY ("version_meta_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
-  ALTER TABLE "_posts_v_locales" ADD CONSTRAINT "_posts_v_locales_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."_posts_v"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "services_locales" ADD CONSTRAINT "services_locales_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."services"("id") ON DELETE cascade ON UPDATE no action;
   CREATE INDEX "pages_blocks_contact_details_items_order_idx" ON "pages_blocks_contact_details_items" USING btree ("_order");
   CREATE INDEX "pages_blocks_contact_details_items_parent_id_idx" ON "pages_blocks_contact_details_items" USING btree ("_parent_id");
@@ -224,10 +204,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE UNIQUE INDEX "projects_locales_locale_parent_id_unique" ON "projects_locales" USING btree ("_locale","_parent_id");
   CREATE INDEX "_projects_v_version_meta_version_meta_image_idx" ON "_projects_v_locales" USING btree ("version_meta_image_id","_locale");
   CREATE UNIQUE INDEX "_projects_v_locales_locale_parent_id_unique" ON "_projects_v_locales" USING btree ("_locale","_parent_id");
-  CREATE INDEX "posts_meta_meta_image_idx" ON "posts_locales" USING btree ("meta_image_id","_locale");
-  CREATE UNIQUE INDEX "posts_locales_locale_parent_id_unique" ON "posts_locales" USING btree ("_locale","_parent_id");
-  CREATE INDEX "_posts_v_version_meta_version_meta_image_idx" ON "_posts_v_locales" USING btree ("version_meta_image_id","_locale");
-  CREATE UNIQUE INDEX "_posts_v_locales_locale_parent_id_unique" ON "_posts_v_locales" USING btree ("_locale","_parent_id");
   CREATE UNIQUE INDEX "services_locales_locale_parent_id_unique" ON "services_locales" USING btree ("_locale","_parent_id");
   CREATE INDEX "pages_blocks_hero_locale_idx" ON "pages_blocks_hero" USING btree ("_locale");
   CREATE INDEX "pages_blocks_masthead_locale_idx" ON "pages_blocks_masthead" USING btree ("_locale");
@@ -237,7 +213,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "pages_blocks_service_panels_locale_idx" ON "pages_blocks_service_panels" USING btree ("_locale");
   CREATE INDEX "pages_blocks_portfolio_grid_locale_idx" ON "pages_blocks_portfolio_grid" USING btree ("_locale");
   CREATE INDEX "pages_blocks_portfolio_list_locale_idx" ON "pages_blocks_portfolio_list" USING btree ("_locale");
-  CREATE INDEX "pages_blocks_journal_list_locale_idx" ON "pages_blocks_journal_list" USING btree ("_locale");
   CREATE INDEX "pages_blocks_testimonials_locale_idx" ON "pages_blocks_testimonials" USING btree ("_locale");
   CREATE INDEX "pages_blocks_photo_row_locale_idx" ON "pages_blocks_photo_row" USING btree ("_locale");
   CREATE INDEX "pages_blocks_prose_locale_idx" ON "pages_blocks_prose" USING btree ("_locale");
@@ -253,7 +228,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "_pages_v_blocks_service_panels_locale_idx" ON "_pages_v_blocks_service_panels" USING btree ("_locale");
   CREATE INDEX "_pages_v_blocks_portfolio_grid_locale_idx" ON "_pages_v_blocks_portfolio_grid" USING btree ("_locale");
   CREATE INDEX "_pages_v_blocks_portfolio_list_locale_idx" ON "_pages_v_blocks_portfolio_list" USING btree ("_locale");
-  CREATE INDEX "_pages_v_blocks_journal_list_locale_idx" ON "_pages_v_blocks_journal_list" USING btree ("_locale");
   CREATE INDEX "_pages_v_blocks_testimonials_locale_idx" ON "_pages_v_blocks_testimonials" USING btree ("_locale");
   CREATE INDEX "_pages_v_blocks_photo_row_locale_idx" ON "_pages_v_blocks_photo_row" USING btree ("_locale");
   CREATE INDEX "_pages_v_blocks_prose_locale_idx" ON "_pages_v_blocks_prose" USING btree ("_locale");
@@ -265,16 +239,12 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "_pages_v_rels_locale_idx" ON "_pages_v_rels" USING btree ("locale");
   CREATE INDEX "_projects_v_snapshot_idx" ON "_projects_v" USING btree ("snapshot");
   CREATE INDEX "_projects_v_published_locale_idx" ON "_projects_v" USING btree ("published_locale");
-  CREATE INDEX "_posts_v_snapshot_idx" ON "_posts_v" USING btree ("snapshot");
-  CREATE INDEX "_posts_v_published_locale_idx" ON "_posts_v" USING btree ("published_locale");
   CREATE INDEX "pages_rels_services_id_idx" ON "pages_rels" USING btree ("services_id","locale");
   CREATE INDEX "pages_rels_projects_id_idx" ON "pages_rels" USING btree ("projects_id","locale");
-  CREATE INDEX "pages_rels_posts_id_idx" ON "pages_rels" USING btree ("posts_id","locale");
   CREATE INDEX "pages_rels_testimonials_id_idx" ON "pages_rels" USING btree ("testimonials_id","locale");
   CREATE INDEX "pages_rels_media_id_idx" ON "pages_rels" USING btree ("media_id","locale");
   CREATE INDEX "_pages_v_rels_services_id_idx" ON "_pages_v_rels" USING btree ("services_id","locale");
   CREATE INDEX "_pages_v_rels_projects_id_idx" ON "_pages_v_rels" USING btree ("projects_id","locale");
-  CREATE INDEX "_pages_v_rels_posts_id_idx" ON "_pages_v_rels" USING btree ("posts_id","locale");
   CREATE INDEX "_pages_v_rels_testimonials_id_idx" ON "_pages_v_rels" USING btree ("testimonials_id","locale");
   CREATE INDEX "_pages_v_rels_media_id_idx" ON "_pages_v_rels" USING btree ("media_id","locale");
   -- Everything that was a plain column becomes the English value, so a database
@@ -287,10 +257,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
     SELECT "meta_title","meta_description","meta_image_id",'en',"id" FROM "projects";
   INSERT INTO "_projects_v_locales" ("version_meta_title","version_meta_description","version_meta_image_id","_locale","_parent_id")
     SELECT "version_meta_title","version_meta_description","version_meta_image_id",'en',"id" FROM "_projects_v";
-  INSERT INTO "posts_locales" ("meta_title","meta_description","meta_image_id","_locale","_parent_id")
-    SELECT "meta_title","meta_description","meta_image_id",'en',"id" FROM "posts";
-  INSERT INTO "_posts_v_locales" ("version_meta_title","version_meta_description","version_meta_image_id","_locale","_parent_id")
-    SELECT "version_meta_title","version_meta_description","version_meta_image_id",'en',"id" FROM "_posts_v";
   INSERT INTO "services_locales" ("title","summary","copy","_locale","_parent_id")
     SELECT "title","summary","copy",'en',"id" FROM "services";
   UPDATE "pages_rels" SET "locale" = 'en';
@@ -303,7 +269,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   ALTER TABLE "pages_blocks_service_panels" ALTER COLUMN "_locale" DROP DEFAULT;
   ALTER TABLE "pages_blocks_portfolio_grid" ALTER COLUMN "_locale" DROP DEFAULT;
   ALTER TABLE "pages_blocks_portfolio_list" ALTER COLUMN "_locale" DROP DEFAULT;
-  ALTER TABLE "pages_blocks_journal_list" ALTER COLUMN "_locale" DROP DEFAULT;
   ALTER TABLE "pages_blocks_testimonials" ALTER COLUMN "_locale" DROP DEFAULT;
   ALTER TABLE "pages_blocks_photo_row" ALTER COLUMN "_locale" DROP DEFAULT;
   ALTER TABLE "pages_blocks_prose" ALTER COLUMN "_locale" DROP DEFAULT;
@@ -318,7 +283,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   ALTER TABLE "_pages_v_blocks_service_panels" ALTER COLUMN "_locale" DROP DEFAULT;
   ALTER TABLE "_pages_v_blocks_portfolio_grid" ALTER COLUMN "_locale" DROP DEFAULT;
   ALTER TABLE "_pages_v_blocks_portfolio_list" ALTER COLUMN "_locale" DROP DEFAULT;
-  ALTER TABLE "_pages_v_blocks_journal_list" ALTER COLUMN "_locale" DROP DEFAULT;
   ALTER TABLE "_pages_v_blocks_testimonials" ALTER COLUMN "_locale" DROP DEFAULT;
   ALTER TABLE "_pages_v_blocks_photo_row" ALTER COLUMN "_locale" DROP DEFAULT;
   ALTER TABLE "_pages_v_blocks_prose" ALTER COLUMN "_locale" DROP DEFAULT;
@@ -339,12 +303,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   ALTER TABLE "_projects_v" DROP COLUMN "version_meta_title";
   ALTER TABLE "_projects_v" DROP COLUMN "version_meta_description";
   ALTER TABLE "_projects_v" DROP COLUMN "version_meta_image_id";
-  ALTER TABLE "posts" DROP COLUMN "meta_title";
-  ALTER TABLE "posts" DROP COLUMN "meta_description";
-  ALTER TABLE "posts" DROP COLUMN "meta_image_id";
-  ALTER TABLE "_posts_v" DROP COLUMN "version_meta_title";
-  ALTER TABLE "_posts_v" DROP COLUMN "version_meta_description";
-  ALTER TABLE "_posts_v" DROP COLUMN "version_meta_image_id";
   ALTER TABLE "services" DROP COLUMN "title";
   ALTER TABLE "services" DROP COLUMN "summary";
   ALTER TABLE "services" DROP COLUMN "copy";`)
@@ -360,8 +318,6 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   ALTER TABLE "_pages_v_locales" DISABLE ROW LEVEL SECURITY;
   ALTER TABLE "projects_locales" DISABLE ROW LEVEL SECURITY;
   ALTER TABLE "_projects_v_locales" DISABLE ROW LEVEL SECURITY;
-  ALTER TABLE "posts_locales" DISABLE ROW LEVEL SECURITY;
-  ALTER TABLE "_posts_v_locales" DISABLE ROW LEVEL SECURITY;
   ALTER TABLE "services_locales" DISABLE ROW LEVEL SECURITY;
   DROP TABLE "pages_blocks_contact_details_items" CASCADE;
   DROP TABLE "pages_blocks_contact_details" CASCADE;
@@ -371,8 +327,6 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TABLE "_pages_v_locales" CASCADE;
   DROP TABLE "projects_locales" CASCADE;
   DROP TABLE "_projects_v_locales" CASCADE;
-  DROP TABLE "posts_locales" CASCADE;
-  DROP TABLE "_posts_v_locales" CASCADE;
   DROP TABLE "services_locales" CASCADE;
   DROP INDEX "pages_blocks_hero_locale_idx";
   DROP INDEX "pages_blocks_masthead_locale_idx";
@@ -382,7 +336,6 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP INDEX "pages_blocks_service_panels_locale_idx";
   DROP INDEX "pages_blocks_portfolio_grid_locale_idx";
   DROP INDEX "pages_blocks_portfolio_list_locale_idx";
-  DROP INDEX "pages_blocks_journal_list_locale_idx";
   DROP INDEX "pages_blocks_testimonials_locale_idx";
   DROP INDEX "pages_blocks_photo_row_locale_idx";
   DROP INDEX "pages_blocks_prose_locale_idx";
@@ -398,7 +351,6 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP INDEX "_pages_v_blocks_service_panels_locale_idx";
   DROP INDEX "_pages_v_blocks_portfolio_grid_locale_idx";
   DROP INDEX "_pages_v_blocks_portfolio_list_locale_idx";
-  DROP INDEX "_pages_v_blocks_journal_list_locale_idx";
   DROP INDEX "_pages_v_blocks_testimonials_locale_idx";
   DROP INDEX "_pages_v_blocks_photo_row_locale_idx";
   DROP INDEX "_pages_v_blocks_prose_locale_idx";
@@ -410,16 +362,12 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP INDEX "_pages_v_rels_locale_idx";
   DROP INDEX "_projects_v_snapshot_idx";
   DROP INDEX "_projects_v_published_locale_idx";
-  DROP INDEX "_posts_v_snapshot_idx";
-  DROP INDEX "_posts_v_published_locale_idx";
   DROP INDEX "pages_rels_services_id_idx";
   DROP INDEX "pages_rels_projects_id_idx";
-  DROP INDEX "pages_rels_posts_id_idx";
   DROP INDEX "pages_rels_testimonials_id_idx";
   DROP INDEX "pages_rels_media_id_idx";
   DROP INDEX "_pages_v_rels_services_id_idx";
   DROP INDEX "_pages_v_rels_projects_id_idx";
-  DROP INDEX "_pages_v_rels_posts_id_idx";
   DROP INDEX "_pages_v_rels_testimonials_id_idx";
   DROP INDEX "_pages_v_rels_media_id_idx";
   ALTER TABLE "pages" ADD COLUMN "title" varchar;
@@ -436,12 +384,6 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   ALTER TABLE "_projects_v" ADD COLUMN "version_meta_title" varchar;
   ALTER TABLE "_projects_v" ADD COLUMN "version_meta_description" varchar;
   ALTER TABLE "_projects_v" ADD COLUMN "version_meta_image_id" integer;
-  ALTER TABLE "posts" ADD COLUMN "meta_title" varchar;
-  ALTER TABLE "posts" ADD COLUMN "meta_description" varchar;
-  ALTER TABLE "posts" ADD COLUMN "meta_image_id" integer;
-  ALTER TABLE "_posts_v" ADD COLUMN "version_meta_title" varchar;
-  ALTER TABLE "_posts_v" ADD COLUMN "version_meta_description" varchar;
-  ALTER TABLE "_posts_v" ADD COLUMN "version_meta_image_id" integer;
   ALTER TABLE "services" ADD COLUMN "title" varchar NOT NULL;
   ALTER TABLE "services" ADD COLUMN "summary" varchar NOT NULL;
   ALTER TABLE "services" ADD COLUMN "copy" jsonb NOT NULL;
@@ -449,22 +391,16 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   ALTER TABLE "_pages_v" ADD CONSTRAINT "_pages_v_version_meta_image_id_media_id_fk" FOREIGN KEY ("version_meta_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "projects" ADD CONSTRAINT "projects_meta_image_id_media_id_fk" FOREIGN KEY ("meta_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "_projects_v" ADD CONSTRAINT "_projects_v_version_meta_image_id_media_id_fk" FOREIGN KEY ("version_meta_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
-  ALTER TABLE "posts" ADD CONSTRAINT "posts_meta_image_id_media_id_fk" FOREIGN KEY ("meta_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
-  ALTER TABLE "_posts_v" ADD CONSTRAINT "_posts_v_version_meta_image_id_media_id_fk" FOREIGN KEY ("version_meta_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
   CREATE INDEX "pages_meta_meta_image_idx" ON "pages" USING btree ("meta_image_id");
   CREATE INDEX "_pages_v_version_meta_version_meta_image_idx" ON "_pages_v" USING btree ("version_meta_image_id");
   CREATE INDEX "projects_meta_meta_image_idx" ON "projects" USING btree ("meta_image_id");
   CREATE INDEX "_projects_v_version_meta_version_meta_image_idx" ON "_projects_v" USING btree ("version_meta_image_id");
-  CREATE INDEX "posts_meta_meta_image_idx" ON "posts" USING btree ("meta_image_id");
-  CREATE INDEX "_posts_v_version_meta_version_meta_image_idx" ON "_posts_v" USING btree ("version_meta_image_id");
   CREATE INDEX "pages_rels_services_id_idx" ON "pages_rels" USING btree ("services_id");
   CREATE INDEX "pages_rels_projects_id_idx" ON "pages_rels" USING btree ("projects_id");
-  CREATE INDEX "pages_rels_posts_id_idx" ON "pages_rels" USING btree ("posts_id");
   CREATE INDEX "pages_rels_testimonials_id_idx" ON "pages_rels" USING btree ("testimonials_id");
   CREATE INDEX "pages_rels_media_id_idx" ON "pages_rels" USING btree ("media_id");
   CREATE INDEX "_pages_v_rels_services_id_idx" ON "_pages_v_rels" USING btree ("services_id");
   CREATE INDEX "_pages_v_rels_projects_id_idx" ON "_pages_v_rels" USING btree ("projects_id");
-  CREATE INDEX "_pages_v_rels_posts_id_idx" ON "_pages_v_rels" USING btree ("posts_id");
   CREATE INDEX "_pages_v_rels_testimonials_id_idx" ON "_pages_v_rels" USING btree ("testimonials_id");
   CREATE INDEX "_pages_v_rels_media_id_idx" ON "_pages_v_rels" USING btree ("media_id");
   ALTER TABLE "pages_blocks_hero" DROP COLUMN "_locale";
@@ -479,7 +415,6 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   ALTER TABLE "pages_blocks_service_panels" DROP COLUMN "_locale";
   ALTER TABLE "pages_blocks_portfolio_grid" DROP COLUMN "_locale";
   ALTER TABLE "pages_blocks_portfolio_list" DROP COLUMN "_locale";
-  ALTER TABLE "pages_blocks_journal_list" DROP COLUMN "_locale";
   ALTER TABLE "pages_blocks_testimonials" DROP COLUMN "_locale";
   ALTER TABLE "pages_blocks_photo_row" DROP COLUMN "_locale";
   ALTER TABLE "pages_blocks_prose" DROP COLUMN "_locale";
@@ -499,7 +434,6 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   ALTER TABLE "_pages_v_blocks_service_panels" DROP COLUMN "_locale";
   ALTER TABLE "_pages_v_blocks_portfolio_grid" DROP COLUMN "_locale";
   ALTER TABLE "_pages_v_blocks_portfolio_list" DROP COLUMN "_locale";
-  ALTER TABLE "_pages_v_blocks_journal_list" DROP COLUMN "_locale";
   ALTER TABLE "_pages_v_blocks_testimonials" DROP COLUMN "_locale";
   ALTER TABLE "_pages_v_blocks_photo_row" DROP COLUMN "_locale";
   ALTER TABLE "_pages_v_blocks_prose" DROP COLUMN "_locale";
@@ -511,10 +445,7 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   ALTER TABLE "_pages_v_rels" DROP COLUMN "locale";
   ALTER TABLE "_projects_v" DROP COLUMN "snapshot";
   ALTER TABLE "_projects_v" DROP COLUMN "published_locale";
-  ALTER TABLE "_posts_v" DROP COLUMN "snapshot";
-  ALTER TABLE "_posts_v" DROP COLUMN "published_locale";
   DROP TYPE "public"."_locales";
   DROP TYPE "public"."enum__pages_v_published_locale";
-  DROP TYPE "public"."enum__projects_v_published_locale";
-  DROP TYPE "public"."enum__posts_v_published_locale";`)
+  DROP TYPE "public"."enum__projects_v_published_locale";`)
 }

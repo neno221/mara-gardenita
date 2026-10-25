@@ -10,15 +10,13 @@
   top: 0;
 }
 
-.navGrid {
-  grid-column-gap: 23px;
-  grid-row-gap: 0px;
-  grid-template-rows: auto;
-  grid-template-columns: 1fr auto 1fr;
-  grid-auto-columns: 1fr;
+/* Wordmark at the start, the links and the button gathered at the end. */
+.navRow {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
   align-items: center;
-  justify-items: stretch;
-  display: grid;
+  display: flex;
 }
 
 .navMenu {
@@ -30,16 +28,12 @@
   flex-direction: row;
   justify-content: center;
   align-items: center;
+  margin-left: auto;
   display: flex;
 }
 
-/* The two link clusters hug the wordmark rather than filling their columns. */
-.navGroupLeading {
-  justify-self: end;
-}
-
-.navGroupTrailing {
-  justify-self: start;
+.navButton {
+  margin-left: 15px;
 }
 
 .navLink {
@@ -137,19 +131,21 @@
     position: relative;
   }
 
-  .navGrid {
-    grid-template-columns: 1fr;
+  .navRow {
+    flex-direction: column;
   }
 
-  .navGroup,
-  .navGroupLeading,
-  .navGroupTrailing {
+  .navGroup {
     flex-direction: column;
-    justify-self: center;
+    margin-left: 0;
+  }
+
+  .navButton {
+    margin-top: 10px;
+    margin-left: 0;
   }
 
   .brandMobile {
-    margin-left: auto;
     margin-right: auto;
     display: flex;
   }

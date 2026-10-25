@@ -7,8 +7,8 @@ import {
 } from "@/lib/pageRoute";
 
 /**
- * Every English page on the site, except the two detail routes. The Greek twin
- * is `app/(greek)/gr/[[...slug]]`.
+ * Every English page on the site, except the project detail route. The Greek
+ * twin is `app/(greek)/gr/[[...slug]]`.
  *
  * One file serves every Pages document: a page is a row and a list of blocks,
  * so building another is an edit in the admin rather than a route and a deploy.

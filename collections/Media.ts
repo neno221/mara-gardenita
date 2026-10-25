@@ -49,8 +49,8 @@ export const Media: CollectionConfig = {
     defaultColumns: ["filename", "alt", "category"],
   },
   upload: {
-    // Decision C keeps media on local disk; public/media is gitignored, so it is
-    // covered by scripts/db-dump.ps1 rather than by version control.
+    // Local disk in development; public/media is gitignored, so it is covered by
+    // scripts/db-dump.ps1. On Vercel the Blob adapter in payload.config.ts takes over.
     staticDir: path.resolve(dirname, "../public/media"),
     mimeTypes: ["image/*"],
     imageSizes: [

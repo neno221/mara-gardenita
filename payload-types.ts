@@ -71,7 +71,6 @@ export interface Config {
     users: User;
     media: Media;
     projects: Project;
-    posts: Post;
     services: Service;
     testimonials: Testimonial;
     instagram: Instagram;
@@ -86,7 +85,6 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     projects: ProjectsSelect<false> | ProjectsSelect<true>;
-    posts: PostsSelect<false> | PostsSelect<true>;
     services: ServicesSelect<false> | ServicesSelect<true>;
     testimonials: TestimonialsSelect<false> | TestimonialsSelect<true>;
     instagram: InstagramSelect<false> | InstagramSelect<true>;
@@ -159,7 +157,6 @@ export interface Page {
     | ServicePanelsBlock
     | PortfolioGridBlock
     | PortfolioListBlock
-    | JournalListBlock
     | TestimonialsBlock
     | PhotoRowBlock
     | ProseBlock
@@ -608,91 +605,6 @@ export interface PortfolioListBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "JournalListBlock".
- */
-export interface JournalListBlock {
-  mode: 'latest' | 'picked';
-  /**
-   * How many to print. Empty prints them all.
-   */
-  limit?: number | null;
-  /**
-   * In the order they are printed.
-   */
-  posts?: (number | Post)[] | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'journalList';
-}
-/**
- * Journal entries. Order is the sequence /blog prints, which is not date order.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "posts".
- */
-export interface Post {
-  id: number;
-  title: string;
-  /**
-   * The URL segment. Changing it changes a published address.
-   */
-  slug: string;
-  /**
-   * Printed as the eyebrow and emitted as <time datetime>. One field, two forms.
-   */
-  published: string;
-  /**
-   * The index card's blurb, and the page's meta description.
-   */
-  excerpt: string;
-  /**
-   * The /blog index crop, 735 x 647.
-   */
-  card: number | Media;
-  /**
-   * The full-bleed plate at the top of the post, 1372 x 855.
-   */
-  hero: number | Media;
-  /**
-   * Paragraphs, h3, blockquote, lists and figures. globals.css already styles all of those as bare elements, so the output inherits the site's typography.
-   */
-  body: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  };
-  /**
-   * Lowest first. The published order, which no field on the document implies.
-   */
-  order: number;
-  meta?: {
-    title?: string | null;
-    description?: string | null;
-    /**
-     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
-     */
-    image?: (number | null) | Media;
-    /**
-     * Emits robots noindex and drops the document from the sitemap. For a page that is published because someone needs the link, not because it is finished.
-     */
-    noIndex?: boolean | null;
-  };
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "TestimonialsBlock".
  */
 export interface TestimonialsBlock {
@@ -880,10 +792,6 @@ export interface PayloadLockedDocument {
         value: number | Project;
       } | null)
     | ({
-        relationTo: 'posts';
-        value: number | Post;
-      } | null)
-    | ({
         relationTo: 'services';
         value: number | Service;
       } | null)
@@ -954,7 +862,6 @@ export interface PagesSelect<T extends boolean = true> {
         servicePanels?: T | ServicePanelsBlockSelect<T>;
         portfolioGrid?: T | PortfolioGridBlockSelect<T>;
         portfolioList?: T | PortfolioListBlockSelect<T>;
-        journalList?: T | JournalListBlockSelect<T>;
         testimonials?: T | TestimonialsBlockSelect<T>;
         photoRow?: T | PhotoRowBlockSelect<T>;
         prose?: T | ProseBlockSelect<T>;
@@ -1096,17 +1003,6 @@ export interface PortfolioGridBlockSelect<T extends boolean = true> {
 export interface PortfolioListBlockSelect<T extends boolean = true> {
   showAll?: T;
   projects?: T;
-  id?: T;
-  blockName?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "JournalListBlock_select".
- */
-export interface JournalListBlockSelect<T extends boolean = true> {
-  mode?: T;
-  limit?: T;
-  posts?: T;
   id?: T;
   blockName?: T;
 }
@@ -1290,31 +1186,6 @@ export interface ProjectsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "posts_select".
- */
-export interface PostsSelect<T extends boolean = true> {
-  title?: T;
-  slug?: T;
-  published?: T;
-  excerpt?: T;
-  card?: T;
-  hero?: T;
-  body?: T;
-  order?: T;
-  meta?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-        image?: T;
-        noIndex?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-  _status?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "services_select".
  */
 export interface ServicesSelect<T extends boolean = true> {
@@ -1404,7 +1275,7 @@ export interface Header {
    */
   logo: number | Media;
   /**
-   * Split around the wordmark: the first half left, the rest right.
+   * Left to right, after the wordmark.
    */
   nav: {
     /**
@@ -1421,6 +1292,24 @@ export interface Header {
     externalUrl?: string | null;
     id?: string | null;
   }[];
+  /**
+   * The outlined button at the end of the bar. Leave the label empty to omit it.
+   */
+  cta?: {
+    /**
+     * Leave empty to omit the link entirely.
+     */
+    label?: string | null;
+    /**
+     * Where it goes. Renaming that page's slug updates this link.
+     */
+    page?: (number | null) | Page;
+    /**
+     * Used instead of the page, for a destination this site does not hold.
+     */
+    externalUrl?: string | null;
+    id?: string | null;
+  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1483,6 +1372,14 @@ export interface Footer {
 export interface HeaderSelect<T extends boolean = true> {
   logo?: T;
   nav?:
+    | T
+    | {
+        label?: T;
+        page?: T;
+        externalUrl?: T;
+        id?: T;
+      };
+  cta?:
     | T
     | {
         label?: T;

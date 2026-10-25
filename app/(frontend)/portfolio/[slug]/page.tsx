@@ -22,7 +22,7 @@ import { SiteShell } from "@/components/SiteShell";
  * template shipped no detail-page copy and decision B forbids inventing any, so
  * `RenderBlocks` renders nothing until someone writes something. What the page
  * shows meanwhile is the one piece of real content a Project holds — its
- * photograph — in the same masthead-then-plate shape a journal post uses. That
+ * photograph — under the masthead, on a drifting plate. That
  * is a layout borrowed from the site, not copy invented for it.
  *
  * This route is exempt from the fingerprint: it has no "before" to compare to.

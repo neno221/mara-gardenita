@@ -4,13 +4,12 @@ import { getInstagramTiles } from "@/lib/instagram";
 import { DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
 import { resolveLink } from "@/lib/links";
 import { artworkFrom } from "@/lib/media";
-import { getPosts, getProjects } from "@/lib/payload";
+import { getProjects } from "@/lib/payload";
 import { SIZES } from "@/lib/sizes";
 import { ContactDetails } from "./ContactDetails";
 import { Hero } from "./Hero";
 import { PageMasthead } from "./HeroTop";
 import { InstagramFeed } from "./InstagramFeed";
-import { JournalCard } from "./JournalCard";
 import { PhotoRow } from "./PhotoRow";
 import { PortfolioCard } from "./PortfolioCard";
 import { PortfolioGrid } from "./PortfolioGrid";
@@ -21,7 +20,6 @@ import { ServiceGrid } from "./ServiceGrid";
 import { ServicePanel, type ServiceDetail } from "./ServicePanel";
 import { StorySplit } from "./StorySplit";
 import { Testimonials } from "./Testimonials";
-import journalStyles from "./JournalList.module.css";
 import portfolioStyles from "./PortfolioList.module.css";
 import panelStyles from "./ServicePanels.module.css";
 
@@ -70,7 +68,6 @@ const BANDING: Record<PageBlock["blockType"], Banding> = {
   instagramFeed: "own",
 
   portfolioList: "shared",
-  journalList: "shared",
   photoRow: "shared",
   prose: "shared",
   pressStrip: "shared",
@@ -92,7 +89,7 @@ const opensBody = (previous: PageBlock | undefined) => previous?.blockType === "
 /**
  * A page's blocks, banded.
  *
- * Reproduces today's five pages exactly:
+ * Reproduces today's four pages exactly:
  *
  * | Page | Bands |
  * |---|---|
@@ -100,7 +97,6 @@ const opensBody = (previous: PageBlock | undefined) => previous?.blockType === "
  * | about | HeroSection(tight) · Section(first){6 blocks} · Section{testimonials} |
  * | services | HeroSection(tight) · Section(first){servicePanels} |
  * | portfolio | HeroSection(tight) · Section(first){portfolioList} |
- * | blog | HeroSection(tight) · Section(first){journalList} |
  *
  * **What coalescing costs:** it is implicit. An editor cannot split one run of
  * prose into two bands, because adjacency is the only thing that decides. The
@@ -270,9 +266,6 @@ function renderBlock(block: PageBlock, locale: Locale) {
     case "portfolioList":
       return <PortfolioListBlock block={block} />;
 
-    case "journalList":
-      return <JournalListBlock block={block} />;
-
     case "testimonials":
       return (
         <Testimonials
@@ -323,10 +316,9 @@ function toServiceDetail(service: {
 /* ------------------------------------------- the blocks that read a collection */
 
 /**
- * Three blocks fetch rather than take what the page hands them, because an index
- * is not a selection: `/portfolio` and `/blog` want whatever is published, in
- * collection order, without anyone editing the page when a project or a post is
- * added.
+ * Two blocks fetch rather than take what the page hands them, because an index
+ * is not a selection: `/portfolio` wants whatever is published, in collection
+ * order, without anyone editing the page when a project is added.
  *
  * They are async server components returned from the switch, so the fetches run
  * in parallel with the rest of the tree rather than serialising ahead of it.
@@ -349,33 +341,6 @@ async function PortfolioListBlock({ block }: { block: Extract<PageBlock, { block
             // PortfolioCard.module.css, exactly as it was (decision D).
             image={artworkFrom(project.image, SIZES.portfolioList)}
             variant="feature"
-          />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-async function JournalListBlock({ block }: { block: Extract<PageBlock, { blockType: "journalList" }> }) {
-  const picked = block.mode === "picked";
-  const posts = picked
-    ? (block.posts ?? []).map((value) => must(value, "journalList.posts"))
-    : (await getPosts()).slice(0, block.limit ?? undefined);
-
-  return (
-    <div className={journalStyles.wrapper}>
-      <div className={journalStyles.list} role="list">
-        {posts.map((post) => (
-          <JournalCard
-            key={post.slug}
-            title={post.title}
-            href={`/post/${post.slug}`}
-            published={post.published}
-            excerpt={post.excerpt}
-            // Every card takes the full-width hint, which is what all four
-            // shipped with; `fingerprints/README.md` records the one that gains
-            // a candidate by it.
-            card={artworkFrom(post.card, SIZES.fullWidth)}
           />
         ))}
       </div>

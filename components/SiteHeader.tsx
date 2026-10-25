@@ -8,6 +8,7 @@ import { switchLocalePath, withLocale, type Locale } from "@/lib/i18n";
 import type { ResolvedLink } from "@/lib/links";
 import { useScrollProgress } from "@/lib/useScrollProgress";
 import { SiteLink } from "./SiteLink";
+import buttons from "./buttons.module.css";
 import styles from "./SiteHeader.module.css";
 
 const MOBILE_NAV = "(max-width: 991px)";
@@ -16,15 +17,17 @@ const MOBILE_NAV = "(max-width: 991px)";
  * The bar on every page.
  *
  * The four links were written into this file, which made adding a menu entry a
- * code change; they come from the Header global now. The grid is still three
- * columns — links, wordmark, links — so the nav is split at its midpoint, with
- * the odd one out going left.
+ * code change; they come from the Header global now. One row, read left to
+ * right: the wordmark, the links, then the global's button — the outlined
+ * `.button` every other call to action on the site uses — and last the switch
+ * to the other language.
  */
 export function SiteHeader({
   locale,
   logo,
   logoAlt,
   nav,
+  cta,
   pageRef,
 }: HeaderProps & { pageRef: React.RefObject<HTMLDivElement | null> }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -35,10 +38,6 @@ export function SiteHeader({
   const pathname = usePathname();
   const home = withLocale("/", locale);
   const other: Locale = locale === "gr" ? "en" : "gr";
-
-  const split = Math.ceil(nav.length / 2);
-  const leading = nav.slice(0, split);
-  const trailing = nav.slice(split);
 
   // The hairline under the header fades in over the first sliver of scroll.
   useScrollProgress(pageRef, { smoothing: 94 }, (progress) => {
@@ -103,29 +102,35 @@ export function SiteHeader({
         }}
       >
         <nav className={styles.navMenu} ref={menuRef} aria-label="Primary">
-          <div className={styles.navGrid}>
-            <div className={`${styles.navGroup} ${styles.navGroupLeading}`}>
-              {leading.map((item, index) => (
-                <NavLink key={item.href} item={item} first={index === 0} onNavigate={closeMenu} />
-              ))}
-            </div>
+          <div className={styles.navRow}>
             <SiteLink href={home} className={styles.brand} onClick={closeMenu}>
               <img {...logo} alt={logoAlt} className={styles.logo} />
             </SiteLink>
-            <div className={`${styles.navGroup} ${styles.navGroupTrailing}`}>
-              {trailing.map((item) => (
+            <div className={styles.navGroup}>
+              {nav.map((item) => (
                 <NavLink key={item.href} item={item} onNavigate={closeMenu} />
               ))}
+            </div>
+            {cta && (
               <SiteLink
-                href={switchLocalePath(pathname, other)}
-                className={styles.navLink}
-                hrefLang={other === "gr" ? "el" : "en"}
-                lang={other === "gr" ? "el" : "en"}
+                href={cta.href}
+                className={`${buttons.button} ${styles.navButton}`}
                 onClick={closeMenu}
               >
-                {other === "gr" ? "GR" : "EN"}
+                {cta.label}
               </SiteLink>
-            </div>
+            )}
+            {/* After the button, so the bar keeps its order — wordmark, links,
+                Contact — and the language switch sits outside it. */}
+            <SiteLink
+              href={switchLocalePath(pathname, other)}
+              className={styles.navLink}
+              hrefLang={other === "gr" ? "el" : "en"}
+              lang={other === "gr" ? "el" : "en"}
+              onClick={closeMenu}
+            >
+              {other === "gr" ? "GR" : "EN"}
+            </SiteLink>
           </div>
         </nav>
       </div>
@@ -145,26 +150,8 @@ export function SiteHeader({
   );
 }
 
-/**
- * One entry in the navigation.
- *
- * `first` reproduces a trailing `<br>` that the template's export left inside the
- * opening link and nowhere else. It is not decoration: `.navLink` is an
- * inline-block with a 140% line box, so the extra empty line makes that one link
- * 73.6px tall against its neighbours' 56.8px — and since the nav grid centres on
- * its tallest cell, it is what sets the header's height on every page. Dropping
- * it lifts the whole bar by 13.6px, which is exactly the kind of change decision
- * E's gate exists to refuse.
- */
-function NavLink({
-  item,
-  first,
-  onNavigate,
-}: {
-  item: ResolvedLink;
-  first?: boolean;
-  onNavigate: () => void;
-}) {
+/** One entry in the navigation. */
+function NavLink({ item, onNavigate }: { item: ResolvedLink; onNavigate: () => void }) {
   const pathname = usePathname();
 
   return (
@@ -175,7 +162,6 @@ function NavLink({
       onClick={onNavigate}
     >
       {item.label}
-      {first && <br />}
     </SiteLink>
   );
 }
