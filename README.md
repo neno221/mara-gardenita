@@ -15,9 +15,10 @@ npm start
 
 The site runs on [Payload](https://payloadcms.com) — see
 [`docs/payload-plan.md`](docs/payload-plan.md) for the architecture and the
-phased migration behind it, and [`docs/deploy.md`](docs/deploy.md) for what a
-deploy would need, which is deferred rather than done: the database is a local
-Docker volume and the uploads are a local directory.
+phased migration behind it. It runs on Vercel with Neon Postgres and Blob media —
+see [`docs/vercel.md`](docs/vercel.md); [`docs/deploy.md`](docs/deploy.md) is the
+earlier plan for that deploy. Locally the database is a Docker volume and uploads
+are a local directory.
 
 Five of the six routes below are Pages documents rendered by one catch-all route
 from a block array, so their section order is editable and building a sixth page
