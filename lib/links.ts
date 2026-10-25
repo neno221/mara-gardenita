@@ -15,6 +15,7 @@
  * not `/home`.
  */
 import type { Page } from "@/payload-types";
+import { DEFAULT_LOCALE, withLocale, type Locale } from "./i18n";
 
 /** A stored link: a label, and either a Pages document or an off-site URL. */
 export type LinkValue = {
@@ -27,8 +28,8 @@ export type LinkValue = {
 export type ResolvedLink = { label: string; href: string };
 
 /** The path a Pages document is served at. `home` is the front page. */
-export function pathFor(slug: string): string {
-  return slug === "home" ? "/" : `/${slug}`;
+export function pathFor(slug: string, locale: Locale = DEFAULT_LOCALE): string {
+  return withLocale(slug === "home" ? "/" : `/${slug}`, locale);
 }
 
 /**
@@ -40,10 +41,10 @@ export function pathFor(slug: string): string {
  * a page render whole with every destination wrong. The call sites all read
  * through `getPage`, which sets the depth and the `populate` that keeps it cheap.
  */
-export function hrefFor(value: LinkValue): string {
+export function hrefFor(value: LinkValue, locale: Locale = DEFAULT_LOCALE): string {
   const { page, externalUrl } = value;
 
-  if (typeof page === "object" && page !== null) return pathFor(page.slug);
+  if (typeof page === "object" && page !== null) return pathFor(page.slug, locale);
   if (typeof page === "number") {
     throw new Error(
       `Link points at page ${page} but the document was not populated, so its slug is unknown. ` +
@@ -65,7 +66,10 @@ export function hrefFor(value: LinkValue): string {
  * the two grids all carry an optional CTA — so it is checked before the
  * destination is resolved, and an unlabelled link with no page is not an error.
  */
-export function resolveLink(value: LinkValue | null | undefined): ResolvedLink | null {
+export function resolveLink(
+  value: LinkValue | null | undefined,
+  locale: Locale = DEFAULT_LOCALE,
+): ResolvedLink | null {
   if (!value?.label) return null;
-  return { label: value.label, href: hrefFor(value) };
+  return { label: value.label, href: hrefFor(value, locale) };
 }

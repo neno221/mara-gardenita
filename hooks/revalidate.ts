@@ -58,7 +58,10 @@ function revalidate(path: string, type?: "layout" | "page"): void {
 }
 
 /** Everything under the root layout — the blunt instrument, used deliberately. */
-const revalidateEverything = () => revalidate("/", "layout");
+const revalidateEverything = () => {
+  revalidate("/", "layout");
+  revalidate("/gr", "layout");
+};
 
 /**
  * A Page's own URL, plus the tree.
@@ -74,6 +77,7 @@ export const revalidatePage: CollectionAfterChangeHook = ({ doc, previousDoc }) 
     revalidate(pathFor(previousDoc.slug as string));
   }
   if (doc?.slug) revalidate(pathFor(doc.slug as string));
+  if (doc?.slug) revalidate(pathFor(doc.slug as string, "gr"));
   revalidateEverything();
   return doc;
 };

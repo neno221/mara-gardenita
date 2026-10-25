@@ -45,6 +45,18 @@ export default buildConfig({
   // rather than a document someone could delete.
   globals: [Header, Footer],
 
+  // English is the default and the fallback: a field with no Greek yet shows its
+  // English text rather than an empty string. English lives at the root, Greek
+  // under `/gr` (lib/i18n.ts).
+  localization: {
+    locales: [
+      { label: "English", code: "en" },
+      { label: "Ελληνικά", code: "gr" },
+    ],
+    defaultLocale: "en",
+    fallback: true,
+  },
+
   editor: lexicalEditor(),
 
   plugins: [
@@ -85,7 +97,12 @@ export default buildConfig({
       generateDescription,
       generateImage,
       fields: ({ defaultFields }) => [
-        ...defaultFields,
+        // Title, description and image are per language; `noIndex` below is not.
+        ...defaultFields.map((field) =>
+          "name" in field && ["title", "description"].includes(field.name as string)
+            ? { ...field, localized: true }
+            : field,
+        ),
         {
           name: "noIndex",
           type: "checkbox",

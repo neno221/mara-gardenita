@@ -8,6 +8,7 @@
 import { draftMode } from "next/headers";
 import { getPayload } from "payload";
 import config from "@payload-config";
+import type { Locale } from "./i18n";
 import type {
   Footer,
   Header,
@@ -149,7 +150,7 @@ const PAGE_QUERY = {
 } as const;
 
 /** One page by slug, or null. `home` is the front page. */
-export async function getPage(slug: string): Promise<Page | null> {
+export async function getPage(slug: string, locale: Locale = "en"): Promise<Page | null> {
   const client = await getClient();
   const { where, draft } = await visibility();
   const { docs } = await client.find({
@@ -157,6 +158,7 @@ export async function getPage(slug: string): Promise<Page | null> {
     where: { ...where, slug: { equals: slug } },
     draft,
     limit: 1,
+    locale,
     ...PAGE_QUERY,
   });
   return docs[0] ?? null;

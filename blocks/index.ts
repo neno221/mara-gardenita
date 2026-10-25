@@ -1,5 +1,6 @@
 import type { Block } from "payload";
 
+import { ContactDetails } from "./ContactDetails";
 import { Hero } from "./Hero";
 import { InstagramFeed } from "./InstagramFeed";
 import { Masthead } from "./Masthead";
@@ -37,6 +38,7 @@ export const blocks: Block[] = [
   Testimonials,
   PhotoRow,
   Prose,
+  ContactDetails,
   PressStrip,
   InstagramFeed,
 ];

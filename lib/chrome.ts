@@ -17,6 +17,7 @@ import { artworkFrom } from "./media";
 import { getInstagramTiles } from "./instagram";
 import { resolveLink, type ResolvedLink } from "./links";
 import { getFooter, getHeader } from "./payload";
+import { DEFAULT_LOCALE, type Locale } from "./i18n";
 import type { InstagramTileData } from "@/components/InstagramFeed";
 
 /**
@@ -36,6 +37,7 @@ function logoAlt(value: number | { alt?: string | null }): string {
 }
 
 export type HeaderProps = {
+  locale: Locale;
   logo: Artwork;
   logoAlt: string;
   nav: ResolvedLink[];
@@ -59,7 +61,7 @@ export type ChromeProps = { header: HeaderProps; footer: FooterProps };
 /** How many tiles the footer prints. Six, as published. */
 const FOOTER_TILES = 6;
 
-export async function getChrome(): Promise<ChromeProps> {
+export async function getChrome(locale: Locale = DEFAULT_LOCALE): Promise<ChromeProps> {
   const [header, footer, tiles] = await Promise.all([
     getHeader(),
     getFooter(),
@@ -68,12 +70,13 @@ export async function getChrome(): Promise<ChromeProps> {
 
   return {
     header: {
+      locale,
       logo: artworkFrom(header.logo),
       logoAlt: logoAlt(header.logo),
       // `resolveLink` returns null for an unlabelled row, which is how a
       // half-filled nav entry stops the page rather than rendering a blank link.
-      nav: header.nav.flatMap((item) => resolveLink(item) ?? []),
-      cta: resolveLink(header.cta),
+      nav: header.nav.flatMap((item) => resolveLink(item, locale) ?? []),
+      cta: resolveLink(header.cta, locale),
     },
     footer: {
       instagramHeading: footer.instagramHeading,
@@ -81,7 +84,7 @@ export async function getChrome(): Promise<ChromeProps> {
       socialHeading: footer.socialHeading,
       social: (footer.social ?? []).map((item) => ({ label: item.label, href: item.url })),
       quickLinksHeading: footer.quickLinksHeading,
-      quickLinks: (footer.quickLinks ?? []).flatMap((item) => resolveLink(item) ?? []),
+      quickLinks: (footer.quickLinks ?? []).flatMap((item) => resolveLink(item, locale) ?? []),
       logo: artworkFrom(footer.logo),
       logoAlt: logoAlt(footer.logo),
       credit: footer.credit?.label

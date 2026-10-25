@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import gsap from "gsap";
 import type { HeaderProps } from "@/lib/chrome";
+import { switchLocalePath, withLocale, type Locale } from "@/lib/i18n";
 import type { ResolvedLink } from "@/lib/links";
 import { useScrollProgress } from "@/lib/useScrollProgress";
 import { SiteLink } from "./SiteLink";
@@ -18,9 +19,11 @@ const MOBILE_NAV = "(max-width: 991px)";
  * The four links were written into this file, which made adding a menu entry a
  * code change; they come from the Header global now. One row, read left to
  * right: the wordmark, the links, then the global's button — the outlined
- * `.button` every other call to action on the site uses.
+ * `.button` every other call to action on the site uses — and last the switch
+ * to the other language.
  */
 export function SiteHeader({
+  locale,
   logo,
   logoAlt,
   nav,
@@ -32,6 +35,9 @@ export function SiteHeader({
   const menuRef = useRef<HTMLElement>(null);
 
   const closeMenu = useCallback(() => setMenuOpen(false), []);
+  const pathname = usePathname();
+  const home = withLocale("/", locale);
+  const other: Locale = locale === "gr" ? "en" : "gr";
 
   // The hairline under the header fades in over the first sliver of scroll.
   useScrollProgress(pageRef, { smoothing: 94 }, (progress) => {
@@ -84,7 +90,7 @@ export function SiteHeader({
 
   return (
     <header className={styles.navbar}>
-      <SiteLink href="/" className={styles.brandMobile} onClick={closeMenu}>
+      <SiteLink href={home} className={styles.brandMobile} onClick={closeMenu}>
         <img {...logo} alt={logoAlt} className={styles.logoMobile} />
       </SiteLink>
 
@@ -97,7 +103,7 @@ export function SiteHeader({
       >
         <nav className={styles.navMenu} ref={menuRef} aria-label="Primary">
           <div className={styles.navRow}>
-            <SiteLink href="/" className={styles.brand} onClick={closeMenu}>
+            <SiteLink href={home} className={styles.brand} onClick={closeMenu}>
               <img {...logo} alt={logoAlt} className={styles.logo} />
             </SiteLink>
             <div className={styles.navGroup}>
@@ -114,6 +120,17 @@ export function SiteHeader({
                 {cta.label}
               </SiteLink>
             )}
+            {/* After the button, so the bar keeps its order — wordmark, links,
+                Contact — and the language switch sits outside it. */}
+            <SiteLink
+              href={switchLocalePath(pathname, other)}
+              className={styles.navLink}
+              hrefLang={other === "gr" ? "el" : "en"}
+              lang={other === "gr" ? "el" : "en"}
+              onClick={closeMenu}
+            >
+              {other === "gr" ? "GR" : "EN"}
+            </SiteLink>
           </div>
         </nav>
       </div>

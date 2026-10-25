@@ -3,15 +3,14 @@ import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
 /**
  * The journal goes, and the header gains its button.
  *
- * Schema first, then content, because the content steps run through the Local
- * API against the config as it now stands — one that has no Posts collection
- * and expects `header.cta_*` to exist.
+ * Schema first, then content: the content steps write `header.cta_*`, which
+ * the schema step adds.
  *
  * The generated SQL dropped `posts` with CASCADE and then dropped the three
  * foreign keys that CASCADE had already taken with it, which fails on a real
  * database. Those three are `IF EXISTS` now.
  */
-export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
+export async function up({ db, payload }: MigrateUpArgs): Promise<void> {
   // A lock held on a post would otherwise outlive the post as an empty row.
   await db.execute(sql`
    DELETE FROM "payload_locked_documents" WHERE "id" IN (
@@ -51,51 +50,49 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   DROP TYPE "public"."enum_posts_status";
   DROP TYPE "public"."enum__posts_v_version_status";`)
 
-  await payload.delete({ collection: 'pages', where: { slug: { equals: 'blog' } }, req })
+  // The content steps are SQL rather than the Local API. The Local API reads the
+  // database through the config as it stands when the migration runs, and a later
+  // migration (localization) changes the schema that config expects — so on a
+  // database migrating from scratch these steps would query tables that do not
+  // exist yet. SQL against the schema as of this migration has no such problem.
+
+  // The journal page, and its versions; the blocks of both cascade.
+  await db.execute(sql`
+   DELETE FROM "_pages_v" WHERE "parent_id" IN (SELECT "id" FROM "pages" WHERE "slug" = 'blog');
+   DELETE FROM "pages" WHERE "slug" = 'blog';`)
 
   // An empty database — a fresh environment migrating before its first seed —
   // has no pages to point the header at, and the seed writes this same nav.
-  const { docs: pages } = await payload.find({
-    collection: 'pages',
-    where: { slug: { in: ['about', 'portfolio', 'services', 'contact'] } },
-    limit: 4,
-    depth: 0,
-    select: { slug: true },
-    req,
-  })
-  const page = (slug: string) => pages.find((doc) => doc.slug === slug)?.id
-  if (page('about') && page('portfolio') && page('services') && page('contact')) {
-    await payload.updateGlobal({
-      slug: 'header',
-      data: {
-        nav: [
-          { label: 'About', page: page('about') },
-          { label: 'Gallery', page: page('portfolio') },
-          { label: 'Services', page: page('services') },
-        ],
-        cta: { label: 'Contact', page: page('contact') },
-      },
-      req,
-    })
+  const { rows: pages } = await db.execute(sql`
+   SELECT "id", "slug" FROM "pages" WHERE "slug" IN ('about', 'portfolio', 'services', 'contact')`)
+  const page = (slug: string) =>
+    (pages as { id: number; slug: string }[]).find((row) => row.slug === slug)?.id
+  const { rows: header } = await db.execute(sql`SELECT "id" FROM "header" LIMIT 1`)
+  const headerId = (header as { id: number }[])[0]?.id
+  if (headerId && page('about') && page('portfolio') && page('services') && page('contact')) {
+    // One statement per call: a parameterised query cannot carry several.
+    await db.execute(sql`DELETE FROM "header_nav" WHERE "_parent_id" = ${headerId}`)
+    await db.execute(sql`
+     INSERT INTO "header_nav" ("_order", "_parent_id", "id", "label", "page_id") VALUES
+       (1, ${headerId}, substr(md5(random()::text), 1, 24), 'About', ${page('about')}),
+       (2, ${headerId}, substr(md5(random()::text), 1, 24), 'Gallery', ${page('portfolio')}),
+       (3, ${headerId}, substr(md5(random()::text), 1, 24), 'Services', ${page('services')})`)
+    await db.execute(sql`
+     UPDATE "header" SET "cta_label" = 'Contact', "cta_page_id" = ${page('contact')}
+     WHERE "id" = ${headerId}`)
   }
 
   // The journal's photographs, unless something else on the site took one up.
-  // Deleted through the Local API rather than SQL so a storage adapter removes
-  // the files along with the rows.
-  const { docs: journalMedia } = await payload.find({
-    collection: 'media',
-    where: { filename: { like: 'journal-' } },
-    limit: 100,
-    depth: 0,
-    req,
-  })
-  for (const media of journalMedia) {
-    if (!(media.filename ?? '').startsWith('journal-')) continue
+  // Rows only: production ran an earlier version of this migration that deleted
+  // the Blob files through the Local API, and a fresh database never had them.
+  const { rows: journalMedia } = await db.execute(sql`
+   SELECT "id", "filename" FROM "media" WHERE "filename" LIKE 'journal-%'`)
+  for (const media of journalMedia as { id: number; filename: string }[]) {
     if (await isReferenced(db, media.id)) {
       payload.logger.info(`Keeping ${media.filename}: still referenced outside the journal.`)
       continue
     }
-    await payload.delete({ collection: 'media', id: media.id, req })
+    await db.execute(sql`DELETE FROM "media" WHERE "id" = ${media.id}`)
   }
 }
 

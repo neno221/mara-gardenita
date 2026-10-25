@@ -1,10 +1,12 @@
 import { Fragment } from "react";
 import type { Page } from "@/payload-types";
 import { getInstagramTiles } from "@/lib/instagram";
+import { DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
 import { resolveLink } from "@/lib/links";
 import { artworkFrom } from "@/lib/media";
 import { getProjects } from "@/lib/payload";
 import { SIZES } from "@/lib/sizes";
+import { ContactDetails } from "./ContactDetails";
 import { Hero } from "./Hero";
 import { PageMasthead } from "./HeroTop";
 import { InstagramFeed } from "./InstagramFeed";
@@ -69,6 +71,7 @@ const BANDING: Record<PageBlock["blockType"], Banding> = {
   photoRow: "shared",
   prose: "shared",
   pressStrip: "shared",
+  contactDetails: "shared",
 };
 
 /**
@@ -100,7 +103,13 @@ const opensBody = (previous: PageBlock | undefined) => previous?.blockType === "
  * escape hatch, if anyone ever asks, is a zero-height `sectionBreak` block —
  * one line in the switch. Nobody has asked.
  */
-export function RenderBlocks({ blocks }: { blocks: PageBlock[] }) {
+export function RenderBlocks({
+  blocks,
+  locale = DEFAULT_LOCALE,
+}: {
+  blocks: PageBlock[];
+  locale?: Locale;
+}) {
   const bands = [];
 
   for (let i = 0; i < blocks.length; ) {
@@ -108,7 +117,7 @@ export function RenderBlocks({ blocks }: { blocks: PageBlock[] }) {
     const first = opensBody(blocks[i - 1]);
 
     if (BANDING[block.blockType] === "none") {
-      bands.push(<Fragment key={keyFor(block, i)}>{renderBlock(block)}</Fragment>);
+      bands.push(<Fragment key={keyFor(block, i)}>{renderBlock(block, locale)}</Fragment>);
       i += 1;
       continue;
     }
@@ -116,7 +125,7 @@ export function RenderBlocks({ blocks }: { blocks: PageBlock[] }) {
     if (BANDING[block.blockType] === "own") {
       bands.push(
         <Section key={keyFor(block, i)} first={first}>
-          {renderBlock(block)}
+          {renderBlock(block, locale)}
         </Section>,
       );
       i += 1;
@@ -130,7 +139,7 @@ export function RenderBlocks({ blocks }: { blocks: PageBlock[] }) {
     bands.push(
       <Section key={keyFor(run[0], start)} first={first}>
         {run.map((child, offset) => (
-          <Fragment key={keyFor(child, start + offset)}>{renderBlock(child)}</Fragment>
+          <Fragment key={keyFor(child, start + offset)}>{renderBlock(child, locale)}</Fragment>
         ))}
       </Section>,
     );
@@ -160,14 +169,15 @@ function must<T>(value: number | T, field: string): T {
   return value;
 }
 
-function renderBlock(block: PageBlock) {
+function renderBlock(block: PageBlock, locale: Locale) {
   switch (block.blockType) {
     case "hero":
       return (
         <Hero
           eyebrow={block.eyebrow}
           heading={block.heading}
-          cta={resolveLink(block.cta)}
+          lede={block.lede ?? undefined}
+          cta={resolveLink(block.cta, locale)}
           left={artworkFrom(block.collageLeft, SIZES.heroSide)}
           right={artworkFrom(block.collageRight, SIZES.heroSide)}
           center={artworkFrom(block.collageCenter, SIZES.heroCenter)}
@@ -180,17 +190,18 @@ function renderBlock(block: PageBlock) {
           subtitle={block.eyebrow}
           heading={block.heading}
           lede={block.lede ?? undefined}
-          cta={resolveLink(block.cta) ?? undefined}
+          cta={resolveLink(block.cta, locale) ?? undefined}
         />
       );
 
     case "storySplit":
       return (
         <StorySplit
-          eyebrow={block.eyebrow}
+          eyebrow={block.eyebrow ?? undefined}
           heading={block.heading}
           copy={block.copy}
-          cta={resolveLink(block.cta)}
+          signature={block.signature ?? undefined}
+          cta={resolveLink(block.cta, locale)}
           image={artworkFrom(block.image, SIZES.story)}
           petals={block.petals}
           side={block.side}
@@ -200,6 +211,8 @@ function renderBlock(block: PageBlock) {
     case "serviceGrid":
       return (
         <ServiceGrid
+          heading={block.heading ?? undefined}
+          intro={block.intro ?? undefined}
           services={block.services.map((value) => {
             const service = must(value, "serviceGrid.services");
             return {
@@ -209,7 +222,7 @@ function renderBlock(block: PageBlock) {
               icon: artworkFrom(service.icon),
             };
           })}
-          cta={resolveLink(block.cta)}
+          cta={resolveLink(block.cta, locale)}
         />
       );
 
@@ -243,9 +256,12 @@ function renderBlock(block: PageBlock) {
               image: artworkFrom(project.image, SIZES.portfolioGrid),
             };
           })}
-          cta={resolveLink(block.cta)}
+          cta={resolveLink(block.cta, locale)}
         />
       );
+
+    case "contactDetails":
+      return <ContactDetails items={block.items} />;
 
     case "portfolioList":
       return <PortfolioListBlock block={block} />;
