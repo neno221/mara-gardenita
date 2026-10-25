@@ -7,7 +7,7 @@ import { RenderBlocks } from "@/components/RenderBlocks";
 import { SiteShell } from "@/components/SiteShell";
 
 /**
- * Every page on the site, except the two detail routes.
+ * Every page on the site, except the project detail route.
  *
  * This one file replaces `app/(frontend)/{page,about,services,portfolio,blog}`
  * and the five `*View` components behind them. A page is a row in a table and a

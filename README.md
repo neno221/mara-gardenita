@@ -15,12 +15,13 @@ npm start
 
 The site runs on [Payload](https://payloadcms.com) — see
 [`docs/payload-plan.md`](docs/payload-plan.md) for the architecture and the
-phased migration behind it, and [`docs/deploy.md`](docs/deploy.md) for what a
-deploy would need, which is deferred rather than done: the database is a local
-Docker volume and the uploads are a local directory.
+phased migration behind it. It runs on Vercel with Neon Postgres and Blob media —
+see [`docs/vercel.md`](docs/vercel.md); [`docs/deploy.md`](docs/deploy.md) is the
+earlier plan for that deploy. Locally the database is a Docker volume and uploads
+are a local directory.
 
-Six of the eight routes below are Pages documents rendered by one catch-all route
-from a block array, so their section order is editable and building a seventh page
+Five of the six routes below are Pages documents rendered by one catch-all route
+from a block array, so their section order is editable and building a sixth page
 needs no code.
 
 | Route | Source | Blocks |
@@ -28,10 +29,8 @@ needs no code.
 | `/` | `home` page | hero · serviceGrid · storySplit ×2 · portfolioGrid · testimonials |
 | `/portfolio` | `portfolio` page | masthead · portfolioList |
 | `/about` | `about` page | masthead · photoRow · prose · photoRow · prose · pressStrip · photoRow · testimonials |
-| `/blog` | `blog` page | masthead · journalList |
 | `/services` | `services` page | masthead · servicePanels |
 | `/contact` | `contact` page | masthead · prose |
-| `/post/<slug>` | Posts collection | masthead, drifting hero plate, the Lexical body |
 | `/portfolio/<slug>` | Projects collection | masthead, the project's photograph, its block body |
 
 The about headline reads "About Lovio" — one `o` — because that is the word the
@@ -46,7 +45,6 @@ app/
     layout.tsx              fonts + document metadata
     globals.css             design tokens, reset, typography scale
     [[...slug]]/page.tsx    every Pages document; `home` answers at /
-    post/[slug]/page.tsx    renders <JournalPost />, per-post metadata + static params
     portfolio/[slug]/page.tsx  a project's own page
     next/preview/route.ts   turns draft mode on for a signed-in editor
     next/exit-preview/route.ts  and off again
@@ -54,16 +52,16 @@ app/
   sitemap.ts                every published URL, minus anything flagged noIndex
   (payload)/                the admin panel and the API — generated, not hand-edited
 payload.config.ts           collections, globals, plugin-seo, the Postgres adapter, Lexical
-collections/                Pages · Users · Media · Projects · Posts · Services · Testimonials · Instagram
+collections/                Pages · Users · Media · Projects · Services · Testimonials · Instagram
 globals/                    Header, Footer — the chrome on every page
-blocks/                     the thirteen-block library, and the shared link field
+blocks/                     the twelve-block library, and the shared link field
 access/                     who may read, write and delete what
 hooks/                      afterChange revalidation
 migrations/                 committed; `push` is dev-only
 components/
   RenderBlocks.tsx    the block switch, and the banding rule that owns sectioning
   SiteShell.tsx       header + clipping page body + footer, shared by every page
-  SiteHeader.tsx      sticky bar, collapsed menu, nav from the Header global
+  SiteHeader.tsx      sticky bar: wordmark, nav, Contact button — all from the Header global
   SiteFooter.tsx      link columns and wordmark, from the Footer global
   InstagramFeed.tsx   the scattered tile grid, from the Instagram collection
   Section.tsx         a page section: the padded band + the 1200px column
@@ -78,15 +76,12 @@ components/
   PressStrip.tsx      the publication logos, divided by `:nth-child` rules
   PortfolioCard.tsx   one project tile, `grid` (four-up) or `feature` (two-up)
   PortfolioGrid.tsx   the four-up grid on the home page
-  JournalCard.tsx     one journal entry: photograph overlapped by a white plate
-  JournalPost.tsx     a single post: drifting hero plate + the prose body
   Testimonials.tsx    cross-fading quote slider
   RichText.tsx        Lexical -> the markup this site publishes
   SiteLink.tsx        an internal link, or a plain anchor for an off-site URL
   photo.module.css    the shared photo plate and the picture that fills it
   Section.module.css  section rhythm, block headings, shared type
   buttons.module.css  the outlined button and the underlined link
-  JournalList.module.css    (no component) the run of entries, used by the block
   PortfolioList.module.css  (no component) the two-up grid, used by the block
   *.module.css        otherwise one stylesheet per component, alongside it
 lib/
@@ -98,14 +93,12 @@ lib/
   instagram.ts        the feed as tiles, for the footer and the block alike
   lexical.ts          builders for the serialized rich text the seed writes
   metadata.ts         the shared page/article metadata shape + the site URL
-  dates.ts            one stored timestamp -> its printed and machine forms
   easing.ts           cubic-bezier solvers used as GSAP eases
   useScrollProgress.ts  scroll-linked, damped 0-1 progress
   useDriftingPhoto.ts   the shared frame-drift + picture-zoom parallax
   useRevealOnView.ts    staggered fade-in on first intersection
   useHoverZoom.ts       paired frame/photo hover scale
   artwork.ts            the `Artwork` shape and the petals
-  projects.ts · journal.ts · services.ts   superseded by the collections; phase 6 deletes them
 scripts/
   seed.ts             imports the published site into Payload
   fingerprint.ts      the acceptance gate — see fingerprints/README.md
@@ -125,13 +118,10 @@ interior page opens with `PageMasthead` — the closed-up hero band wrapped arou
 collage below the masthead. `Section` renders the padded band and the 1200px
 column that nine call sites used to write out by hand; `first` marks the section
 that opens a page body, whose leading space the hero above already carries.
-`HeroTop` renders its label as a `<time>` where the page passes
-`subtitleDateTime`, which is how a post's publication date reaches the masthead.
 
-The three route files build their metadata with `pageMetadata`, which fills in
-the matching Open Graph and Twitter cards; a post passes `article` as well, for
-its publication time. The values come from each document's `meta` group —
-`@payloadcms/plugin-seo` on Pages, Projects and Posts, with a `noIndex` checkbox
+The route files build their metadata with `pageMetadata`, which fills in the
+matching Open Graph and Twitter cards. The values come from each document's `meta` group —
+`@payloadcms/plugin-seo` on Pages and Projects, with a `noIndex` checkbox
 appended — so a title is an edit rather than a deploy, and `lib/seo.ts` supplies
 the admin's "auto-generate" fallbacks. Set `NEXT_PUBLIC_SITE_URL` and it becomes
 `metadataBase`, so the share-card image URLs are absolute; leave it unset and no
@@ -140,7 +130,7 @@ host rather than baking a placeholder into every card.
 
 ## Drafts, preview and publishing
 
-Pages, Projects and Posts keep drafts and up to 20 versions each. An unpublished
+Pages and Projects keep drafts and up to 20 versions each. An unpublished
 document 404s for the public and is absent from the API; an editor reaches it
 through the admin's Preview button or the live-preview pane, which load
 `/next/preview` — that route wants both `PAYLOAD_PUBLIC_DRAFT_SECRET` **and** a
@@ -158,13 +148,6 @@ request.
 a Page or touch the Header and Footer, and cannot change their own role; the
 site's own reads are filtered separately in `lib/payload.ts`, because the Local
 API runs as root and an access rule alone would not close the render path.
-
-Each journal card lays its photograph and its plate on the same four-track grid
-row — `1fr 50px 50px 1fr` — with the photograph spanning tracks 1-2 and the plate
-tracks 2-4, so they overlap across the one shared 50px track. The plate rides 25px lower
-and pulls the same amount back off the bottom, leaving the row exactly as tall as
-the taller of the two. Below 767px the grid collapses to one column and the
-photograph takes `order: -9999` to stay on top.
 
 The services grid runs two unequal columns, `1.7fr 1fr`. The opening panel takes
 the wide track, the second takes the narrow one and hangs 80px lower, and the
@@ -193,7 +176,7 @@ All motion runs through [GSAP](https://gsap.com). There are four moves:
 | Scroll parallax | hero collage, story photos, about photos, post hero, service panels | `useScrollProgress` maps the element's travel through the viewport onto 0-1, eases the value toward its target once per `gsap.ticker` frame, and the component lerps transforms from that |
 | Reveal | photos, petals | `useRevealOnView` fades from 0 on first intersection, staggered 200 / 400 / 600 ms |
 | Sprig | every section label | a three-step timeline: tumble in, overshoot, settle level |
-| Hover zoom | portfolio, journal + Instagram tiles | `useHoverZoom` eases the frame in while the photo pushes out |
+| Hover zoom | portfolio + Instagram tiles | `useHoverZoom` eases the frame in while the photo pushes out |
 
 The damping in `useScrollProgress` is expressed the same way the design was
 authored — a 0-100 "smoothing" number, where the per-frame step is `1 - smoothing / 100`.

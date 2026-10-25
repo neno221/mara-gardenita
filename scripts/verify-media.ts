@@ -20,7 +20,7 @@ import { getPayload } from "payload";
 import config from "../payload.config";
 
 const CASES = [
-  { file: "public/images/journal-guest-list-hero.jpg", intrinsic: 1372, expectDistinct: [500, 800, 1080] },
+  { file: "public/images/hero-center.jpg", intrinsic: 908, expectDistinct: [500, 800] },
   // Narrower than two of the three targets: w800 is a real downscale (803 -> 800),
   // w1080 can only clamp back to 803, which duplicates the original.
   { file: "public/images/hero-left.jpg", intrinsic: 803, expectDistinct: [500, 800] },

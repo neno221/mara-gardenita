@@ -39,6 +39,7 @@ export type HeaderProps = {
   logo: Artwork;
   logoAlt: string;
   nav: ResolvedLink[];
+  cta: ResolvedLink | null;
 };
 
 export type FooterProps = {
@@ -72,6 +73,7 @@ export async function getChrome(): Promise<ChromeProps> {
       // `resolveLink` returns null for an unlabelled row, which is how a
       // half-filled nav entry stops the page rather than rendering a blank link.
       nav: header.nav.flatMap((item) => resolveLink(item) ?? []),
+      cta: resolveLink(header.cta),
     },
     footer: {
       instagramHeading: footer.instagramHeading,

@@ -2,7 +2,6 @@ import type { Block } from "payload";
 
 import { Hero } from "./Hero";
 import { InstagramFeed } from "./InstagramFeed";
-import { JournalList } from "./JournalList";
 import { Masthead } from "./Masthead";
 import { PhotoRow } from "./PhotoRow";
 import { PortfolioGrid } from "./PortfolioGrid";
@@ -15,7 +14,7 @@ import { StorySplit } from "./StorySplit";
 import { Testimonials } from "./Testimonials";
 
 /**
- * The block library (spec §6): thirteen blocks, every one available on every
+ * The block library (spec §6): twelve blocks, every one available on every
  * Pages document.
  *
  * That last clause is what makes sections reusable rather than merely
@@ -35,7 +34,6 @@ export const blocks: Block[] = [
   ServicePanels,
   PortfolioGrid,
   PortfolioList,
-  JournalList,
   Testimonials,
   PhotoRow,
   Prose,

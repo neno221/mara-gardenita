@@ -54,9 +54,9 @@ const converters: JSXConvertersFunction = ({ defaultConverters }) => ({
 
     return (
       <figure>
-        {/* No `sizes` hint: both figures in the journal body shipped
-            single-source, and lib/media.ts's first invariant says the caller
-            states that intent rather than inferring it from the pixels. */}
+        {/* No `sizes` hint: a figure in a body ships single-source, and
+            lib/media.ts's first invariant says the caller states that intent
+            rather than inferring it from the pixels. */}
         <img {...toArtwork(media)} loading="lazy" alt={media.alt ?? ""} />
         {media.caption ? <figcaption>{media.caption}</figcaption> : null}
       </figure>

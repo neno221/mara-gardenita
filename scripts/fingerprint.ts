@@ -35,17 +35,12 @@ import { fileURLToPath } from "node:url";
 const REPO = dirname(dirname(fileURLToPath(import.meta.url)));
 const OUT_DIR = join(REPO, "fingerprints");
 
-/** The nine URLs the site actually serves. */
+/** The four URLs the site actually serves. */
 const ROUTES = [
   { id: "home", path: "/" },
   { id: "about", path: "/about" },
   { id: "services", path: "/services" },
   { id: "portfolio", path: "/portfolio" },
-  { id: "blog", path: "/blog" },
-  { id: "post-napkin-fold", path: "/post/napkin-fold-ideas-that-will-elevate-your-table" },
-  { id: "post-guest-list", path: "/post/wedding-guest-list-tool-our-best-kept-secret" },
-  { id: "post-full-service", path: "/post/what-does-a-full-service-wedding-planner-do" },
-  { id: "post-family-affair", path: "/post/a-family-affair-how-to-plan-a-kid-friendly-wedding" },
 ] as const;
 
 /** Desktop, and the narrowest breakpoint. Height is fixed so `vh` units resolve alike. */
