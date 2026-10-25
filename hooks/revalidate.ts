@@ -105,8 +105,6 @@ const detailRoute = (prefix: string) => {
 export const { change: revalidateProject, remove: revalidateProjectDelete } =
   detailRoute("/portfolio");
 
-export const { change: revalidatePost, remove: revalidatePostDelete } = detailRoute("/post");
-
 /** A collection that only ever appears inside someone else's page. */
 export const revalidateSiteWide: CollectionAfterChangeHook = ({ doc }) => {
   revalidateEverything();

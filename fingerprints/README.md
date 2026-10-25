@@ -9,6 +9,13 @@ see [What moved in phase 3](#what-moved-in-phase-3), and decision I in the plan 
 why the gate was moved rather than met. And in phase 4, where all eighteen moved and
 **not one of them moved in geometry** — see [What moved in phase 4](#what-moved-in-phase-4).
 
+**Then cut to eight.** The journal was removed in October 2026, taking `/blog` and the
+four `/post/<slug>` routes — and their ten captures — with it. The same change
+rebuilt the header (wordmark, About, Gallery, Services, then a Contact button), so the
+remaining eight were re-captured. With the `SiteHeader_*` elements set aside, every
+capture matched its predecessor exactly: class sequence, images, boxes and
+`scrollHeight`. The sections below describe the eighteen-capture history as it was.
+
 ```bash
 npm run db:up                       # not needed for the fingerprint, but phase 1 wants it
 npm run dev                         # note the port

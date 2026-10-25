@@ -12,7 +12,6 @@ import { Users } from "./collections/Users";
 import { Media } from "./collections/Media";
 import { Pages } from "./collections/Pages";
 import { Projects } from "./collections/Projects";
-import { Posts } from "./collections/Posts";
 import { Services } from "./collections/Services";
 import { Testimonials } from "./collections/Testimonials";
 import { Instagram } from "./collections/Instagram";
@@ -28,8 +27,8 @@ export default buildConfig({
   },
 
   // Pages is listed first because it is the one collection an editor opens to
-  // change what the site *is*; the other six hold what it is made of.
-  collections: [Pages, Users, Media, Projects, Posts, Services, Testimonials, Instagram],
+  // change what the site *is*; the other five hold what it is made of.
+  collections: [Pages, Users, Media, Projects, Services, Testimonials, Instagram],
 
   // Both rendered by `SiteShell` on every page, which is why they are globals
   // rather than a document someone could delete.
@@ -39,7 +38,7 @@ export default buildConfig({
 
   plugins: [
     /**
-     * SEO on the three collections that have a URL (spec §8).
+     * SEO on the two collections that have a URL (spec §8).
      *
      * It replaces the hand-rolled `meta` group phase 4 put on Pages, and the swap
      * costs nothing in the database: the plugin names its fields `meta.title` and
@@ -52,7 +51,7 @@ export default buildConfig({
      * three scrolls away, and the spec asks for it per document.
      */
     seoPlugin({
-      collections: ["pages", "projects", "posts"],
+      collections: ["pages", "projects"],
       uploadsCollection: "media",
       generateTitle,
       generateDescription,

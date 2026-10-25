@@ -3,22 +3,21 @@
  *
  *   npm run payload -- run scripts/seed.ts            # import what is missing
  *   npm run payload -- run scripts/seed.ts --force    # overwrite what is there
- *   npm run payload -- run scripts/seed.ts --only=posts
+ *   npm run payload -- run scripts/seed.ts --only=projects
  *
  * **Every string is copied verbatim** (decision B). No placeholder scheme, no
  * find-and-replace: lorem in the CMS has to render identically to lorem in the
  * code, or the fingerprint diff stops measuring the migration and starts
  * measuring the copy edit. The two exceptions are stated where they happen — the
- * testimonials' typed quotation marks move to the component, and the journal's
- * paired `date`/`published` strings collapse into one timestamp.
+ * testimonials' typed quotation marks move to the component.
  *
  * **Existing documents are skipped, not updated.** Decision C makes this Docker
  * volume the only copy of every edit anyone makes, so a seed that silently
  * rewrote a document an editor had touched would be a data-loss bug wearing the
  * word "idempotent". `--force` overwrites, and says so in the tally.
  *
- * The `lib/` modules the constants below are transcribed from — `projects.ts`,
- * `journal.ts` and `services.ts` — were deleted in phase 6 once nothing rendered
+ * The `lib/` modules the constants below are transcribed from — `projects.ts`
+ * and `services.ts` — were deleted in phase 6 once nothing rendered
  * from them. The attributions are kept as provenance: this file is now the only
  * record of what the hardcoded site said, and re-running it against an empty
  * database is what reproduces it.
@@ -29,7 +28,7 @@ import { fileURLToPath } from "node:url";
 import { getPayload, type Payload, type Where } from "payload";
 import config from "../payload.config";
 import type { Media } from "../payload-types";
-import { bulletList, editorState, figure, heading, paragraph, quote } from "../lib/lexical";
+import { editorState, paragraph } from "../lib/lexical";
 
 const REPO = dirname(dirname(fileURLToPath(import.meta.url)));
 const IMAGES = join(REPO, "public", "images");
@@ -60,18 +59,6 @@ function categoryOf(filename: string): Media["category"] {
 }
 
 /**
- * The one caption in the library.
- *
- * §1.3: the spec calls Media's `caption` "optional, unused by current
- * components". It is neither — it is the `<figcaption>` under the second figure
- * in the journal body, and `components/RichText`'s upload converter reads it.
- */
-const CAPTIONS: Record<string, string> = {
-  "journal-post-figure-two.jpg":
-    "Aenean massa. Cum sociis natoque penatibus et magnis dis parturient",
-};
-
-/**
  * Uploads every original in `public/images` and returns the library by filename.
  *
  * Every file, not only the photographs the five collections reference: the press
@@ -82,8 +69,8 @@ const CAPTIONS: Record<string, string> = {
  * derivatives and no rasterisation.
  *
  * `alt` is empty on every document. The site's components already supply their
- * own alt text where they have any — `alt={project.name}` on a portfolio card,
- * `alt={post.title}` on a journal plate — and the rest are decorative by design.
+ * own alt text where they have any — `alt={project.name}` on a portfolio card —
+ * and the rest are decorative by design.
  * A generated alt here would be worse than none: invented, and rendered.
  */
 async function seedMedia(payload: Payload): Promise<Map<string, Media>> {
@@ -103,7 +90,6 @@ async function seedMedia(payload: Payload): Promise<Map<string, Media>> {
   for (const filename of files) {
     const data = {
       alt: "",
-      caption: CAPTIONS[filename],
       category: categoryOf(filename),
     };
 
@@ -149,7 +135,7 @@ function mediaId(library: Map<string, Media>, filename: string): number {
   return doc.id;
 }
 
-type ContentSlug = "pages" | "projects" | "posts" | "services" | "testimonials" | "instagram";
+type ContentSlug = "pages" | "projects" | "services" | "testimonials" | "instagram";
 
 /**
  * Creates a document unless one already answers to `where`.
@@ -320,104 +306,6 @@ const PROJECTS = [
 ] as const;
 
 /**
- * `lib/journal.ts`, with `date` and `published` collapsed into one timestamp.
- *
- * Midnight UTC, and `JournalCard` formats it in UTC too. A local-timezone render
- * of `2021-08-07T00:00:00Z` west of Greenwich prints "August 6".
- *
- * The first excerpt ends with a trailing space. That is in the template.
- */
-const POSTS = [
-  {
-    slug: "napkin-fold-ideas-that-will-elevate-your-table",
-    title: "Napkin fold ideas that will elevate your table",
-    published: "2021-08-07T00:00:00.000Z",
-    excerpt:
-      "Enim cursus posuere id commodo, et euismod lacus, aliquet quam. Dui eget suscipit nibh morbi. Bibendum congue cursus in nibh facilisis nulla mauris. ",
-    card: "journal-napkin-fold-card.jpg",
-    hero: "journal-napkin-fold-hero.jpg",
-  },
-  {
-    slug: "wedding-guest-list-tool-our-best-kept-secret",
-    title: "Wedding guest list tool: Our best kept secret",
-    published: "2021-08-07T00:00:00.000Z",
-    excerpt:
-      "Urna diam non, consectetur imperdiet magna. Consequat orci luctus sagittis in. Id pellentesque nunc, viverra fringilla. Augue euismod et pulvinar.",
-    card: "journal-guest-list-card.jpg",
-    hero: "journal-guest-list-hero.jpg",
-  },
-  {
-    slug: "what-does-a-full-service-wedding-planner-do",
-    title: "What does a full service wedding planner do?",
-    published: "2021-08-13T00:00:00.000Z",
-    excerpt:
-      "At varius mattis scelerisque erat a blandit. Metus senectus habitant consequat sed amet mi duis viverra egestas. Id potenti proin turpis in.",
-    card: "journal-full-service-card.jpg",
-    hero: "journal-full-service-hero.jpg",
-  },
-  {
-    slug: "a-family-affair-how-to-plan-a-kid-friendly-wedding",
-    title: "A Family Affair: how to plan a kid friendly wedding",
-    published: "2021-08-07T00:00:00.000Z",
-    excerpt:
-      "Euismod ornare elit neque sollicitudin vitae sapien sed consequat. Porttitor eu, bibendum congue convallis congue facilisis pretium sed. Sit diam sed.",
-    card: "journal-family-affair-card.jpg",
-    hero: "journal-family-affair-hero.jpg",
-  },
-] as const;
-
-/**
- * The journal body, converted once and planted on all four posts (§1.3).
- *
- * `JournalPost.tsx` renders this same markup for every post — the spec's
- * "convert the journal post bodies into Lexical" is converting one body. Each
- * paragraph below is a JSX text run with its newlines collapsed to single
- * spaces, which is what the browser receives today.
- *
- * The figure node ids are derived from the filename rather than random, so that
- * re-running the seed produces byte-identical JSON.
- */
-function journalBody(library: Map<string, Media>) {
-  return editorState([
-    paragraph(
-      "Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae.",
-    ),
-    heading("h3", "Aenean vulputate eleifend"),
-    paragraph(
-      "Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Donec pede justo, fringilla sociis natoque penatibus",
-    ),
-    figure(mediaId(library, "journal-post-figure-one.jpg"), "figure-one"),
-    paragraph(
-      "Convallis dictum consequat amet ut et sed. Praesent netus id in vitae tristique id. Vitae diam ut adipiscing elit nunc vulputate. Adipiscing cras rutrum amet ultrices nibh duis. Sed velit euismod quis mollis. A dignissim a in aliquam pretium, accumsan.",
-    ),
-    heading("h3", "Nulla consequat massa quis enim"),
-    paragraph(
-      "Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc.",
-    ),
-    quote(
-      "“Etiam lectus bibendum nam tortor, est posuere. Mauris tempus eget tempor nunc ultricies. Sem morbi volutpat.”",
-    ),
-    paragraph(
-      "At hendrerit id mattis ut arcu, sociis ridiculus. Cras tempor, ante nunc, magna enim lectus. Ultrices consectetur eget lorem vitae sodales. Aliquet ipsum morbi proin blandit risus sagittis, enim. Risus ipsum, consectetur ultrices turpis sit in. Mauris id elementum odio lectus at netus amet. Aliquet non egestas massa, a, sit morbi tempor tortor, convallis. Lectus orci nunc diam arcu etiam pharetra mattis viverra gravida.",
-    ),
-    figure(mediaId(library, "journal-post-figure-two.jpg"), "figure-two"),
-    heading("h3", "Aliquam lorem ante, dapibus"),
-    paragraph(
-      "Praesent placerat proin metus enim elementum, ultrices quis ut. Vehicula urna, scelerisque magnis nisi magna elit. Nulla etiam quisque sed suspendisse accumsan",
-    ),
-    bulletList([
-      "In enim justo, rhoncus ut, imperdiet a, venenatis vitae.",
-      "Nullam dictum felis eu pede mollis pretium.",
-      "Integer tincidunt. Cras dapibus.",
-      "Vivamus elementum semper nisi eleifend tellus",
-    ]),
-    paragraph(
-      "Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim.",
-    ),
-  ]);
-}
-
-/**
  * Six tiles, a day apart, so `-addedAt` prints `instagram-1` … `instagram-6`.
  *
  * The dates are fixed rather than relative to now: a seed whose sort key depends
@@ -558,29 +446,6 @@ if (wants("projects")) {
   console.log(`  projects        ${PROJECTS.length}`);
 }
 
-if (wants("posts")) {
-  const body = journalBody(library);
-  for (const [index, post] of POSTS.entries()) {
-    await upsert(
-      payload,
-      "posts",
-      { slug: { equals: post.slug } },
-      {
-        title: post.title,
-        slug: post.slug,
-        published: post.published,
-        excerpt: post.excerpt,
-        card: mediaId(library, post.card),
-        hero: mediaId(library, post.hero),
-        body,
-        order: index,
-        _status: "published",
-      },
-    );
-  }
-  console.log(`  posts           ${POSTS.length}  (one body, planted four times)`);
-}
-
 if (wants("instagram")) {
   for (let tile = 1; tile <= 6; tile++) {
     const image = mediaId(library, `instagram-${tile}.jpg`);
@@ -714,21 +579,6 @@ if (wants("pages")) {
     ],
   });
 
-  await upsertPage(payload, "blog", {
-    title: "Journal",
-    slug: "blog",
-    _status: "published",
-    meta: {
-      title: "Journal — Loovio",
-      description:
-        "Notes from the Loovio studio on planning, styling and hosting a wedding worth remembering.",
-    },
-    layout: [
-      { blockType: "masthead", eyebrow: "Blog", heading: "Journal" },
-      { blockType: "journalList", mode: "latest" },
-    ],
-  });
-
   // Decision A's new page. The hero's "Book A Consult" has pointed at /contact
   // since the template shipped; this is the first time the link resolves.
   const contact = await upsertPage(payload, "contact", {
@@ -802,11 +652,11 @@ if (wants("pages")) {
     ],
   });
 
-  // Six, not the plan's seven. Spec §5 seeds "home, about, services, portfolio,
-  // blog, and a new contact" — its six already include the page decision A adds,
-  // so the plan double-counts it. What decision A really adds beyond the spec is
-  // the /portfolio/<slug> route, and that is not a Pages document.
-  console.log("  pages           6  (the five without a page CTA, then home)");
+  // Spec §5 seeded six — "home, about, services, portfolio, blog, and a new
+  // contact". The journal went later, `blog` with it, which leaves five. What
+  // decision A adds beyond the spec is the /portfolio/<slug> route, and that is
+  // not a Pages document.
+  console.log("  pages           5  (the four without a page CTA, then home)");
 }
 
 if (wants("globals")) {
@@ -828,14 +678,14 @@ if (wants("globals")) {
       slug: "header",
       data: {
         logo,
-        // Split around the wordmark at its midpoint: two left, two right, as
-        // `SiteHeader` printed them.
+        // Read left to right after the wordmark. The portfolio is "Gallery" in
+        // the bar; the page and its URL keep their own name.
         nav: [
-          navItem("Portfolio", "portfolio"),
           navItem("About", "about"),
-          navItem("Journal", "blog"),
+          navItem("Gallery", "portfolio"),
           navItem("Services", "services"),
         ],
+        cta: navItem("Contact", "contact"),
       },
     });
     if (header.nav?.length) replaced++;

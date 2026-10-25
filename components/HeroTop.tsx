@@ -7,8 +7,6 @@ import buttons from "./buttons.module.css";
 
 type HeroTopProps = {
   subtitle: string;
-  /** Set where the label is a publication date, so it renders as a `<time>`. */
-  subtitleDateTime?: string;
   heading: string;
   /** A lede under the headline, where the page opens on prose rather than a link. */
   lede?: string;
@@ -24,7 +22,6 @@ type HeroTopProps = {
  */
 export function HeroTop({
   subtitle,
-  subtitleDateTime,
   heading,
   lede,
   cta,
@@ -34,16 +31,10 @@ export function HeroTop({
     <div className={styles.heroTop}>
       <div className={styles.borderTop} />
       <Sprig className={section.sprig} />
-      {subtitleDateTime ? (
-        <time className={section.subtitle} dateTime={subtitleDateTime}>
-          {subtitle}
-        </time>
-      ) : (
-        <div className={section.subtitle}>
-          {subtitle}
-          <br />
-        </div>
-      )}
+      <div className={section.subtitle}>
+        {subtitle}
+        <br />
+      </div>
       <h1 className={styles.headingHero}>{heading}</h1>
       {lede && <p className={`${section.paragraph} ${section.paragraphTight}`}>{lede}</p>}
       {cta && (

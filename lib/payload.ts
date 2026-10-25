@@ -13,7 +13,6 @@ import type {
   Header,
   Instagram,
   Page,
-  Post,
   Project,
   Service,
   Testimonial,
@@ -59,16 +58,16 @@ const PUBLISHED = { _status: { equals: "published" } };
  *
  * It is read here rather than passed down from each route because a page renders
  * a tree of blocks that each fetch their own content — `portfolioList` queries
- * projects, `journalList` queries posts — and threading a flag through all of
+ * projects — and threading a flag through all of
  * them would mean every future block had to remember to.
  *
  * **It throws outside a request, and that is the interesting case.** The same
- * `getProjects` and `getPosts` that render a page also feed the two detail
- * routes' `generateStaticParams`, which Next runs at build time with no HTTP
+ * `getProjects` that renders a page also feeds the detail route's
+ * `generateStaticParams`, which Next runs at build time with no HTTP
  * request to read a cookie from. There is no preview at build time — nobody is
  * signed in and nothing is being previewed — so the honest answer there is
  * `false`, and catching is how you get it. Letting it throw would mean the
- * static params of two routes depended on a cookie that cannot exist.
+ * static params of a route depended on a cookie that cannot exist.
  */
 async function isDraft(): Promise<boolean> {
   try {
@@ -117,34 +116,6 @@ export async function getTestimonials(): Promise<Testimonial[]> {
   const client = await getClient();
   const { docs } = await client.find({ collection: "testimonials", limit: 20, depth: DEPTH });
   return docs;
-}
-
-/** The journal index, in the order `/blog` prints — which is not date order. */
-export async function getPosts(): Promise<Post[]> {
-  const client = await getClient();
-  const { where, draft } = await visibility();
-  const { docs } = await client.find({
-    collection: "posts",
-    where,
-    draft,
-    limit: 100,
-    depth: DEPTH,
-  });
-  return docs;
-}
-
-/** One post, or null. `null` rather than a throw: an unknown slug is a 404. */
-export async function getPost(slug: string): Promise<Post | null> {
-  const client = await getClient();
-  const { where, draft } = await visibility();
-  const { docs } = await client.find({
-    collection: "posts",
-    where: { ...where, slug: { equals: slug } },
-    draft,
-    limit: 1,
-    depth: DEPTH,
-  });
-  return docs[0] ?? null;
 }
 
 /** The footer's feed, newest first. `-addedAt` is the collection's default sort. */
@@ -220,10 +191,10 @@ export async function getPageSlugs(): Promise<string[]> {
  * worth it being cheap.
  */
 export async function getSitemapEntries(): Promise<
-  { collection: "pages" | "projects" | "posts"; slug: string; updatedAt: string }[]
+  { collection: "pages" | "projects"; slug: string; updatedAt: string }[]
 > {
   const client = await getClient();
-  const collections = ["pages", "projects", "posts"] as const;
+  const collections = ["pages", "projects"] as const;
 
   const results = await Promise.all(
     collections.map(async (collection) => {

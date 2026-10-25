@@ -6,7 +6,7 @@ import { getSitemapEntries } from "@/lib/payload";
 /**
  * Every published URL on the site (spec §8). There was none before phase 5.
  *
- * Generated from the three collections that have a URL, skipping anything with
+ * Generated from the two collections that have a URL, skipping anything with
  * `meta.noIndex` — a document that asks not to be indexed should not be listed
  * in the file whose entire purpose is to get it indexed. `robots.ts` points here.
  *
@@ -20,12 +20,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const entries = await getSitemapEntries();
 
   return entries.map(({ collection, slug, updatedAt }) => {
-    const path =
-      collection === "pages"
-        ? pathFor(slug)
-        : collection === "projects"
-          ? `/portfolio/${slug}`
-          : `/post/${slug}`;
+    const path = collection === "pages" ? pathFor(slug) : `/portfolio/${slug}`;
 
     return {
       url: `${base}${path}`,

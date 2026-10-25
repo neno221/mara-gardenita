@@ -23,12 +23,11 @@
  * The path a document is previewed at.
  *
  * Pages resolve through `pathFor` so `home` previews at `/` like it serves at
- * `/`; the two detail collections have fixed prefixes.
+ * `/`; projects have a fixed prefix.
  */
 export function previewPath(collection: string, slug: string): string {
   if (collection === "pages") return slug === "home" ? "/" : `/${slug}`;
   if (collection === "projects") return `/portfolio/${slug}`;
-  if (collection === "posts") return `/post/${slug}`;
   throw new Error(`${collection} has no public URL, so it cannot be previewed.`);
 }
 

@@ -18,8 +18,6 @@ type PageMetadata = {
   image?: Upload;
   /** Emits `robots: noindex`. The checkbox `plugin-seo` does not ship. */
   noIndex?: boolean | null;
-  /** Set on a journal post, which shares as an article rather than a page. */
-  article?: { publishedTime: string };
 };
 
 /**
@@ -37,7 +35,6 @@ export function pageMetadata({
   description,
   image,
   noIndex,
-  article,
 }: PageMetadata): Metadata {
   const src = asMedia(image)?.url ?? undefined;
   const images = src ? [src] : undefined;
@@ -47,7 +44,7 @@ export function pageMetadata({
     ...(description ? { description } : {}),
     ...(noIndex ? { robots: { index: false, follow: false } } : {}),
     openGraph: {
-      ...(article ? { type: "article", publishedTime: article.publishedTime } : { type: "website" }),
+      type: "website",
       title,
       ...(description ? { description } : {}),
       ...(images ? { images } : {}),

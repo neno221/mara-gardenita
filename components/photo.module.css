@@ -1,8 +1,7 @@
 /*
  * The framed photograph. `.frame` is the clip the picture drifts and zooms
- * inside of, used by the about tiles, the story splits, the service panels, a
- * post's hero plate, and — through `composes` — the journal card. `.fill` is
- * the picture itself, which the two card grids and the hero collage share too.
+ * inside of, used by the about tiles, the story splits, the service panels and
+ * a project's plate. `.fill` is the picture itself, which the two card grids and the hero collage share too.
  * The preload colour stands in until the photograph decodes.
  */
 .frame {
